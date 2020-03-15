@@ -25,7 +25,7 @@
 
 #include <time.h>
 
-#define DEBUG_PKG_DIS
+#undef DEBUG_PKG_DIS
 #define DEBUG_PKG
 #ifdef DEBUG_PKG
 #	include "NewtPrint.h"
@@ -369,16 +369,16 @@ newtRef PkgWriteFrame(pkg_stream_t *pkg, newtRefArg frame)
     // recursively add all arrays making up the map
     map = NewtFrameMap(frame);
     map_pos = PkgWriteObject(pkg, map);
-    PkgWriteU32(pkg, dst+8, map_pos);
+    PkgWriteU32(pkg, dst+8, (uint32_t)map_pos);
     
     // now add all slots and fill in the rest of our chunk
     for (i=0; i<n; i++) {
         slot = NewtGetFrameSlot(frame, i);
         slot_pos = PkgWriteObject(pkg, slot);
-        PkgWriteU32(pkg, dst+12+4*i, slot_pos);
+        PkgWriteU32(pkg, dst+12+4*i, (uint32_t)slot_pos);
     }
     
-    return NewtMakePointer(dst);
+    return NewtMakePointer((void*)(uintptr_t)dst);
 }
 
 /*------------------------------------------------------------------------*/
@@ -408,16 +408,16 @@ newtRef PkgWriteArray(pkg_stream_t *pkg, newtRefArg array)
     // add the class information
     klass = NcClassOf(array);
     klass_pos = PkgWriteObject(pkg, klass);
-    PkgWriteU32(pkg, dst+8, klass_pos);
+    PkgWriteU32(pkg, dst+8, (uint32_t)klass_pos);
     
     // now add all slots and fill in the rest of our chunk
     for (i=0; i<n; i++) {
         slot = NewtGetArraySlot(array, i);
         slot_pos = PkgWriteObject(pkg, slot);
-        PkgWriteU32(pkg, dst+12+4*i, slot_pos);
+        PkgWriteU32(pkg, dst+12+4*i, (uint32_t)slot_pos);
     }
     
-    return NewtMakePointer(dst);
+    return NewtMakePointer((void*)(uintptr_t)dst);
 }
 
 /*------------------------------------------------------------------------*/
@@ -445,10 +445,10 @@ newtRef PkgWriteBinary(pkg_stream_t *pkg, newtRefArg obj)
     } else if (NewtRefIsString(obj)) {
 #		ifdef HAVE_LIBICONV
         size_t buflen;
-        char *buf = NewtIconv(pkg->to_utf16, data, size, &buflen);
+        char *buf = NewtIconv(pkg->to_utf16, (char*)data, size, &buflen);
         if (buf) {
-            size = buflen;
-            data = buf;
+            size = (uint32_t)buflen;
+            data = (uint8_t*)buf;
         }
 #		endif /* HAVE_LIBICONV */
     }
@@ -464,13 +464,13 @@ newtRef PkgWriteBinary(pkg_stream_t *pkg, newtRefArg obj)
         PkgWriteU32(pkg, dst+8, kNewtSymbolClass);
         PkgWriteU32(pkg, dst+12, NewtRefToHash(obj)); // make sure the hash has the right endianness
         PkgWriteData(pkg, dst+16, (uint8_t*)NewtSymbolGetName(obj), size-16);
-        return NewtMakePointer(dst);
+        return NewtMakePointer((void*)(uintptr_t)dst);
     }
     
     // add the class information
     klass = NcClassOf(obj);
     klass_ref = PkgWriteObject(pkg, klass);
-    PkgWriteU32(pkg, dst+8, klass_ref);
+    PkgWriteU32(pkg, dst+8, (uint32_t)klass_ref);
     
     // copy the binary data over
     if (klass==NSSYM0(real)) {
@@ -482,7 +482,7 @@ newtRef PkgWriteBinary(pkg_stream_t *pkg, newtRefArg obj)
         PkgWriteData(pkg, dst+12, data, size-12);
     }
     
-    return NewtMakePointer(dst);
+    return NewtMakePointer((void*)(uintptr_t)dst);
 }
 
 /*------------------------------------------------------------------------*/
@@ -495,10 +495,10 @@ newtRef PkgWriteBinary(pkg_stream_t *pkg, newtRefArg obj)
  */
 newtRef PkgWriteObject(pkg_stream_t *pkg, newtRefArg obj)
 {
-    uint32_t dst = pkg->size;
+    newtRef dst = pkg->size;
     newtRef prec;
     
-    // FIXME add handling named magic pointers here
+    // FIXME: add handling named magic pointers here
     if (NewtRefIsImmediate(obj)) {
         // immediates have the same form in memory as in packages
         // immediates include magic pointers
@@ -563,7 +563,7 @@ void PkgWritePart(pkg_stream_t *pkg, newtRefArg part)
     PkgWriteU32(pkg, dst,    0x00001041);
     PkgWriteU32(pkg, dst+4,  0x00000000);
     PkgWriteU32(pkg, dst+8,  0x00000002);
-    PkgWriteU32(pkg, dst+12, PkgWriteObject(pkg, data));
+    PkgWriteU32(pkg, dst+12, (uint32_t)PkgWriteObject(pkg, data));
     
     NewtSetLength(pkg->precedents, 0);
     NewtSetLength(pkg->instances, 0);
@@ -780,7 +780,7 @@ newtRef PkgReadRef(pkg_stream_t *pkg, uint32_t p_obj)
             result = ref; 
             break;
         case 3: // magic pointer
-            // FIXME we must implement special code for name magic pointers here!
+            // FIXME: we must implement special code for named magic pointers here!
             result = ref; // already a correct magic pointer
             break;
     }
@@ -832,6 +832,8 @@ newtRef PkgReadBinaryObject(pkg_stream_t *pkg, uint32_t p_obj)
     } else if (klass==NSSYM0(bits)) {
         result = NewtMakeBinary(klass, pkg->data + p_obj + 12, size-12, true);
     } else if (klass==NSSYM0(cbits)) {
+        result = NewtMakeBinary(klass, pkg->data + p_obj + 12, size-12, true);
+    } else if (klass==NSSYM(mask)) {
         result = NewtMakeBinary(klass, pkg->data + p_obj + 12, size-12, true);
     } else if (klass==NSSYM0(nativeModule)) {
         result = NewtMakeBinary(klass, pkg->data + p_obj + 12, size-12, true);

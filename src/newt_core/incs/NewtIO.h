@@ -29,7 +29,7 @@
 /// 入出力ストリーム
 typedef struct {
     FILE *		file;		///< ファイルポインタ
-	newtRefVar	obj;		///< オブジェクト
+    newtRefVar	obj;		///< オブジェクト
 } newtStream_t;
 
 

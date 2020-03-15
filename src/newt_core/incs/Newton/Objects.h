@@ -34,7 +34,7 @@ typedef newtRefArg				RefArg;
 #define	NILREF					kNewtRefNIL
 #define	TRUEREF					kNewtRefTRUE
 #define	FALSEREF				NILREF
-#define	INVALIDPTRREF			NewtMakeInt30(0)
+#define	INVALIDPTRREF			NewtMakeInt62(0)
 
 // 残りは未実装、定義すること
 

@@ -2618,7 +2618,7 @@ void is_push_constant(int16_t b)
         if (8191 < n)
         {	// 負の数
             n |= 0xFFFFC000;
-            r = NewtMakeInt30(r);
+            r = NewtMakeInt62(r);
         }
     }
     else

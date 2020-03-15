@@ -21,11 +21,11 @@
 /* マクロ */
 
 // Instruction Code
-#define kNBCFieldMask				0x07		///< バイトコードフィールドのマスク
+static const uint8_t kNBCFieldMask	= 0x07; ///< Bytecode field mask
 
-#define	kNBCInstructionsLen			26			///< 命令セットテーブルの長さ
-#define	kNBCSimpleInstructionsLen	8			///< シンプル命令セットテーブルの長さ
-#define	kBCFuncsLen					25			///< 関数テーブルの長さ
+static const uint8_t kNBCInstructionsLen = 26; ///< Instruction set table length
+static const uint16_t kNBCSimpleInstructionsLen = 8; ///< Length of simple instruction set table
+static const uint16_t kBCFuncsLen = 25; ///< Function table length
 
 
 /* 定数 */

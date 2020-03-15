@@ -1,7 +1,7 @@
 /*------------------------------------------------------------------------*/
 /**
  * @file	endian_utils.c
- * @brief   エンディアン・ユーティリティ
+ * @brief   Endian utility
  *
  * @author  M.Nukui
  * @date	2005-06-04
@@ -36,13 +36,13 @@
 
 double swapd(double d)
 {
-	uint64_t	tmp = 0;
+    uint64_t	tmp = 0;
 
     memcpy(&tmp, &d, sizeof(d));
-	tmp = (tmp >> 32) | (tmp << 32);
-	tmp = ((tmp & ULL(0xff00ff00ff00ff00)) >> 8) | ((tmp & ULL(0x00ff00ff00ff00ff)) << 8);
-	tmp = ((tmp & ULL(0xffff0000ffff0000)) >> 16) | ((tmp & ULL(0x0000ffff0000ffff)) << 16);
+    tmp = (tmp >> 32) | (tmp << 32);
+    tmp = ((tmp & ULL(0xff00ff00ff00ff00)) >> 8) | ((tmp & ULL(0x00ff00ff00ff00ff)) << 8);
+    tmp = ((tmp & ULL(0xffff0000ffff0000)) >> 16) | ((tmp & ULL(0x0000ffff0000ffff)) << 16);
     memcpy(&d, &tmp, sizeof(d));
 
-	return d;
+    return d;
 }

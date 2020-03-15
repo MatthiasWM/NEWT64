@@ -23,10 +23,16 @@
 //#define NOBJ_ADDR_SHIFT		2
 #define NOBJ_ADDR_SHIFT		0
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#define NewtRefIsInt30(r)			((r & 3) == 0)						///< 30bit整数オブジェクトか？
-#define	NewtRefToInt30(r)			(int32_t)((int32_t)r >> 2)			///< オブジェクトを 30bit整数に変換
-#define	NewtMakeInt30(v)			(newtRef)((int32_t)(v) << 2)		///< 30bit整数オブジェクトを作成
+static inline bool
+    NewtRefIsInt62(newtRefArg r)    { return ((r & 3) == 0); } ///< 30bit整数オブジェクトか？
+static inline int64_t
+    NewtRefToInt62(newtRefArg r)    { return ((int64_t)r) >> 2; }///< オブジェクトを 30bit整数に変換
+static inline newtRef
+    NewtMakeInt62(int64_t v)        { return (newtRef)(v << 2); } ///< 30bit整数オブジェクトを作成
 
 #define	NewtRefIsPointer(r)			((r & 3) == 1)						///< ポインタオブジェクトか？
 #define	NewtRefToPointer(r)			(newtObjRef)((uintptr_t)r - 1)		///< オブジェクト参照をポインタに変換
@@ -100,10 +106,10 @@
 /* 定数 */
 
 enum {
-	kNewtNotFunction			= 0,
-	kNewtCodeBlock,						// バイトコード関数
-	kNewtNativeFn,						// ネイティブ関数（rcvrなし、old style）
-	kNewtNativeFunc						// ネイティブ関数（rcvrあり、new style）
+    kNewtNotFunction			= 0,
+    kNewtCodeBlock,						// バイトコード関数
+    kNewtNativeFn,						// ネイティブ関数（rcvrなし、old style）
+    kNewtNativeFunc						// ネイティブ関数（rcvrあり、new style）
 };
 
 
@@ -114,11 +120,6 @@ typedef void(*newt_install_t)(void);
 
 
 /* 関数プロトタイプ */
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 
 uint32_t	NewtSymbolHashFunction(const char * name);
 newtRef		NewtLookupSymbol(newtRefArg r, const char * name, uint32_t hash, int32_t st);
@@ -142,7 +143,7 @@ bool		NewtRefIsSymbol(newtRefArg r);
 uint32_t	NewtRefToHash(newtRefArg r);
 bool		NewtRefIsString(newtRefArg r);
 bool		NewtRefIsInteger(newtRefArg r);
-int32_t		NewtRefToInteger(newtRefArg r);
+int64_t		NewtRefToInteger(newtRefArg r);
 bool		NewtRefIsInt32(newtRefArg r);
 bool		NewtRefIsReal(newtRefArg r);
 double		NewtRefToReal(newtRefArg r);
@@ -167,7 +168,7 @@ newtRef		NewtMakeString(const char *s, bool literal);
 newtRef		NewtMakeString2(const char *s, uint32_t len, bool literal);
 newtRef		NewtBinarySetLength(newtRefArg r, uint32_t n);
 newtRef		NewtStringSetLength(newtRefArg r, uint32_t n);
-newtRef		NewtMakeInteger(int32_t v);
+newtRef		NewtMakeInteger(int64_t v);
 newtRef		NewtMakeInt32(int32_t v);
 newtRef		NewtMakeReal(double v);
 newtRef		NewtMakeArray(newtRefArg klass, uint32_t n);

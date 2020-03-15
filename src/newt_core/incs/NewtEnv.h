@@ -80,15 +80,15 @@ typedef struct {
     newtRefVar	named_mps;		///< 名前付マジックポインタテーブル
 #endif /* __NAMED_MAGIC_POINTER__ */
 
-	// メモリ関係
+    // メモリ関係
     newtPool	pool;			///< メモリプール
     bool		sweep;			///< 現在の sweep 状態（トグルする）
     bool		needgc;			///< GC が必要
 
-	/// モード
-	struct {
-		bool	nos2;			///< NOS2 コンパチブル
-	} mode;
+    /// モード
+    struct {
+        bool	nos2;			///< NOS2 コンパチブル
+    } mode;
 
     // デバッグ
     bool		_debug;			///< デバッグフラグ
@@ -96,9 +96,9 @@ typedef struct {
     bool		_dumpLex;		///< 字句解析ダンプフラグ
     bool		_dumpSyntax;	///< 構文木ダンプフラグ
     bool		_dumpBC;		///< バイトコードダンプフラグ
-	int32_t		_indent;		///< number of tabs for indenting a printout
-	int32_t		_indentDepth;	///< base for calculating the indent depth
-	int32_t		_printBinaries;	///< print binary objects so that they can be regenerated from the printout
+    int32_t		_indent;		///< number of tabs for indenting a printout
+    int32_t		_indentDepth;	///< base for calculating the indent depth
+    int32_t		_printBinaries;	///< print binary objects so that they can be regenerated from the printout
 } newt_env_t;
 
 
@@ -121,7 +121,7 @@ typedef struct {
 
     // native function
 
-	/// function
+    /// function
     struct {
         newtRefVar	native0;		///< function.native0 （rcvrなし）
         newtRefVar	native;			///< function.native （rcvrあり）
@@ -147,7 +147,7 @@ typedef struct {
     newtRefVar	collect;			///< collect
     newtRefVar	deeply;				///< deeply
 
-    // class	
+    // class
     newtRefVar	__char;				///< char
     newtRefVar	boolean;			///< boolean
     newtRefVar	weird_immediate;	///< weird_immediate
@@ -158,8 +158,8 @@ typedef struct {
     newtRefVar	hasVar;				///< hasVar
     newtRefVar	defGlobalFn;		///< defGlobalFn
     newtRefVar	defGlobalVar;		///< defGlobalVar
-//    newtRefVar	and;				///< and
-//    newtRefVar	or;					///< or
+    //    newtRefVar	and;				///< and
+    //    newtRefVar	or;					///< or
     newtRefVar	mod;				///< mod
     newtRefVar	shiftLeft;			///< <<
     newtRefVar	shiftRight;			///< >>
@@ -169,14 +169,14 @@ typedef struct {
 
     // exception frame
 
-	/// type
+    /// type
     struct {
         newtRefVar	ref;			///< type.ref
     } type;
 
-	/// ext
+    /// ext
     struct {
-		/// ext.ex
+        /// ext.ex
         struct {
             newtRefVar	msg;		///< ext.ex.msg
         } ex;
@@ -211,20 +211,20 @@ typedef struct {
     newtRefVar	pattern;			///< pattern
     newtRefVar	option;				///< option
 
-	// for require
+    // for require
     newtRefVar	requires;			///< requires
 
-	// ENV
+    // ENV
     newtRefVar	_ENV_;				///< _ENV_
     newtRefVar	NEWTLIB;			///< NEWTLIB
 
-	// ARGV
+    // ARGV
     newtRefVar	_ARGV_;				///< _ARGV_
-	newtRefVar  _EXEDIR_;			///< _EXEDIR_
+    newtRefVar  _EXEDIR_;			///< _EXEDIR_
 
-	// stdout, stderr
-	newtRefVar  _STDOUT_;			///< _STDOUT_
-	newtRefVar  _STDERR_;			///< _STDERR_
+    // stdout, stderr
+    newtRefVar  _STDOUT_;			///< _STDOUT_
+    newtRefVar  _STDERR_;			///< _STDERR_
 } newt_sym_t;
 
 

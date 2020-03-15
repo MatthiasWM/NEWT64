@@ -17,19 +17,19 @@
 
 /*
 
-関数ネーミングルール
+ 関数ネーミングルール
 
-  Ns******	NewtonScript ネイティブコード（第一引数に rcvr あり、スクリプトから使用）
-  Nc******	NewtonScript ネイティブコード（第一引数に rcvr なし、C言語から使用）
-  NVM*****	VM関連
-  NPS*****	パーサー関連
-  NSOF*****	NSOF関連
-  Newt*****	オブジェクト関連、その他
+ Ns******	NewtonScript ネイティブコード（第一引数に rcvr あり、スクリプトから使用）
+ Nc******	NewtonScript ネイティブコード（第一引数に rcvr なし、C言語から使用）
+ NVM*****	VM関連
+ NPS*****	パーサー関連
+ NSOF*****	NSOF関連
+ Newt*****	オブジェクト関連、その他
 
-使わないように：(OBSOLETE)
-  NS******	Cocoa APIs
+ 使わないように：(OBSOLETE)
+ NS******	Cocoa APIs
 
-*/
+ */
 
 
 /* ヘッダファイル */
@@ -118,7 +118,7 @@ newtRef		NcStringer(newtRefArg r);								// bytecode
 newtRef		NsStrCat(newtRefArg rcvr, newtRefArg str, newtRefArg v);
 newtRef		NsMakeSymbol(newtRefArg rcvr, newtRefArg r);
 newtRef		NsMakeFrame(newtRefArg rcvr);
-newtRef NsMakeArray(newtRefArg rcvr, newtRefArg size, newtRefArg initialValue);
+newtRef     NsMakeArray(newtRefArg rcvr, newtRefArg size, newtRefArg initialValue);
 newtRef		NsMakeBinary(newtRefArg rcvr, newtRefArg length, newtRefArg klass);
 newtRef		NsMakeBinaryFromHex(newtRefArg rcvr, newtRefArg hex, newtRefArg klass);
 

@@ -825,7 +825,7 @@ bool NewtRefIsString(newtRefArg r)
 
 bool NewtRefIsInteger(newtRefArg r)
 {
-    return (NewtRefIsInt30(r) || NewtRefIsInt32(r));
+    return (NewtRefIsInt62(r) || NewtRefIsInt32(r));
 }
 
 
@@ -837,14 +837,14 @@ bool NewtRefIsInteger(newtRefArg r)
  * @return			整数
  */
 
-int32_t NewtRefToInteger(newtRefArg r)
+int64_t NewtRefToInteger(newtRefArg r)
 {
-    int32_t	v = 0;
+    int64_t	v = 0;
     
-    if (NewtRefIsInt30(r))
-        v = NewtRefToInt30(r);
+    if (NewtRefIsInt62(r))
+        v = NewtRefToInt62(r);
     else if (NewtRefIsNIL(r))
-        v = NewtMakeInt30(0);
+        v = NewtMakeInt62(0);
     else
         NewtGetObjData(r, (uint8_t *)&v, sizeof(v));
     
@@ -1424,14 +1424,15 @@ newtRef NewtStringSetLength(newtRefArg r, uint32_t n)
  * @return			整数オブジェクト
  */
 
-newtRef NewtMakeInteger(int32_t v)
+newtRef NewtMakeInteger(int64_t v)
 {
-    if (-536870912 <= v && v <= 536870911)
-    {   // 30bit 以内の場合
-        return NewtMakeInt30(v);
+    if (0xE000000000000000 <= v && v <= 0x1FFFFFFFFFFFFFFF)
+    {   // 62bit 以内の場合
+        return NewtMakeInt62(v);
     }
     else
     {
+        // 64bit version
         return NewtMakeInt32(v);
     }
 }

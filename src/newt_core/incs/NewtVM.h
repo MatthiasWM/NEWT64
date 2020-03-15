@@ -135,47 +135,47 @@ extern "C" {
 #endif
 
 
-void			NVMInit(void);
-void			NVMClean(void);
-newtRef		NVMSelf(void);
-newtRef		NVMCurrentFunction(void);
-newtRef		NVMCurrentImplementor(void);
-bool		NVMHasVar(newtRefArg name);
-void		NVMThrowData(newtRefArg name, newtRefArg data);
-void		NVMThrow(newtRefArg name, newtRefArg data);
-void		NVMRethrow(void);
-newtRef		NVMCurrentException(void);
-void		NVMClearException(void);
+void        NVMInit(void);
+void        NVMClean(void);
+newtRef     NVMSelf(void);
+newtRef     NVMCurrentFunction(void);
+newtRef     NVMCurrentImplementor(void);
+bool        NVMHasVar(newtRefArg name);
+void        NVMThrowData(newtRefArg name, newtRefArg data);
+void        NVMThrow(newtRefArg name, newtRefArg data);
+void        NVMRethrow(void);
+newtRef     NVMCurrentException(void);
+void        NVMClearException(void);
 
-bool		NVMFuncCheckNumArgs(newtRefArg fn, int16_t numArgs);
+bool        NVMFuncCheckNumArgs(newtRefArg fn, int16_t numArgs);
 
-void		NVMDumpInstName(FILE * f, uint8_t a, int16_t b);
-void		NVMDumpCode(FILE * f, uint8_t * bc, uint32_t len);
-void		NVMDumpBC(FILE * f, newtRefArg instructions);
-void		NVMDumpFn(FILE * f, newtRefArg fn);
-void		NVMDumpStackTop(FILE * f, char * s);
-void		NVMDumpStacks(FILE * f);
+void        NVMDumpInstName(FILE * f, uint8_t a, int16_t b);
+void        NVMDumpCode(FILE * f, uint8_t * bc, uint32_t len);
+void        NVMDumpBC(FILE * f, newtRefArg instructions);
+void        NVMDumpFn(FILE * f, newtRefArg fn);
+void        NVMDumpStackTop(FILE * f, char * s);
+void        NVMDumpStacks(FILE * f);
 
-void		NVMFnCall(newtRefArg fn, int16_t numArgs);
-newtRef		NVMInterpret(newtRefArg fn, newtErr * errP);
-newtErr		NVMInfo(const char * name);
+void        NVMFnCall(newtRefArg fn, int16_t numArgs);
+newtRef     NVMInterpret(newtRefArg fn, newtErr * errP);
+newtErr     NVMInfo(const char * name);
 
-newtRef		NVMCall(newtRefArg fn, int16_t numArgs, newtErr * errP);
-newtRef		NVMInterpretFile(const char * path, newtErr * errP);
-newtRef		NVMInterpretStr(const char * s, newtErr * errP);
+newtRef     NVMCall(newtRefArg fn, int16_t numArgs, newtErr * errP);
+newtRef     NVMInterpretFile(const char * path, newtErr * errP);
+newtRef     NVMInterpretStr(const char * s, newtErr * errP);
 
-newtRef		NVMMessageSendWithArgArray(newtRefArg inImpl, newtRefArg inRcvr,
+newtRef     NVMMessageSendWithArgArray(newtRefArg inImpl, newtRefArg inRcvr,
                                        newtRefArg inFunction, newtRefArg inArgs);
 
-newtRef		NcCall(newtRefArg fn, int argc, ...);
-newtRef		NcCallWithArgArray(newtRefArg fn, newtRefArg args);
-newtRef		NcCallGlobalFn(newtRefArg sym, int argc, ...);
-newtRef		NcCallGlobalFnWithArgArray(newtRefArg sym, newtRefArg args);
+newtRef     NcCall(newtRefArg fn, int argc, ...);
+newtRef     NcCallWithArgArray(newtRefArg fn, newtRefArg args);
+newtRef     NcCallGlobalFn(newtRefArg sym, int argc, ...);
+newtRef     NcCallGlobalFnWithArgArray(newtRefArg sym, newtRefArg args);
 
-newtRef		NcSend(newtRefArg receiver, newtRefArg sym, bool ignore, int argc, ...);
-newtRef		NcSendWithArgArray(newtRefArg receiver, newtRefArg sym, bool ignore, newtRefArg args);
-newtRef		NcSendProto(newtRefArg receiver, newtRefArg sym, bool ignore, int argc, ...);
-newtRef		NcSendProtoWithArgArray(newtRefArg receiver, newtRefArg sym, bool ignore, newtRefArg args);
+newtRef     NcSend(newtRefArg receiver, newtRefArg sym, bool ignore, int argc, ...);
+newtRef     NcSendWithArgArray(newtRefArg receiver, newtRefArg sym, bool ignore, newtRefArg args);
+newtRef     NcSendProto(newtRefArg receiver, newtRefArg sym, bool ignore, int argc, ...);
+newtRef     NcSendProtoWithArgArray(newtRefArg receiver, newtRefArg sym, bool ignore, newtRefArg args);
 
 
 #ifdef __cplusplus

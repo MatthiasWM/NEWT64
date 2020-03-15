@@ -31,14 +31,6 @@
 
 /* マクロ */
 
-// Newton Refs Constant
-#define	kNewtRefNIL			0x0002		///< NIL
-#define	kNewtRefTRUE		0x001A		///< TRUE
-#define	kNewtSymbolClass	0x55552		///< シンボルクラス
-
-#define	kNewtRefUnbind		0xFFF2		///< #UNDEF（独自機能）
-
-
 /* 定数 */
 
 /// オブジェクトタイプ（内部でのみ使用）
@@ -166,6 +158,14 @@ typedef newtSymData *	newtSymDataRef;
 typedef int32_t		newtErr;
 
 typedef uint32_t        newtUniChar;
+
+
+// Newton Refs Constant
+static const newtRef kNewtRefNIL        = 0x00000002;   ///< NIL
+static const newtRef kNewtRefTRUE       = 0x0000001A;   ///< TRUE
+static const newtRef kNewtSymbolClass   = 0x00055552;   ///< シンボルクラス
+static const newtRef kNewtRefUnbind     = 0x0000FFF2;   ///< #UNDEF（独自機能）
+
 
 #endif /* NEWTTYPE_H */
 

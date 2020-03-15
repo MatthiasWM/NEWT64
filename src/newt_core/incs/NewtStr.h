@@ -35,19 +35,19 @@ extern "C" {
 #endif
 
 
-newtRef		NsChr(newtRefArg rcvr, newtRefArg r);
-newtRef		NsOrd(newtRefArg rcvr, newtRefArg r);
-newtRef		NsStrLen(newtRefArg rcvr, newtRefArg r);
-newtRef		NsSubStr(newtRefArg rcvr, newtRefArg r, newtRefArg start, newtRefArg count);
-newtRef		NsStrEqual(newtRefArg rcvr, newtRefArg a, newtRefArg b);
-newtRef		NsStrExactCompare(newtRefArg rcvr, newtRefArg a, newtRefArg b);
-newtRef		NsBeginsWith(newtRefArg rcvr, newtRefArg str, newtRefArg sub);
-newtRef		NsEndsWith(newtRefArg rcvr, newtRefArg str, newtRefArg sub);
+newtRef NsChr(newtRefArg rcvr, newtRefArg r);
+newtRef NsOrd(newtRefArg rcvr, newtRefArg r);
+newtRef NsStrLen(newtRefArg rcvr, newtRefArg r);
+newtRef NsSubStr(newtRefArg rcvr, newtRefArg r, newtRefArg start, newtRefArg count);
+newtRef NsStrEqual(newtRefArg rcvr, newtRefArg a, newtRefArg b);
+newtRef NsStrExactCompare(newtRefArg rcvr, newtRefArg a, newtRefArg b);
+newtRef NsBeginsWith(newtRefArg rcvr, newtRefArg str, newtRefArg sub);
+newtRef NsEndsWith(newtRefArg rcvr, newtRefArg str, newtRefArg sub);
 
-newtRef		NsSPrintObject(newtRefArg rcvr, newtRefArg r);
-newtRef		NsSplit(newtRefArg rcvr, newtRefArg r, newtRefArg sep);
-newtRef   NsStrPos(newtRefArg rcvr, newtRefArg haystack, newtRefArg needle, newtRefArg start);
-newtRef		NsParamStr(newtRefArg rcvr, newtRefArg baseString, newtRefArg paramStrArray);
+newtRef NsSPrintObject(newtRefArg rcvr, newtRefArg r);
+newtRef NsSplit(newtRefArg rcvr, newtRefArg r, newtRefArg sep);
+newtRef NsStrPos(newtRefArg rcvr, newtRefArg haystack, newtRefArg needle, newtRefArg start);
+newtRef NsParamStr(newtRefArg rcvr, newtRefArg baseString, newtRefArg paramStrArray);
 newtRef NsStrReplace(newtRefArg rcvr, newtRefArg string, newtRefArg substr, newtRefArg replacement, newtRefArg count);
 
 

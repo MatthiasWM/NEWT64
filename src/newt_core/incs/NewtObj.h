@@ -34,9 +34,12 @@ static inline int64_t
 static inline newtRef
     NewtMakeInt62(int64_t v)        { return (newtRef)(v << 2); } ///< 30bit整数オブジェクトを作成
 
-#define	NewtRefIsPointer(r)			((r & 3) == 1)						///< ポインタオブジェクトか？
-#define	NewtRefToPointer(r)			(newtObjRef)((uintptr_t)r - 1)		///< オブジェクト参照をポインタに変換
-#define	NewtMakePointer(v)			(newtRef)((uintptr_t)(v) + 1)		///< ポインタオブジェクトを作成
+static inline bool
+    NewtRefIsPointer(newtRefArg r)  { return ((r & 3) == 1); } ///< ポインタオブジェクトか？
+static inline void*
+    NewtRefToPointer(newtRefArg r)  { return (void*)(r - 1); } ///< オブジェクト参照をポインタに変換
+static inline newtRef
+    NewtMakePointer(void *v)        { return (newtRef)((uintptr_t)v + 1); } ///< ポインタオブジェクトを作成
 
 #define	NewtRefIsCharacter(r)		((r & 0xF) == 6)					///< 文字オブジェクトか？
 #define	NewtRefToCharacter(r)		(int)(((uint32_t)r >> 4) & 0xFFFF)	///< オブジェクト参照を文字に変換

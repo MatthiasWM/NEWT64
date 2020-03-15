@@ -12,9 +12,9 @@
 
 /* ヘッダファイル */
 #ifdef HAVE_MEMORY_H
-	#include <memory.h>
+#include <memory.h>
 #else
-	#include <string.h>
+#include <string.h>
 #endif
 
 
@@ -147,26 +147,26 @@ void NewtCheckGC(newtPool pool, size_t size)
 newtObjRef NewtObjChainAlloc(newtPool pool, size_t size, size_t dataSize)
 {
     newtObjRef	obj;
-
+    
     NewtCheckGC(pool, size + dataSize);
-
+    
     obj = (newtObjRef)NewtMemAlloc(pool, size);
     if (obj == NULL) return NULL;
-
-	memset(&obj->header, 0, sizeof(obj->header));
-
+    
+    memset(&obj->header, 0, sizeof(obj->header));
+    
     if (0 < dataSize)
     {
         uint8_t *	data;
-    
+        
         data = NewtMemAlloc(pool, dataSize);
-    
+        
         if (data == NULL)
         {
             NewtMemFree(obj);
             return NULL;
         }
-
+        
         *((uint8_t **)(obj + 1)) = data;
     }
     else
@@ -174,13 +174,13 @@ newtObjRef NewtObjChainAlloc(newtPool pool, size_t size, size_t dataSize)
         obj->header.size = 0;
         obj->header.flags = kNewtObjLiteral;
     }
-
+    
     if (pool != NULL)
     {
         NewtPoolChain(pool, obj, dataSize == 0);
         pool->usesize += size + dataSize;
     }
-
+    
     return obj;
 }
 
@@ -200,7 +200,7 @@ newtObjRef NewtObjChainAlloc(newtPool pool, size_t size, size_t dataSize)
 void NewtObjFree(newtPool pool, newtObjRef obj)
 {
     uint32_t	datasize;
-
+    
     if (NewtObjIsLiteral(obj))
     {
         datasize = NewtAlign(sizeof(newtObj) + NewtObjSize(obj), 4);
@@ -209,12 +209,12 @@ void NewtObjFree(newtPool pool, newtObjRef obj)
     {
         datasize = sizeof(newtObj) + sizeof(uint8_t *);
         datasize += NewtObjCalcDataSize(NewtObjSize(obj));
-
+        
         NewtMemFree(NewtObjData(obj));
     }
-
+    
     NewtMemFree(obj);
-
+    
     if (pool != NULL)
         pool->usesize -= datasize;
 }
@@ -233,13 +233,13 @@ void NewtObjChainFree(newtPool pool, newtObjRef * objp)
 {
     newtObjRef	nextp;
     newtObjRef	obj;
-
+    
     for (obj = *objp; obj != NULL; obj = nextp)
     {
         nextp = obj->header.nextp;
         NewtObjFree(pool, obj);
     }
-
+    
     *objp = NULL;
 }
 
@@ -257,12 +257,12 @@ void NewtPoolRelease(newtPool pool)
     if (pool != NULL)
     {
         int32_t		usesize;
-
+        
         usesize = pool->usesize;
-
+        
         NewtObjChainFree(pool, &pool->obj);
         NewtObjChainFree(pool, &pool->literal);
-
+        
         if (NEWT_DEBUG)
             NewtPoolSnap("RELEASE", pool, usesize);
     }
@@ -290,21 +290,21 @@ void NewtPoolMarkClean(newtPool pool)
         newtObjRef	obj;
         newtObjRef *	prevp = &pool->obj;
         int32_t		usesize;
-
+        
         usesize = pool->usesize;
-
+        
         for (obj = pool->obj; obj != NULL; obj = nextp)
         {
             nextp = obj->header.nextp;
-
+            
             if (NewtObjIsLiteral(obj))
             {
                 NewtObjChain(&pool->literal, obj);
                 *prevp = nextp;
-
+                
                 continue;
             }
-
+            
             obj->header.h &= ~ (uint32_t)kNewtObjSweep;
             prevp = &obj->header.nextp;
         }
@@ -330,40 +330,40 @@ void NewtPoolSweep(newtPool pool, bool mark)
         newtObjRef	obj;
         newtObjRef *	prevp = &pool->obj;
         int32_t		usesize;
-
+        
         usesize = pool->usesize;
-
+        
         for (obj = pool->obj; obj != NULL; obj = nextp)
         {
             nextp = obj->header.nextp;
-
+            
             if (NewtObjIsLiteral(obj))
             {
                 NewtObjChain(&pool->literal, obj);
                 *prevp = nextp;
-
+                
                 continue;
             }
-
+            
             if (NewtObjIsSweep(obj, mark))
             {
                 *prevp = nextp;
                 NewtObjFree(pool, obj);
-
+                
                 continue;
             }
-
+            
             prevp = &obj->header.nextp;
         }
-
+        
         if (NEWT_DEBUG)
             NewtPoolSnap("GC", pool, usesize);
     }
-
+    
     if (pool->maxspace < pool->usesize)
     {
         pool->maxspace = ((pool->usesize + pool->expandspace - 1) / pool->expandspace)
-                            * pool->expandspace;
+        * pool->expandspace;
     }
 }
 
@@ -382,31 +382,31 @@ void NewtGCRefMark(newtRefArg r, bool mark)
     if (NewtRefIsPointer(r))
     {
         newtObjRef	obj;
-    
+        
         obj = NewtRefToPointer(r);
-    
+        
         if (! NewtObjIsLiteral(obj) && NewtObjIsSweep(obj, mark))
         {
             if (mark)
                 obj->header.flags &= ~ (uint32_t)kNewtObjSweep;
             else
                 obj->header.flags |= kNewtObjSweep;
-
+            
             if (NewtObjIsSlotted(obj))
             {
                 newtRef *	slots;
                 uint32_t	len;
                 uint32_t	i;
-    
+                
                 len = NewtObjSlotsLength(obj);
                 slots = NewtObjToSlots(obj);
-    
+                
                 for (i = 0; i < len; i++)
                 {
                     NewtGCRefMark(slots[i], mark);
                 }
             }
-    
+            
             if (NewtObjIsFrame(obj))
                 NewtGCRefMark(obj->as.map, mark);
         }
@@ -446,40 +446,40 @@ void NewtGCStackMark(vm_env_t * env, bool mark)
     newtRef *	stack;
     vm_reg_t *	callstack;
     uint32_t	i;
-
+    
     // スタック
     stack = (newtRef *)env->stack.stackp;
-
+    
     for (i = 0; i < env->reg.sp; i++)
     {
         NewtGCRefMark(stack[i], mark);
     }
-
+    
     // 関数呼出しスタック
     callstack = (vm_reg_t *)env->callstack.stackp;
-
+    
     for (i = 0; i < env->callstack.sp; i++)
     {
         NewtGCRegMark(&callstack[i], mark);
     }
-
+    
     // 例外ハンドラ・スタック
     NewtGCRefMark(env->currexcp, mark);
-
-/*
-    {
-        vm_excp_t *	excpstack;
-        vm_excp_t *	excp;
-
-        excpstack = (vm_excp_t *)env->excpstack.stackp;
-
-        for (i = 0; i < env->excpsp; i++)
-        {
-            excp = &excpstack[i];
-            NewtGCRefMark(excp->sym, mark);
-        }
-    }
-*/
+    
+    /*
+     {
+     vm_excp_t *	excpstack;
+     vm_excp_t *	excp;
+     
+     excpstack = (vm_excp_t *)env->excpstack.stackp;
+     
+     for (i = 0; i < env->excpsp; i++)
+     {
+     excp = &excpstack[i];
+     NewtGCRefMark(excp->sym, mark);
+     }
+     }
+     */
 }
 
 
@@ -495,13 +495,13 @@ void NewtGCStackMark(vm_env_t * env, bool mark)
 void NewtGCMark(vm_env_t * env, bool mark)
 {
     NewtGCRefMark(NcGetRoot(), mark);
-//    NewtGCRefMark(NSGetGlobals(), mark);
-//    NewtGCRefMark(NSGetGlobalFns(), mark);
-//    NewtGCRefMark(NSGetMagicPointers(), mark);
-
+    //    NewtGCRefMark(NSGetGlobals(), mark);
+    //    NewtGCRefMark(NSGetGlobalFns(), mark);
+    //    NewtGCRefMark(NSGetMagicPointers(), mark);
+    
     // レジスタ
     NewtGCRegMark(&env->reg, mark);
-
+    
     // スタック
     NewtGCStackMark(env, mark);
 }
@@ -515,16 +515,16 @@ void NewtGCMark(vm_env_t * env, bool mark)
 
 void NewtGC(void)
 {
-//    NewtPoolMarkClean(NEWT_POOL);
-	vm_env_t *	env;
-
-	for (env = &vm_env; env; env = env->next)
-	{
-		NewtGCMark(&vm_env, NEWT_SWEEP);
-	}
-
-	NewtPoolSweep(NEWT_POOL, NEWT_SWEEP);
-
+    //    NewtPoolMarkClean(NEWT_POOL);
+    vm_env_t *	env;
+    
+    for (env = &vm_env; env; env = env->next)
+    {
+        NewtGCMark(&vm_env, NEWT_SWEEP);
+    }
+    
+    NewtPoolSweep(NEWT_POOL, NEWT_SWEEP);
+    
     NEWT_SWEEP = ! NEWT_SWEEP;
     NEWT_NEEDGC = false;
 }
@@ -545,6 +545,6 @@ void NewtGC(void)
 
 newtRef	NsGC(newtRefArg rcvr)
 {
-	NEWT_NEEDGC = true;
+    NEWT_NEEDGC = true;
     return kNewtRefNIL;
 }

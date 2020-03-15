@@ -18,7 +18,7 @@
 #define NEWT_PROTO		"/0"									///< プロト
 
 #ifndef NEWT_VERSION
-#define NEWT_VERSION	"v0.1.4"								///< バージョン
+#define NEWT_VERSION	"v0.2.0"								///< バージョン
 #endif
 
 #ifndef NEWT_BUILD
@@ -26,7 +26,7 @@
 #endif
 
 
-#define NEWT_COPYRIGHT	"Copyright (C) 2003-2014 Makoto Nukui"  ///< コピーライト
+#define NEWT_COPYRIGHT	"Copyright (C) 2003-2020 Makoto Nukui and others"  ///< コピーライト
 #define NEWT_PARAMS		"[switches] [--] [programfile]"			///< 引数
 
 /// 使用方法

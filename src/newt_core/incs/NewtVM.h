@@ -75,7 +75,7 @@ enum {
     kIterPos,				///< オブジェクトの位置
     kIterMax,				///< オブジェクトの長さ
     kIterMap,				///< frameオブジェクトのマップ
-
+    
     //
     kIterALength			///< イテレータ配列の長さ
 };
@@ -96,7 +96,7 @@ typedef struct {
 typedef struct {
     uint32_t	callsp;		///< 呼出しスタックのスタックポインタ
     uint32_t	excppc;		///< 例外ハンドラを作成したときのプログラムカウンタ
-
+    
     newtRefVar	sym;		///< シンボル
     uint32_t	pc;			///< プログラムカウンタ
 } vm_excp_t;
@@ -107,21 +107,21 @@ typedef struct vm_env_t {
     // バイトコード
     uint8_t *	bc;				///< バイトコード
     uint32_t	bclen;			///< バイトコードの長さ
-
+    
     // レジスタ
     vm_reg_t	reg;			///< レジスタ
-
+    
     // スタック
     newtStack	stack;			///< スタック
     newtStack	callstack;		///< 関数呼出しスタック
     newtStack	excpstack;		///< 例外ハンドラ・スタック
-
+    
     // 例外
     newtRefVar	currexcp;		///< 現在の例外
-
-	// VM 管理
-	uint16_t	level;			///< VM呼出しレベル
-	struct vm_env_t *	next;	///< VM 実行環境のチェイン
+    
+    // VM 管理
+    uint16_t	level;			///< VM呼出しレベル
+    struct vm_env_t *	next;	///< VM 実行環境のチェイン
 } vm_env_t;
 
 
@@ -165,7 +165,7 @@ newtRef		NVMInterpretFile(const char * path, newtErr * errP);
 newtRef		NVMInterpretStr(const char * s, newtErr * errP);
 
 newtRef		NVMMessageSendWithArgArray(newtRefArg inImpl, newtRefArg inRcvr,
-				newtRefArg inFunction, newtRefArg inArgs);
+                                       newtRefArg inFunction, newtRefArg inArgs);
 
 newtRef		NcCall(newtRefArg fn, int argc, ...);
 newtRef		NcCallWithArgArray(newtRefArg fn, newtRefArg args);

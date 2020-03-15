@@ -18,9 +18,9 @@
 #include "platform.h"
 
 #if HAVE_STDINT_H
-	#include <stdint.h>
+#include <stdint.h>
 #else
-	#include <inttypes.h>
+#include <inttypes.h>
 #endif
 
 #include <stdbool.h>
@@ -52,12 +52,12 @@ enum {
     kNewtTrue,						///< TRUE（特殊参照／即値）
     kNewtUnbind,					///< 未定義（特殊参照／即値）
     kNewtMagicPointer,				///< マジックポインタ（即値）
-
+    
     //　ポインタ参照
     kNewtBinary,					///< バイナリオブジェクト
     kNewtArray,						///< 配列
     kNewtFrame,						///< フレーム
-
+    
     //　バイナリオブジェクト
     kNewtInt32,						///< 32bit整数
     kNewtReal,						///< 浮動小数点
@@ -70,7 +70,7 @@ enum {
 enum {
     kNewtObjSlotted		= 0x01,		///< スロット
     kNewtObjFrame		= 0x02,		///< フレーム
-
+    
     kNewtObjLiteral		= 0x40,		///< リテラル
     kNewtObjSweep		= 0x80		///< ゴミ掃除（GC用）
 };
@@ -98,27 +98,27 @@ enum {
     kNSOFNIL				= 10,   ///< NIL
     kNSOFSmallRect			= 11,   ///< 小さい矩形
     kNSOFLargeBinary		= 12,	///< 大きいバイナリ
-
+    
     kNSOFNamedMagicPointer	= 0x10,	///< 名前付マジックポインタ（独自機能）
 };
 
 
 /// Newton Package Format: Part Flags
 enum {
-	kProtocolPart	= 0,		///< part contains protocol data
-	kNOSPart		= 1,		///< part contains NOS data
-	kRawPart		= 2,		///< raw part data, no defined type
-	kAutoLoadFlag	= 0x0010,	///< protocols will be registered automatically
-	kAutoRemoveFlag	= 0x0020,	///< protocols will be unregistered automatically
-	kNotifyFlag		= 0x0080,	///< notify system handler of installation
-	kAutoCopyFlag	= 0x0100	///< part must be moved into precious RAM before activation
+    kProtocolPart	= 0,		///< part contains protocol data
+    kNOSPart		= 1,		///< part contains NOS data
+    kRawPart		= 2,		///< raw part data, no defined type
+    kAutoLoadFlag	= 0x0010,	///< protocols will be registered automatically
+    kAutoRemoveFlag	= 0x0020,	///< protocols will be unregistered automatically
+    kNotifyFlag		= 0x0080,	///< notify system handler of installation
+    kAutoCopyFlag	= 0x0100	///< part must be moved into precious RAM before activation
 };
 
 
 /// Newton Package Format: Object Header Flags
 enum {
-	kObjSlotted	= 0x01,	///< object is an array
-	kObjFrame	= 0x02,	///< object is a frame if both flags are set
+    kObjSlotted	= 0x01,	///< object is an array
+    kObjFrame	= 0x02,	///< object is a frame if both flags are set
 };
 
 
@@ -143,8 +143,8 @@ typedef struct {
 /// オブジェクト
 typedef struct newtObj {
     newtObjHeader	header; ///< オブジェクトヘッダ
-
-	/// as
+    
+    /// as
     union {
         newtRef	klass;		///< クラス
         newtRef	map;		///< マップ

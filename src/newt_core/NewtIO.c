@@ -19,21 +19,21 @@
 #include "NewtIO.h"
 
 #if defined(HAVE_TERMIOS_H)
-	#include <termios.h>
-	#include <unistd.h>
-	#include <sys/select.h>
+#include <termios.h>
+#include <unistd.h>
+#include <sys/select.h>
 #elif defined(__WIN32__)
-	#include <conio.h>
+#include <conio.h>
 #endif
 
 
 /* マクロ */
 #if defined(HAVE_TERMIOS_H)
-	#define	newt_getch()	tcgetch(0)
+#define	newt_getch()	tcgetch(0)
 #elif defined(__WIN32__)
-	#define	newt_getch()	getch()
+#define	newt_getch()	getch()
 #else
-	#define	newt_getch()	(0)
+#define	newt_getch()	(0)
 #endif
 
 
@@ -53,14 +53,14 @@ static int	tcgetch(int fd);
 
 void NIOSetFile(newtStream_t * stream, FILE * f)
 {
-	stream->file = f;
-
-	if (f == stdout)
-		stream->obj = NcGetGlobalVar(NSSYM0(_STDOUT_));
-	else if (f == stderr)
-		stream->obj = NcGetGlobalVar(NSSYM0(_STDERR_));
-	else
-		stream->obj = kNewtRefUnbind;
+    stream->file = f;
+    
+    if (f == stdout)
+        stream->obj = NcGetGlobalVar(NSSYM0(_STDOUT_));
+    else if (f == stderr)
+        stream->obj = NcGetGlobalVar(NSSYM0(_STDERR_));
+    else
+        stream->obj = kNewtRefUnbind;
 }
 
 
@@ -78,14 +78,14 @@ void NIOSetFile(newtStream_t * stream, FILE * f)
 
 int NIOFprintf(newtStream_t * stream, const char * format, ...)
 {
-	va_list	args;
-	int		result;
-
-	va_start(args, format);
-	result = NIOVfprintf(stream, format, args);
-	va_end(args);
-
-	return result;
+    va_list	args;
+    int		result;
+    
+    va_start(args, format);
+    result = NIOVfprintf(stream, format, args);
+    va_end(args);
+    
+    return result;
 }
 
 
@@ -104,28 +104,28 @@ int NIOFprintf(newtStream_t * stream, const char * format, ...)
 
 int NIOVfprintf(newtStream_t * stream, const char * format, va_list ap)
 {
-	int		result = 0;
-
-	if (NewtRefIsString(stream->obj))
-	{
-		char	wk[NEWT_SNPRINTF_BUFFSIZE];
-
-		result = vsnprintf(wk, sizeof(wk), format, ap);
-
-		if (0 < result)
-		{
-			if (sizeof(wk) < result)
-				wk[sizeof(wk) - 1] = '\0';
-
-			NewtStrCat(stream->obj, wk);
-		}
-	}
-	else
-	{
-		result = vfprintf(stream->file, format, ap);
-	}
-
-	return result;
+    int		result = 0;
+    
+    if (NewtRefIsString(stream->obj))
+    {
+        char	wk[NEWT_SNPRINTF_BUFFSIZE];
+        
+        result = vsnprintf(wk, sizeof(wk), format, ap);
+        
+        if (0 < result)
+        {
+            if (sizeof(wk) < result)
+                wk[sizeof(wk) - 1] = '\0';
+            
+            NewtStrCat(stream->obj, wk);
+        }
+    }
+    else
+    {
+        result = vfprintf(stream->file, format, ap);
+    }
+    
+    return result;
 }
 
 
@@ -142,21 +142,21 @@ int NIOVfprintf(newtStream_t * stream, const char * format, va_list ap)
 
 int NIOFputc(int c, newtStream_t * stream)
 {
-	int		result = 0;
-
-	if (NewtRefIsString(stream->obj))
-	{
-		char	wk[4];
-
-		sprintf(wk, "%c", c);
-		NewtStrCat(stream->obj, wk);
-	}
-	else
-	{
-		result = fputc(c, stream->file);
-	}
-
-	return result;
+    int		result = 0;
+    
+    if (NewtRefIsString(stream->obj))
+    {
+        char	wk[4];
+        
+        sprintf(wk, "%c", c);
+        NewtStrCat(stream->obj, wk);
+    }
+    else
+    {
+        result = fputc(c, stream->file);
+    }
+    
+    return result;
 }
 
 
@@ -173,18 +173,18 @@ int NIOFputc(int c, newtStream_t * stream)
 
 int NIOFputs(const char *str, newtStream_t * stream)
 {
-	int		result = 0;
-
-	if (NewtRefIsString(stream->obj))
-	{
-		NewtStrCat(stream->obj, (char *)str);
-	}
-	else
-	{
-		result = fputs(str, stream->file);
-	}
-
-	return result;
+    int		result = 0;
+    
+    if (NewtRefIsString(stream->obj))
+    {
+        NewtStrCat(stream->obj, (char *)str);
+    }
+    else
+    {
+        result = fputs(str, stream->file);
+    }
+    
+    return result;
 }
 
 
@@ -203,17 +203,17 @@ int NIOFputs(const char *str, newtStream_t * stream)
 
 int NewtFprintf(FILE * f, const char * format, ...)
 {
-	newtStream_t	stream;
-	va_list	args;
-	int		result;
-
-	NIOSetFile(&stream, f);
-
-	va_start(args, format);
-	result = NIOVfprintf(&stream, format, args);
-	va_end(args);
-
-	return result;
+    newtStream_t	stream;
+    va_list	args;
+    int		result;
+    
+    NIOSetFile(&stream, f);
+    
+    va_start(args, format);
+    result = NIOVfprintf(&stream, format, args);
+    va_end(args);
+    
+    return result;
 }
 
 
@@ -228,10 +228,10 @@ int NewtFprintf(FILE * f, const char * format, ...)
 
 int NewtFputc(int c, FILE * f)
 {
-	newtStream_t	stream;
-
-	NIOSetFile(&stream, f);
-	return NIOFputc(c, &stream);
+    newtStream_t	stream;
+    
+    NIOSetFile(&stream, f);
+    return NIOFputc(c, &stream);
 }
 
 
@@ -246,10 +246,10 @@ int NewtFputc(int c, FILE * f)
 
 int NewtFputs(const char *str, FILE * f)
 {
-	newtStream_t	stream;
-
-	NIOSetFile(&stream, f);
-	return NIOFputs(str, &stream);
+    newtStream_t	stream;
+    
+    NIOSetFile(&stream, f);
+    return NIOFputs(str, &stream);
 }
 
 
@@ -268,24 +268,24 @@ int NewtFputs(const char *str, FILE * f)
 
 int NewtDebugMsg(const char * title, const char * format, ...)
 {
-	newtStream_t	stream;
-	va_list	args;
-	int		result;
-
-	NIOSetFile(&stream, stderr);
-
-	if (title != NULL)
-	{
-		NIOFputs("[", &stream);
-		NIOFputs(title, &stream);
-		NIOFputs("] ", &stream);
-	}
-
-	va_start(args, format);
-	result = NIOVfprintf(&stream, format, args);
-	va_end(args);
-
-	return result;
+    newtStream_t	stream;
+    va_list	args;
+    int		result;
+    
+    NIOSetFile(&stream, stderr);
+    
+    if (title != NULL)
+    {
+        NIOFputs("[", &stream);
+        NIOFputs(title, &stream);
+        NIOFputs("] ", &stream);
+    }
+    
+    va_start(args, format);
+    result = NIOVfprintf(&stream, format, args);
+    va_end(args);
+    
+    return result;
 }
 
 
@@ -305,63 +305,63 @@ int NewtDebugMsg(const char * title, const char * format, ...)
 
 newtRef NewtFgets(FILE * stream)
 {
-	newtRefVar  result = kNewtRefNIL;
-	char	buff[NEWT_FGETS_BUFFSIZE];
-	char *  str;
-	char	c;
-	int		maxsize;
-	int		oldlen;
-	int		len;
-
-	maxsize = sizeof(buff) - 1;
-
-	while ((str = fgets(buff, sizeof(buff), stream)) != NULL)
-	{
-		len = strlen(str);
-
-		if (result == kNewtRefNIL)
-		{	// 文字列オブジェクト作成
-			result = NewtMakeString2(str, len, false);
-
-			if (NewtRefIsNIL(result))
-			{	// メモリを確保できなかった
-				return NewtThrow0(kNErrOutOfObjectMemory);
-			}
-		}
-		else
-		{	// 追加
-			oldlen = NewtStringLength(result);
-			result = NewtStrCat2(result, str, len);
-
-			if (NewtStringLength(result) < oldlen + len)
-			{	// メモリを確保できなかった
-				return NewtThrow0(kNErrOutOfObjectMemory);
-			}
-		}
-
-		if (len < maxsize)
-			break;
-
-		// 最後の文字をチェック
-		c = buff[maxsize - 1];
-
-		if (c == '\n')
-			break;
-
-		if (c == '\r')
-		{
-			// １文字先読み
-			c = fgetc(stream);
-
-			if (c != '\n')
-			{	// CRLF でない（CR のみ）場合
-				// 先読みした文字をストリームに戻す
-				ungetc(c, stream);
-				break;
-			}
-		}
-	}
-
+    newtRefVar  result = kNewtRefNIL;
+    char	buff[NEWT_FGETS_BUFFSIZE];
+    char *  str;
+    char	c;
+    int		maxsize;
+    int		oldlen;
+    int		len;
+    
+    maxsize = sizeof(buff) - 1;
+    
+    while ((str = fgets(buff, sizeof(buff), stream)) != NULL)
+    {
+        len = strlen(str);
+        
+        if (result == kNewtRefNIL)
+        {	// 文字列オブジェクト作成
+            result = NewtMakeString2(str, len, false);
+            
+            if (NewtRefIsNIL(result))
+            {	// メモリを確保できなかった
+                return NewtThrow0(kNErrOutOfObjectMemory);
+            }
+        }
+        else
+        {	// 追加
+            oldlen = NewtStringLength(result);
+            result = NewtStrCat2(result, str, len);
+            
+            if (NewtStringLength(result) < oldlen + len)
+            {	// メモリを確保できなかった
+                return NewtThrow0(kNErrOutOfObjectMemory);
+            }
+        }
+        
+        if (len < maxsize)
+            break;
+        
+        // 最後の文字をチェック
+        c = buff[maxsize - 1];
+        
+        if (c == '\n')
+            break;
+        
+        if (c == '\r')
+        {
+            // １文字先読み
+            c = fgetc(stream);
+            
+            if (c != '\n')
+            {	// CRLF でない（CR のみ）場合
+                // 先読みした文字をストリームに戻す
+                ungetc(c, stream);
+                break;
+            }
+        }
+    }
+    
     return result;
 }
 
@@ -377,7 +377,7 @@ newtRef NewtFgets(FILE * stream)
 
 newtRef NsGets(newtRefArg rcvr)
 {
-	return NewtFgets(stdin);
+    return NewtFgets(stdin);
 }
 
 
@@ -392,14 +392,14 @@ newtRef NsGets(newtRefArg rcvr)
 
 newtRef NewtFgetc(FILE * stream)
 {
-	int		c;
-
-	c = fgetc(stream);
-
-	if (c == EOF)
-		return kNewtRefNIL;
-	else
-		return NewtMakeCharacter(c);
+    int		c;
+    
+    c = fgetc(stream);
+    
+    if (c == EOF)
+        return kNewtRefNIL;
+    else
+        return NewtMakeCharacter(c);
 }
 
 
@@ -414,7 +414,7 @@ newtRef NewtFgetc(FILE * stream)
 
 newtRef NsGetc(newtRefArg rcvr)
 {
-	return NewtFgetc(stdin);
+    return NewtFgetc(stdin);
 }
 
 
@@ -433,20 +433,20 @@ newtRef NsGetc(newtRefArg rcvr)
 
 int cbreak_and_noecho(int fd, int vmin, struct termios *tiosp)
 {
-	struct termios	tios;
-	int		err;
-
-	err = tcgetattr(fd, &tios);
-	if (err) return err;
-
-	if (tiosp) *tiosp = tios;
-
-	tios.c_lflag &= ~ (ICANON | ECHO);
+    struct termios	tios;
+    int		err;
+    
+    err = tcgetattr(fd, &tios);
+    if (err) return err;
+    
+    if (tiosp) *tiosp = tios;
+    
+    tios.c_lflag &= ~ (ICANON | ECHO);
     tios.c_cc[VTIME] = 0;
     tios.c_cc[VMIN] = vmin;
-	err = tcsetattr(fd, TCSANOW, &tios);
-
-	return err;
+    err = tcsetattr(fd, TCSANOW, &tios);
+    
+    return err;
 }
 
 
@@ -461,20 +461,20 @@ int cbreak_and_noecho(int fd, int vmin, struct termios *tiosp)
 
 int tcgetch(int fd)
 {
-	struct termios	tios;
-	char	buf[1];
-	int		c = 0;
-	int		err;
-
-	err = cbreak_and_noecho(fd, 1, &tios);
-	if (err) return -1;
-
-	if (0 < read(fd, buf, sizeof(buf)))
-		c = buf[0];
-
-	tcsetattr(fd, TCSANOW, &tios);
-
-	return c;
+    struct termios	tios;
+    char	buf[1];
+    int		c = 0;
+    int		err;
+    
+    err = cbreak_and_noecho(fd, 1, &tios);
+    if (err) return -1;
+    
+    if (0 < read(fd, buf, sizeof(buf)))
+        c = buf[0];
+    
+    tcsetattr(fd, TCSANOW, &tios);
+    
+    return c;
 }
 
 
@@ -492,12 +492,12 @@ int tcgetch(int fd)
 
 newtRef NsGetch(newtRefArg rcvr)
 {
-	int		c;
-
-	c = newt_getch();
-
-	if (c)
-		return NewtMakeCharacter(c);
-	else
-		return kNewtRefNIL;
+    int		c;
+    
+    c = newt_getch();
+    
+    if (c)
+        return NewtMakeCharacter(c);
+    else
+        return kNewtRefNIL;
 }

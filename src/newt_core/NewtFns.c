@@ -44,20 +44,20 @@ static bool			NewtArgsIsNumber(newtRefArg r1, newtRefArg r2, bool * real);
 newtRef NcProtoLookupFrame(newtRefArg start, newtRefArg name)
 {
     newtRefVar	current = start;
-
+    
     while (NewtRefIsNotNIL(current))
     {
-		current = NcResolveMagicPointer(current);
-
-		if (NewtRefIsMagicPointer(current))
-			return kNewtRefUnbind;
-
+        current = NcResolveMagicPointer(current);
+        
+        if (NewtRefIsMagicPointer(current))
+            return kNewtRefUnbind;
+        
         if (NewtHasSlot(current, name))
             return current;
-
+        
         current = NcGetSlot(current, NSSYM0(_proto));
     }
-
+    
     return kNewtRefUnbind;
 }
 
@@ -74,13 +74,13 @@ newtRef NcProtoLookupFrame(newtRefArg start, newtRefArg name)
 newtRef NcProtoLookup(newtRefArg start, newtRefArg name)
 {
     newtRefVar	current;
-
-	current = NcProtoLookupFrame(start, name);
-
-	if (current != kNewtRefUnbind)
-		return NcGetSlot(current, name);
-	else
-		return kNewtRefUnbind;
+    
+    current = NcProtoLookupFrame(start, name);
+    
+    if (current != kNewtRefUnbind)
+        return NcGetSlot(current, name);
+    else
+        return kNewtRefUnbind;
 }
 
 
@@ -96,20 +96,20 @@ newtRef NcProtoLookup(newtRefArg start, newtRefArg name)
 newtRef NcLexicalLookup(newtRefArg start, newtRef name)
 {
     newtRefVar	current = start;
-
+    
     while (NewtRefIsNotNIL(current))
     {
-		current = NcResolveMagicPointer(current);
-
-		if (NewtRefIsMagicPointer(current))
-			return kNewtRefUnbind;
-
+        current = NcResolveMagicPointer(current);
+        
+        if (NewtRefIsMagicPointer(current))
+            return kNewtRefUnbind;
+        
         if (NewtHasSlot(current, name))
             return NcGetSlot(current, name);
-
+        
         current = NcGetSlot(current, NSSYM0(_nextArgFrame));
     }
-
+    
     return kNewtRefUnbind;
 }
 
@@ -127,30 +127,30 @@ newtRef NcFullLookupFrame(newtRefArg start, newtRefArg name)
 {
     newtRefVar	current;
     newtRefVar	left = start;
-
-	if (! NewtRefIsFrame(start))
-		return kNewtRefUnbind;
-
+    
+    if (! NewtRefIsFrame(start))
+        return kNewtRefUnbind;
+    
     while (NewtRefIsNotNIL(left))
     {
         current = left;
-
+        
         while (NewtRefIsNotNIL(current))
         {
-			current = NcResolveMagicPointer(current);
-
-			if (NewtRefIsMagicPointer(current))
-				return kNewtRefUnbind;
-
+            current = NcResolveMagicPointer(current);
+            
+            if (NewtRefIsMagicPointer(current))
+                return kNewtRefUnbind;
+            
             if (NewtHasSlot(current, name))
                 return current;
-    
+            
             current = NcGetSlot(current, NSSYM0(_proto));
         }
-
+        
         left = NcGetSlot(left, NSSYM0(_parent));
     }
-
+    
     return kNewtRefUnbind;
 }
 
@@ -167,13 +167,13 @@ newtRef NcFullLookupFrame(newtRefArg start, newtRefArg name)
 newtRef NcFullLookup(newtRefArg start, newtRefArg name)
 {
     newtRefVar	current;
-
-	current = NcFullLookupFrame(start, name);
-
-	if (current != kNewtRefUnbind)
-		return NcGetSlot(current, name);
-	else
-		return kNewtRefUnbind;
+    
+    current = NcFullLookupFrame(start, name);
+    
+    if (current != kNewtRefUnbind)
+        return NcGetSlot(current, name);
+    else
+        return kNewtRefUnbind;
 }
 
 
@@ -259,26 +259,26 @@ newtRef NcClone(newtRefArg r)
 
 newtRef NsTotalClone(newtRefArg rcvr, newtRefArg r)
 {
-	newtRefVar	result;
-
-	result = NcClone(r);
-
-	if (NewtRefIsFrameOrArray(result))
-	{
+    newtRefVar	result;
+    
+    result = NcClone(r);
+    
+    if (NewtRefIsFrameOrArray(result))
+    {
         newtRef *	slots;
         uint32_t	n;
         uint32_t	i;
-    
+        
         slots = NewtRefToSlots(result);
-		n = NewtLength(result);
-    
+        n = NewtLength(result);
+        
         for (i = 0; i < n; i++)
         {
             slots[i] = NsTotalClone(rcvr, slots[i]);
         }
-	}
-
-	return result;
+    }
+    
+    return result;
 }
 
 
@@ -331,34 +331,34 @@ newtRef NsDeeplyLength(newtRefArg rcvr, newtRefArg r)
 
 newtRef NsSetLength(newtRefArg rcvr, newtRefArg r, newtRefArg len)
 {
-	int32_t	n;
-
-	if (NewtRefIsReadonly(r))
-		return NewtThrow(kNErrObjectReadOnly, r);
-
+    int32_t	n;
+    
+    if (NewtRefIsReadonly(r))
+        return NewtThrow(kNErrObjectReadOnly, r);
+    
     if (! NewtRefIsInteger(len))
         return NewtThrow(kNErrNotAnInteger, len);
-
-	n = NewtRefToInteger(len);
-
+    
+    n = NewtRefToInteger(len);
+    
     switch (NewtGetRefType(r, true))
     {
         case kNewtBinary:
         case kNewtString:
             NewtBinarySetLength(r, n);
             break;
-
+            
         case kNewtArray:
             NewtSlotsSetLength(r, n, kNewtRefUnbind);
-			break;
-
+            break;
+            
         case kNewtFrame:
-			return NewtThrow(kNErrUnexpectedFrame, r);
-
-		default:
-			return NewtThrow(kNErrNotAnArrayOrString, r);
+            return NewtThrow(kNErrUnexpectedFrame, r);
+            
+        default:
+            return NewtThrow(kNErrNotAnArrayOrString, r);
     }
-
+    
     return r;
 }
 
@@ -395,11 +395,11 @@ newtRef NsHasSlot(newtRefArg rcvr, newtRefArg frame, newtRefArg slot)
 newtRef NsGetSlot(newtRefArg rcvr, newtRefArg frame, newtRefArg slot)
 {
     newtObjRef	obj;
-
+    
     obj = NewtRefToPointer(frame);
-
+    
     if (obj != NULL)
-		return NcResolveMagicPointer(NewtObjGetSlot(obj, slot));
+        return NcResolveMagicPointer(NewtObjGetSlot(obj, slot));
     else
         return kNewtRefUnbind;
 }
@@ -419,18 +419,18 @@ newtRef NsGetSlot(newtRefArg rcvr, newtRefArg frame, newtRefArg slot)
 newtRef NsSetSlot(newtRefArg rcvr, newtRefArg frame, newtRefArg slot, newtRefArg v)
 {
     newtObjRef	obj;
-
+    
     obj = NewtRefToPointer(frame);
-
+    
     if (obj != NULL)
-	{
-		if (NewtRefIsReadonly(frame))
-			return NewtThrow(kNErrObjectReadOnly, frame);
-
-		return NewtObjSetSlot(obj, slot, v);
+    {
+        if (NewtRefIsReadonly(frame))
+            return NewtThrow(kNErrObjectReadOnly, frame);
+        
+        return NewtObjSetSlot(obj, slot, v);
     }
-
-   return kNewtRefNIL;
+    
+    return kNewtRefNIL;
 }
 
 
@@ -447,10 +447,10 @@ newtRef NsSetSlot(newtRefArg rcvr, newtRefArg frame, newtRefArg slot, newtRefArg
 newtRef NsRemoveSlot(newtRefArg rcvr, newtRefArg frame, newtRefArg slot)
 {
     newtObjRef	obj;
-
+    
     obj = NewtRefToPointer(frame);
     NewtObjRemoveSlot(obj, slot);
-
+    
     return frame;
 }
 
@@ -469,7 +469,7 @@ newtRef NcSetArraySlot(newtRefArg r, newtRefArg p, newtRefArg v)
 {
     if (! NewtRefIsInteger(p))
         return NewtThrow(kNErrNotAnInteger, p);
-
+    
     return NewtSetArraySlot(r, NewtRefToInteger(p), v);
 }
 
@@ -523,12 +523,12 @@ newtRef NcSetPath(newtRefArg r, newtRefArg p, newtRefArg v)
 {
     newtRefVar	slot;
     newtRefVar	target;
-
+    
     target = NewtGetPath(r, p, &slot);
-
+    
     if (target == kNewtRefUnbind)
         NewtThrow(kNErrOutOfBounds, r);
-
+    
     if (NewtRefIsArray(target))
         return NcSetArraySlot(target, slot, v);
     else
@@ -551,7 +551,7 @@ newtRef NcARef(newtRefArg r, newtRefArg p)
 {
     if (! NewtRefIsInteger(p))
         return NewtThrow(kNErrNotAnInteger, p);
-
+    
     return NewtARef(r, NewtRefToInteger(p));
 }
 
@@ -572,7 +572,7 @@ newtRef NcSetARef(newtRefArg r, newtRefArg p, newtRefArg v)
 {
     if (! NewtRefIsInteger(p))
         return NewtThrow(kNErrNotAnInteger, p);
-
+    
     return NewtSetARef(r, NewtRefToInteger(p), v);
 }
 
@@ -629,10 +629,10 @@ newtRef NsGetVariable(newtRefArg rcvr, newtRefArg frame, newtRefArg slot)
 
 newtRef NsSetVariable(newtRefArg rcvr, newtRefArg frame, newtRefArg slot, newtRefArg v)
 {
-	if (NewtAssignment(frame, slot, v))
-		return v;
-	else
-		return kNewtRefUnbind;
+    if (NewtAssignment(frame, slot, v))
+        return v;
+    else
+        return kNewtRefUnbind;
 }
 
 
@@ -668,53 +668,53 @@ newtRef NsHasVar(newtRefArg rcvr, newtRefArg name)
 newtRef NewtRefTypeToClass(uint16_t type)
 {
     newtRefVar	klass = kNewtRefUnbind;
-
-	switch (type)
-	{
-		case kNewtInt30:
-		case kNewtInt32:
-			klass = NS_INT;
-			break;
-
-		case kNewtCharacter:
-			klass = NS_CHAR;
-			break;
-
-		case kNewtTrue:
-			klass = NSSYM0(boolean);
-			break;
-
-		case kNewtSpecial:
-		case kNewtNil:
-		case kNewtUnbind:
-			klass = NSSYM0(weird_immediate);
-			break;
-
+    
+    switch (type)
+    {
+        case kNewtInt30:
+        case kNewtInt32:
+            klass = NS_INT;
+            break;
+            
+        case kNewtCharacter:
+            klass = NS_CHAR;
+            break;
+            
+        case kNewtTrue:
+            klass = NSSYM0(boolean);
+            break;
+            
+        case kNewtSpecial:
+        case kNewtNil:
+        case kNewtUnbind:
+            klass = NSSYM0(weird_immediate);
+            break;
+            
         case kNewtFrame:
             klass = NSSYM0(frame);
             break;
-
+            
         case kNewtArray:
             klass = NSSYM0(array);
             break;
-
+            
         case kNewtReal:
-			klass = NSSYM0(real);
+            klass = NSSYM0(real);
             break;
-
+            
         case kNewtSymbol:
-			klass = NSSYM0(symbol);
+            klass = NSSYM0(symbol);
             break;
-
+            
         case kNewtString:
             klass = NSSYM0(string);
             break;
-
+            
         case kNewtBinary:
-			klass = NSSYM0(binary);
+            klass = NSSYM0(binary);
             break;
-	}
-
+    }
+    
     return klass;
 }
 
@@ -731,30 +731,30 @@ newtRef NewtObjClassOf(newtRefArg r)
 {
     newtObjRef	obj;
     newtRefVar	klass = kNewtRefNIL;
-
+    
     obj = NewtRefToPointer(r);
-
+    
     if (obj != NULL)
     {
         if (NewtObjIsFrame(obj))
         {
-//            klass = NewtObjGetSlot(obj, NS_CLASS);
-			klass = NcProtoLookup(r, NS_CLASS);
-
+            //            klass = NewtObjGetSlot(obj, NS_CLASS);
+            klass = NcProtoLookup(r, NS_CLASS);
+            
             if (NewtRefIsNIL(klass))
-				klass = NSSYM0(frame);
+                klass = NSSYM0(frame);
         }
         else
         {
             klass = obj->as.klass;
-
-			if (klass == kNewtSymbolClass)
-				klass = NSSYM0(symbol);
+            
+            if (klass == kNewtSymbolClass)
+                klass = NSSYM0(symbol);
             else if (NewtRefIsNIL(klass))
-				klass = NewtRefTypeToClass(NewtGetObjectType(obj, true));
+                klass = NewtRefTypeToClass(NewtGetObjectType(obj, true));
         }
     }
-
+    
     return klass;
 }
 
@@ -771,27 +771,27 @@ newtRef NewtObjClassOf(newtRefArg r)
 newtRef NewtObjSetClass(newtRefArg r, newtRefArg c)
 {
     newtObjRef	obj;
-
+    
     obj = NewtRefToPointer(r);
-
+    
     if (obj != NULL)
     {
         if (NewtObjIsFrame(obj))
-		{
-			if (NewtRefIsReadonly(r))
-			{
-				NewtThrow(kNErrObjectReadOnly, r);
-				return r;
-			}
-
-			NewtObjSetSlot(obj, NS_CLASS, c);
+        {
+            if (NewtRefIsReadonly(r))
+            {
+                NewtThrow(kNErrObjectReadOnly, r);
+                return r;
+            }
+            
+            NewtObjSetSlot(obj, NS_CLASS, c);
         }
-		else
-		{
+        else
+        {
             obj->as.klass = c;
-		}
+        }
     }
-
+    
     return r;
 }
 
@@ -808,30 +808,30 @@ newtRef NewtObjSetClass(newtRefArg r, newtRefArg c)
 newtRef NsPrimClassOf(newtRefArg rcvr, newtRefArg r)
 {
     newtRefVar	klass;
-
+    
     if (NewtRefIsPointer(r))
-	{
-		switch (NewtGetRefType(r, true))
-		{
-			case kNewtFrame:
-				klass = NSSYM0(frame);
-				break;
-
-			case kNewtArray:
-				klass = NSSYM0(array);
-				break;
-
-			default:
-				klass = NSSYM0(binary);
-				break;
-		}
-	}
-	else
-	{
-		klass = NSSYM(immediate);
-	}
-
-	return klass;
+    {
+        switch (NewtGetRefType(r, true))
+        {
+            case kNewtFrame:
+                klass = NSSYM0(frame);
+                break;
+                
+            case kNewtArray:
+                klass = NSSYM0(array);
+                break;
+                
+            default:
+                klass = NSSYM0(binary);
+                break;
+        }
+    }
+    else
+    {
+        klass = NSSYM(immediate);
+    }
+    
+    return klass;
 }
 
 
@@ -848,7 +848,7 @@ newtRef NcClassOf(newtRefArg r)
     if (NewtRefIsPointer(r))
         return NewtObjClassOf(r);
     else
-		return NewtRefTypeToClass(NewtGetRefType(r, false));
+        return NewtRefTypeToClass(NewtGetRefType(r, false));
 }
 
 
@@ -865,7 +865,7 @@ newtRef NcClassOf(newtRefArg r)
 newtRef NcSetClass(newtRefArg r, newtRefArg c)
 {
     if (NewtRefIsPointer(r))
-		return NewtObjSetClass(r, c);
+        return NewtObjSetClass(r, c);
     else
         return kNewtRefNIL;;
 }
@@ -924,12 +924,12 @@ newtRef NsObjectEqual(newtRefArg rcvr, newtRefArg r1, newtRefArg r2)
 
 newtRef NsSymbolCompareLex(newtRefArg rcvr, newtRefArg r1, newtRefArg r2)
 {
-	if (! NewtRefIsSymbol(r1))
+    if (! NewtRefIsSymbol(r1))
         return NewtThrow(kNErrNotASymbol, r1);
-
-	if (! NewtRefIsSymbol(r2))
+    
+    if (! NewtRefIsSymbol(r2))
         return NewtThrow(kNErrNotASymbol, r2);
-
+    
     return NewtMakeInteger(NewtSymbolCompareLex(r1, r2));
 }
 
@@ -1217,12 +1217,12 @@ newtRef NsIsReadonly(newtRefArg rcvr, newtRefArg r)
 newtRef NcAddArraySlot(newtRefArg r, newtRefArg v)
 {
     newtObjRef	obj;
-
+    
     obj = NewtRefToPointer(r);
-
+    
     if (obj != NULL)
-		NewtObjAddArraySlot(obj, v);
-
+        NewtObjAddArraySlot(obj, v);
+    
     return v;
 }
 
@@ -1241,20 +1241,20 @@ newtRef NcStringer(newtRefArg r)
     newtRefVar	str;
     uint32_t	len;
     uint32_t	i;
-
+    
     if (! NewtRefIsArray(r))
         return NewtThrow(kNErrNotAnArray, r);
-
+    
     str = NSSTR("");
-
+    
     len = NewtArrayLength(r);
     slots = NewtRefToSlots(r);
-
+    
     for (i = 0; i < len; i++)
     {
         NcStrCat(str, slots[i]);
     }
-
+    
     return str;
 }
 
@@ -1271,59 +1271,59 @@ newtRef NcStringer(newtRefArg r)
 
 newtRef NsStrCat(newtRefArg rcvr, newtRefArg str, newtRefArg v)
 {
-	char	wk[32];
+    char	wk[32];
     char *	s = NULL;
-
+    
     switch (NewtGetRefType(v, true))
     {
         case kNewtInt30:
         case kNewtInt32:
-            {
-                int	n;
-
-                n = (int)NewtRefToInteger(v);
-                sprintf(wk, "%d", n);
-                s = wk;
-            }
+        {
+            int	n;
+            
+            n = (int)NewtRefToInteger(v);
+            sprintf(wk, "%d", n);
+            s = wk;
+        }
             break;
-
+            
         case kNewtReal:
-            {
-                double	n;
-
-                n = NewtRefToReal(v);
-                sprintf(wk, "%f", n);
-                s = wk;
-            }
+        {
+            double	n;
+            
+            n = NewtRefToReal(v);
+            sprintf(wk, "%f", n);
+            s = wk;
+        }
             break;
-
+            
         case kNewtCharacter:
-			{
-				int		c;
-
-				c = NewtRefToCharacter(v);
-                sprintf(wk, "%c", c);
-                s = wk;
-			}
+        {
+            int		c;
+            
+            c = NewtRefToCharacter(v);
+            sprintf(wk, "%c", c);
+            s = wk;
+        }
             break;
-
+            
         case kNewtSymbol:
-            {
-                newtSymDataRef	sym;
-
-                sym = NewtRefToSymbol(v);
-                s = sym->name;
-            }
+        {
+            newtSymDataRef	sym;
+            
+            sym = NewtRefToSymbol(v);
+            s = sym->name;
+        }
             break;
-
+            
         case kNewtString:
             s = NewtRefToString(v);
             break;
     }
-
+    
     if (s != NULL)
         NewtStrCat(str, s);
-
+    
     return str;
 }
 
@@ -1340,12 +1340,12 @@ newtRef NsStrCat(newtRefArg rcvr, newtRefArg str, newtRefArg v)
 newtRef NsMakeSymbol(newtRefArg rcvr, newtRefArg r)
 {
     char *	s;
-
+    
     if (! NewtRefIsString(r))
         return NewtThrow(kNErrNotAString, r);
-
+    
     s = NewtRefToString(r);
-
+    
     return NewtMakeSymbol(s);
 }
 
@@ -1360,21 +1360,21 @@ newtRef NsMakeSymbol(newtRefArg rcvr, newtRefArg r)
 
 newtRef NsMakeFrame(newtRefArg rcvr)
 {
-	return NewtMakeFrame(kNewtRefUnbind, 0);
+    return NewtMakeFrame(kNewtRefUnbind, 0);
 }
 
 
 newtRef NsMakeArray(newtRefArg rcvr, newtRefArg size, newtRefArg initialValue) {
-  if (!NewtRefIsInteger(size)) {
-    return NewtThrow(kNErrNotAnInteger, size);
-  }
-  int length = NewtRefToInteger(size);
-  newtRef result = NewtMakeArray(kNewtRefUnbind, length);
-  int i;
-  for (i = 0; i<length; i++) {
-    NewtSlotsSetSlot(result, i, initialValue);
-  }
-  return result;
+    if (!NewtRefIsInteger(size)) {
+        return NewtThrow(kNErrNotAnInteger, size);
+    }
+    int length = NewtRefToInteger(size);
+    newtRef result = NewtMakeArray(kNewtRefUnbind, length);
+    int i;
+    for (i = 0; i<length; i++) {
+        NewtSlotsSetSlot(result, i, initialValue);
+    }
+    return result;
 }
 
 
@@ -1392,8 +1392,8 @@ newtRef NsMakeBinary(newtRefArg rcvr, newtRefArg length, newtRefArg klass)
 {
     if (! NewtRefIsInteger(length))
         return NewtThrow(kNErrNotAnInteger, length);
-
-	return NewtMakeBinary(klass, NULL, NewtRefToInteger(length), false);
+    
+    return NewtMakeBinary(klass, NULL, NewtRefToInteger(length), false);
 }
 
 
@@ -1411,8 +1411,8 @@ newtRef NsMakeBinaryFromHex(newtRefArg rcvr, newtRefArg hex, newtRefArg klass)
 {
     if (! NewtRefIsString(hex))
         return NewtThrow(kNErrNotAString, hex);
-
-	return NewtMakeBinaryFromHex(klass, NewtRefToString(hex), false);
+    
+    return NewtMakeBinaryFromHex(klass, NewtRefToString(hex), false);
 }
 
 
@@ -1432,11 +1432,11 @@ newtRef NcBAnd(newtRefArg r1, newtRefArg r2)
 {
     if (! NewtRefIsInteger(r1))
         return NewtThrow(kNErrNotAnInteger, r1);
-
+    
     if (! NewtRefIsInteger(r2))
         return NewtThrow(kNErrNotAnInteger, r2);
-
-  return NewtMakeInteger((NewtRefToInteger(r1) & NewtRefToInteger(r2)));
+    
+    return NewtMakeInteger((NewtRefToInteger(r1) & NewtRefToInteger(r2)));
 }
 
 
@@ -1453,11 +1453,11 @@ newtRef NcBOr(newtRefArg r1, newtRefArg r2)
 {
     if (! NewtRefIsInteger(r1))
         return NewtThrow(kNErrNotAnInteger, r1);
-
+    
     if (! NewtRefIsInteger(r2))
         return NewtThrow(kNErrNotAnInteger, r2);
-
-  return NewtMakeInteger((NewtRefToInteger(r1) | NewtRefToInteger(r2)));
+    
+    return NewtMakeInteger((NewtRefToInteger(r1) | NewtRefToInteger(r2)));
 }
 
 
@@ -1473,7 +1473,7 @@ newtRef NcBNot(newtRefArg r)
 {
     if (! NewtRefIsInteger(r))
         return NewtThrow(kNErrNotAnInteger, r);
-
+    
     return NewtMakeInteger(~ NewtRefToInteger(r));
 }
 
@@ -1494,10 +1494,10 @@ newtRef NcBNot(newtRefArg r)
 
 newtRef NsAnd(newtRefArg rcvr, newtRefArg r1, newtRefArg r2)
 {
-	bool	result;
-
-	result = (NewtRefIsNotNIL(r1) && NewtRefIsNotNIL(r2));
-
+    bool	result;
+    
+    result = (NewtRefIsNotNIL(r1) && NewtRefIsNotNIL(r2));
+    
     return NewtMakeBoolean(result);
 }
 
@@ -1515,10 +1515,10 @@ newtRef NsAnd(newtRefArg rcvr, newtRefArg r1, newtRefArg r2)
 
 newtRef NsOr(newtRefArg rcvr, newtRefArg r1, newtRefArg r2)
 {
-	bool	result;
-
-	result = (NewtRefIsNotNIL(r1) || NewtRefIsNotNIL(r2));
-
+    bool	result;
+    
+    result = (NewtRefIsNotNIL(r1) || NewtRefIsNotNIL(r2));
+    
     return NewtMakeBoolean(result);
 }
 
@@ -1541,7 +1541,7 @@ newtRef NsOr(newtRefArg rcvr, newtRefArg r1, newtRefArg r2)
 bool NewtArgsIsNumber(newtRefArg r1, newtRefArg r2, bool * real)
 {
     *real = false;
-
+    
     if (NewtRefIsReal(r1))
     {
         *real = true;
@@ -1551,7 +1551,7 @@ bool NewtArgsIsNumber(newtRefArg r1, newtRefArg r2, bool * real)
         if (! NewtRefIsInteger(r1))
             return false;
     }
-
+    
     if (NewtRefIsReal(r2))
     {
         *real = true;
@@ -1561,7 +1561,7 @@ bool NewtArgsIsNumber(newtRefArg r1, newtRefArg r2, bool * real)
         if (! NewtRefIsInteger(r2))
             return false;
     }
-
+    
     return true;
 }
 
@@ -1578,28 +1578,28 @@ bool NewtArgsIsNumber(newtRefArg r1, newtRefArg r2, bool * real)
 newtRef NcAdd(newtRefArg r1, newtRefArg r2)
 {
     bool	real;
-
+    
     if (! NewtArgsIsNumber(r1, r2, &real))
-		return NewtThrow0(kNErrNotANumber);
-
+        return NewtThrow0(kNErrNotANumber);
+    
     if (real)
     {
         double real1;
         double real2;
-
+        
         real1 = NewtRefToReal(r1);
         real2 = NewtRefToReal(r2);
-
+        
         return NewtMakeReal(real1 + real2);
     }
     else
     {
         int32_t	int1;
         int32_t	int2;
-
+        
         int1 = NewtRefToInteger(r1);
         int2 = NewtRefToInteger(r2);
-
+        
         return NewtMakeInteger(int1 + int2);
     }
 }
@@ -1617,28 +1617,28 @@ newtRef NcAdd(newtRefArg r1, newtRefArg r2)
 newtRef NcSubtract(newtRefArg r1, newtRefArg r2)
 {
     bool	real;
-
+    
     if (! NewtArgsIsNumber(r1, r2, &real))
-		return NewtThrow0(kNErrNotANumber);
-
+        return NewtThrow0(kNErrNotANumber);
+    
     if (real)
     {
         double real1;
         double real2;
-
+        
         real1 = NewtRefToReal(r1);
         real2 = NewtRefToReal(r2);
-
+        
         return NewtMakeReal(real1 - real2);
     }
     else
     {
         int32_t	int1;
         int32_t	int2;
-
+        
         int1 = NewtRefToInteger(r1);
         int2 = NewtRefToInteger(r2);
-
+        
         return NewtMakeInteger(int1 - int2);
     }
 }
@@ -1656,28 +1656,28 @@ newtRef NcSubtract(newtRefArg r1, newtRefArg r2)
 newtRef NcMultiply(newtRefArg r1, newtRefArg r2)
 {
     bool	real;
-
+    
     if (! NewtArgsIsNumber(r1, r2, &real))
-		return NewtThrow0(kNErrNotANumber);
-
+        return NewtThrow0(kNErrNotANumber);
+    
     if (real)
     {
         double real1;
         double real2;
-
+        
         real1 = NewtRefToReal(r1);
         real2 = NewtRefToReal(r2);
-
+        
         return NewtMakeReal(real1 * real2);
     }
     else
     {
         int32_t	int1;
         int32_t	int2;
-
+        
         int1 = NewtRefToInteger(r1);
         int2 = NewtRefToInteger(r2);
-
+        
         return NewtMakeInteger(int1 * int2);
     }
 }
@@ -1695,34 +1695,34 @@ newtRef NcMultiply(newtRefArg r1, newtRefArg r2)
 newtRef NcDivide(newtRefArg r1, newtRefArg r2)
 {
     bool	real;
-
+    
     if (! NewtArgsIsNumber(r1, r2, &real))
-		return NewtThrow0(kNErrNotANumber);
-
+        return NewtThrow0(kNErrNotANumber);
+    
     if (real)
     {
         double real1;
         double real2;
-
+        
         real1 = NewtRefToReal(r1);
         real2 = NewtRefToReal(r2);
-
+        
         if (real2 == 0.0)
             return NewtThrow(kNErrDiv0, r2);
-
+        
         return NewtMakeReal(real1 / real2);
     }
     else
     {
         int32_t	int1;
         int32_t	int2;
-
+        
         int1 = NewtRefToInteger(r1);
         int2 = NewtRefToInteger(r2);
-
+        
         if (int2 == 0)
             return NewtThrow(kNErrDiv0, r2);
-
+        
         double result = (double)int1 / (double)int2;
         if (result == (int)result) {
             return NewtMakeInteger(result);
@@ -1747,10 +1747,10 @@ newtRef NcDiv(newtRefArg r1, newtRefArg r2)
 {
     if (! NewtRefIsInteger(r1))
         return NewtThrow(kNErrNotAnInteger, r1);
-
+    
     if (! NewtRefIsInteger(r2))
         return NewtThrow(kNErrNotAnInteger, r2);
-
+    
     return NewtMakeInteger(NewtRefToInteger(r1) / NewtRefToInteger(r2));
 }
 
@@ -1769,10 +1769,10 @@ newtRef NsMod(newtRefArg rcvr, newtRefArg r1, newtRefArg r2)
 {
     if (! NewtRefIsInteger(r1))
         return NewtThrow(kNErrNotAnInteger, r1);
-
+    
     if (! NewtRefIsInteger(r2))
         return NewtThrow(kNErrNotAnInteger, r2);
-
+    
     return NewtMakeInteger(NewtRefToInteger(r1) % NewtRefToInteger(r2));
 }
 
@@ -1791,10 +1791,10 @@ newtRef NsShiftLeft(newtRefArg rcvr, newtRefArg r1, newtRefArg r2)
 {
     if (! NewtRefIsInteger(r1))
         return NewtThrow(kNErrNotAnInteger, r1);
-
+    
     if (! NewtRefIsInteger(r2))
         return NewtThrow(kNErrNotAnInteger, r2);
-
+    
     return NewtMakeInteger(NewtRefToInteger(r1) << NewtRefToInteger(r2));
 }
 
@@ -1813,10 +1813,10 @@ newtRef NsShiftRight(newtRefArg rcvr, newtRefArg r1, newtRefArg r2)
 {
     if (! NewtRefIsInteger(r1))
         return NewtThrow(kNErrNotAnInteger, r1);
-
+    
     if (! NewtRefIsInteger(r2))
         return NewtThrow(kNErrNotAnInteger, r2);
-
+    
     return NewtMakeInteger(NewtRefToInteger(r1) >> NewtRefToInteger(r2));
 }
 
@@ -1911,7 +1911,7 @@ newtRef NcLessOrEqual(newtRefArg r1, newtRefArg r2)
 
 newtRef NsCurrentException(newtRefArg rcvr)
 {
-	return NVMCurrentException();
+    return NVMCurrentException();
 }
 
 
@@ -1929,12 +1929,12 @@ newtRef NsCurrentException(newtRefArg rcvr)
 newtRef NsMakeRegex(newtRefArg rcvr, newtRefArg pattern, newtRefArg opt)
 {
     newtRefVar	v[] = {
-                            NSSYM0(_proto),		NSNAMEDMP0(protoREGEX),
-                            NSSYM0(pattern),	pattern,
-                            NSSYM0(option),		opt,
-                        };
-
-	return NewtMakeFrame2(sizeof(v) / (sizeof(newtRefVar) * 2), v);
+        NSSYM0(_proto),		NSNAMEDMP0(protoREGEX),
+        NSSYM0(pattern),	pattern,
+        NSSYM0(option),		opt,
+    };
+    
+    return NewtMakeFrame2(sizeof(v) / (sizeof(newtRefVar) * 2), v);
 }
 
 #endif /* __NAMED_MAGIC_POINTER__ */
@@ -1954,13 +1954,13 @@ newtRef NsMakeRegex(newtRefArg rcvr, newtRefArg pattern, newtRefArg opt)
  */
 newtRef 	NsApply(newtRefArg rcvr, newtRefArg func, newtRefArg params)
 {
-	if (! NewtRefIsFunction(func))
-	{
-		return NewtThrow(kNErrNotAFunction, func);
-	}
-	
-	newtRef ary = NewtRefIsNIL(params) ? NewtMakeArray(kNewtRefUnbind, 0) : params;
-	return NcCallWithArgArray(func, ary);
+    if (! NewtRefIsFunction(func))
+    {
+        return NewtThrow(kNErrNotAFunction, func);
+    }
+    
+    newtRef ary = NewtRefIsNIL(params) ? NewtMakeArray(kNewtRefUnbind, 0) : params;
+    return NcCallWithArgArray(func, ary);
 }
 
 /*------------------------------------------------------------------------*/
@@ -1975,8 +1975,8 @@ newtRef 	NsApply(newtRefArg rcvr, newtRefArg func, newtRefArg params)
  */
 newtRef 	NsPerform(newtRefArg rcvr, newtRefArg frame, newtRefArg message, newtRefArg params)
 {
-	newtRef ary = NewtRefIsNIL(params) ? NewtMakeArray(kNewtRefUnbind, 0) : params;
-	return NcSendWithArgArray(frame, message, false, ary);
+    newtRef ary = NewtRefIsNIL(params) ? NewtMakeArray(kNewtRefUnbind, 0) : params;
+    return NcSendWithArgArray(frame, message, false, ary);
 }
 
 /*------------------------------------------------------------------------*/
@@ -1991,8 +1991,8 @@ newtRef 	NsPerform(newtRefArg rcvr, newtRefArg frame, newtRefArg message, newtRe
  */
 newtRef 	NsPerformIfDefined(newtRefArg rcvr, newtRefArg frame, newtRefArg message, newtRefArg params)
 {
-	newtRef ary = NewtRefIsNIL(params) ? NewtMakeArray(kNewtRefUnbind, 0) : params;
-	return NcSendWithArgArray(frame, message, true, ary);
+    newtRef ary = NewtRefIsNIL(params) ? NewtMakeArray(kNewtRefUnbind, 0) : params;
+    return NcSendWithArgArray(frame, message, true, ary);
 }
 /*------------------------------------------------------------------------*/
 /** Send a message to a method in a frame by name with an array of parameters (proto inheritance only)
@@ -2006,8 +2006,8 @@ newtRef 	NsPerformIfDefined(newtRefArg rcvr, newtRefArg frame, newtRefArg messag
  */
 newtRef 	NsProtoPerform(newtRefArg rcvr, newtRefArg frame, newtRefArg message, newtRefArg params)
 {
-	newtRef ary = NewtRefIsNIL(params) ? NewtMakeArray(kNewtRefUnbind, 0) : params;
-	return NcSendProtoWithArgArray(frame, message, false, ary);
+    newtRef ary = NewtRefIsNIL(params) ? NewtMakeArray(kNewtRefUnbind, 0) : params;
+    return NcSendProtoWithArgArray(frame, message, false, ary);
 }
 
 /*------------------------------------------------------------------------*/
@@ -2022,8 +2022,8 @@ newtRef 	NsProtoPerform(newtRefArg rcvr, newtRefArg frame, newtRefArg message, n
  */
 newtRef 	NsProtoPerformIfDefined(newtRefArg rcvr, newtRefArg frame, newtRefArg message, newtRefArg params)
 {
-	newtRef ary = NewtRefIsNIL(params) ? NewtMakeArray(kNewtRefUnbind, 0) : params;
-	return NcSendProtoWithArgArray(frame, message, true, ary);
+    newtRef ary = NewtRefIsNIL(params) ? NewtMakeArray(kNewtRefUnbind, 0) : params;
+    return NcSendProtoWithArgArray(frame, message, true, ary);
 }
 
 #if 0
@@ -2154,7 +2154,7 @@ newtRef NsCompile(newtRefArg rcvr, newtRefArg r)
 {
     if (! NewtRefIsString(r))
         return NewtThrow(kNErrNotAString, r);
-
+    
     return NBCCompileStr(NewtRefToString(r), true);
 }
 
@@ -2174,7 +2174,7 @@ newtRef NsGetEnv(newtRefArg rcvr, newtRefArg r)
 {
     if (! NewtRefIsString(r))
         return NewtThrow(kNErrNotAString, r);
-
+    
     return NewtGetEnv(NewtRefToString(r));
 }
 
@@ -2196,78 +2196,78 @@ newtRef NsExtractByte(newtRefArg rcvr, newtRefArg r, newtRefArg offset)
 {
     if (! NewtRefIsBinary(r))
         return NewtThrow(kNErrNotABinaryObject, r);
-
+    
     if (! NewtRefIsInteger(offset))
         return NewtThrow(kNErrNotAnInteger, offset);
-
+    
     return NewtGetBinarySlot(r, NewtRefToInteger(offset));
 }
 
 newtRef NsExtractWord(newtRefArg rcvr, newtRefArg r, newtRefArg offset)
 {
-  if (! NewtRefIsBinary(r))
-    return NewtThrow(kNErrNotABinaryObject, r);
-  
-  if (! NewtRefIsInteger(offset))
-    return NewtThrow(kNErrNotAnInteger, offset);
-
-  uint32_t len = NewtBinaryLength(r);
-  uint32_t p = NewtRefToInteger(offset);
-  
-  if (p < len && p + 1 < len)
-  {
-    uint8_t *	data = NewtRefToBinary(r);
-    uint32_t value = (data[p] << 8) | (data[p+1]);
-    return NewtMakeInteger(value);
-  }
-  
-  return kNewtRefUnbind;
-
+    if (! NewtRefIsBinary(r))
+        return NewtThrow(kNErrNotABinaryObject, r);
+    
+    if (! NewtRefIsInteger(offset))
+        return NewtThrow(kNErrNotAnInteger, offset);
+    
+    uint32_t len = NewtBinaryLength(r);
+    uint32_t p = NewtRefToInteger(offset);
+    
+    if (p < len && p + 1 < len)
+    {
+        uint8_t *	data = NewtRefToBinary(r);
+        uint32_t value = (data[p] << 8) | (data[p+1]);
+        return NewtMakeInteger(value);
+    }
+    
+    return kNewtRefUnbind;
+    
 }
 
 newtRef NsRef(newtRefArg rcvr, newtRefArg integer)
 {
-  if (! NewtRefIsInteger(integer))
-    return NewtThrow(kNErrNotAnInteger, integer);
-
-  newtRef result = (newtRef)NewtRefToInteger(integer);
-  if (NewtRefIsPointer(result) == false) {
-    //result = NSSYM0(weird_immediate);
-  }
-  return result;
+    if (! NewtRefIsInteger(integer))
+        return NewtThrow(kNErrNotAnInteger, integer);
+    
+    newtRef result = (newtRef)NewtRefToInteger(integer);
+    if (NewtRefIsPointer(result) == false) {
+        //result = NSSYM0(weird_immediate);
+    }
+    return result;
 }
 
 newtRef NsRefOf(newtRefArg rcvr, newtRefArg object)
 {
-  return NewtMakeInteger(object);
+    return NewtMakeInteger(object);
 }
 
 newtRef NsNegate(newtRefArg rcvr, newtRefArg integer)
 {
-  if (! NewtRefIsInteger(integer))
-    return NewtThrow(kNErrNotAnInteger, integer);
-  
-  return NewtMakeInt32(- (NewtRefToInteger(integer)));
+    if (! NewtRefIsInteger(integer))
+        return NewtThrow(kNErrNotAnInteger, integer);
+    
+    return NewtMakeInt32(- (NewtRefToInteger(integer)));
 }
 
 newtRef NsSetContains(newtRefArg rcvr, newtRefArg array, newtRefArg item) {
-  if (!NewtRefIsArray(array)) {
-    return NewtThrow(kNErrNotAnArray, array);
-  }
-  
-  newtRef *	slots;
-  uint32_t	n;
-  uint32_t	i;
-  
-  slots = NewtRefToSlots(array);
-  n = NewtLength(array);
-  
-  for (i = 0; i < n; i++)
-  {
-    if (slots[i] == item) {
-      return NewtMakeInteger(i);
+    if (!NewtRefIsArray(array)) {
+        return NewtThrow(kNErrNotAnArray, array);
     }
-  }
-  
-  return kNewtRefNIL;
+    
+    newtRef *	slots;
+    uint32_t	n;
+    uint32_t	i;
+    
+    slots = NewtRefToSlots(array);
+    n = NewtLength(array);
+    
+    for (i = 0; i < n; i++)
+    {
+        if (slots[i] == item) {
+            return NewtMakeInteger(i);
+        }
+    }
+    
+    return kNewtRefNIL;
 }

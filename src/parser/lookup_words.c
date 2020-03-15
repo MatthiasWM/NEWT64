@@ -31,24 +31,24 @@
 int lookup_words(keyword_t words[], int len, const char * s)
 {
     int	p, q, r, comp;
-
+    
     p =	0;
     q =	len - 1;
-
+    
     while (p <= q)
     {
         r = (p + q) / 2;
         comp = strcasecmp(s, words[r].name);
-
+        
         if (comp == 0)
             return words[r].tokn;
-
+        
         if (comp < 0)
             q = r - 1;
         else
             p = r + 1;
     }
-
+    
     return -1;
 }
 
@@ -59,7 +59,7 @@ int lookup_words(keyword_t words[], int len, const char * s)
 
 int lookup_membcompare(const void * a1, const void * a2)
 {
-	return strcasecmp(((keyword_t *)a1)->name, ((keyword_t *)a2)->name);
+    return strcasecmp(((keyword_t *)a1)->name, ((keyword_t *)a2)->name);
 }
 
 
@@ -74,5 +74,5 @@ int lookup_membcompare(const void * a1, const void * a2)
 
 void lookup_sorttable(keyword_t words[], int len)
 {
-	qsort((void *)words, len, sizeof(keyword_t), &lookup_membcompare);
+    qsort((void *)words, len, sizeof(keyword_t), &lookup_membcompare);
 }

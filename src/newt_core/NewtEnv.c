@@ -68,14 +68,14 @@ static newtRef	NsDefNamedMP(newtRefArg rcvr, newtRefArg r, newtRefArg v);
 
 char * replacechr(char * str, char src, char dest)
 {
-	char *	s;
-
-	for (s = str; *s; s++)
-	{
-		if (*s == src) *s = dest;
-	}
-
-	return str;
+    char *	s;
+    
+    for (s = str; *s; s++)
+    {
+        if (*s == src) *s = dest;
+    }
+    
+    return str;
 }
 
 
@@ -90,19 +90,19 @@ char * replacechr(char * str, char src, char dest)
 
 char * NewtDefaultEncoding(void)
 {
-	char *	encoding = NULL;
-	char *	lang;
-
-	lang = (char *)getenv("LANG");
-	if (! lang) lang = (char *)getenv("LC_ALL");
-	if (lang) encoding = strchr(lang, '.');
-
-	if (encoding)
-		encoding++;
-	else
-		encoding = NEWT_DEFAULT_ENCODING;
-
-	return encoding;
+    char *	encoding = NULL;
+    char *	lang;
+    
+    lang = (char *)getenv("LANG");
+    if (! lang) lang = (char *)getenv("LC_ALL");
+    if (lang) encoding = strchr(lang, '.');
+    
+    if (encoding)
+        encoding++;
+    else
+        encoding = NEWT_DEFAULT_ENCODING;
+    
+    return encoding;
 }
 
 
@@ -120,7 +120,7 @@ void NewtInitSYM(void)
     // frame
     INITSYM(_proto);
     INITSYM(_parent);
-
+    
     // function
     INITSYM(_implementor);
     INITSYM(_nextArgFrame);
@@ -131,13 +131,13 @@ void NewtInitSYM(void)
     INITSYM(argFrame);
     INITSYM(numArgs);
     INITSYM(indefinite);
-
+    
     // native function
     INITSYM(_function.native0);
     INITSYM(_function.native);
     INITSYM(funcPtr);
     INITSYM(docString);
-
+    
     // classes or types
     INITSYM(binary);
     INITSYM(string);
@@ -150,78 +150,78 @@ void NewtInitSYM(void)
     INITSYM(bits);
     INITSYM(cbits);
     INITSYM(nativeModule);
-
+    
     // for loop
     INITSYM(collect);
     INITSYM(deeply);
-
+    
     // class
     INITSYM2(NS_CHAR, "char");
     INITSYM(boolean);
     INITSYM(weird_immediate);
     INITSYM(forEachState);
-
+    
     // functions（必須）
     INITSYM(hasVariable);
     INITSYM(hasVar);
     INITSYM(defGlobalFn);
     INITSYM(defGlobalVar);
-//    INITSYM(and);
-//    INITSYM(or);
+    //    INITSYM(and);
+    //    INITSYM(or);
     INITSYM(mod);
     INITSYM(shiftLeft);
     INITSYM(shiftRight);
     INITSYM(objectEqual);
     INITSYM(defMagicPointer);
-	INITSYM(makeRegex);
-
+    INITSYM(makeRegex);
+    
     // exception type
     INITSYM(type.ref);
     INITSYM(ext.ex.msg);
-
+    
     // exception frame
     INITSYM(name);
     INITSYM(data);
     INITSYM(message);
     INITSYM(error);
-
+    
     INITSYM(errorCode);
     INITSYM(symbol);
     INITSYM(value);
     INITSYM(index);
-
+    
     // root
-	INITSYM(sym_table);
+    INITSYM(sym_table);
     INITSYM(globals);
     INITSYM(global_fns);
     INITSYM(magic_pointers);
 #ifdef __NAMED_MAGIC_POINTER__
     INITSYM(named_mps);
 #endif /* __NAMED_MAGIC_POINTER__ */
-
+    
     // for print
     INITSYM(printDepth);
     INITSYM(printIndent);
     INITSYM(printLength);
     INITSYM(printBinaries);
-
-	// for regex
+    
+    // for regex
     INITSYM(protoREGEX);
     INITSYM(regex);
     INITSYM(pattern);
     INITSYM(option);
-
-	// for require
+    
+    // for require
     INITSYM(requires);
-
+    
     // ENV
     INITSYM(_ENV_);
     INITSYM(NEWTLIB);
-
-	// ARGV
+    
+    // ARGV
     INITSYM(_ARGV_);
     INITSYM(_EXEDIR_);
-
+    
     // stdout, stderr
     INITSYM(_STDOUT_);
     INITSYM(_STDERR_);
@@ -236,49 +236,49 @@ void NewtInitSYM(void)
 
 void NewtInitSysEnv(void)
 {
-	struct {
-		char *			name;
-		newtRefVar  	slot;
-		const char *	defaultValue;
-	} envs[] = {
-		{"NEWTLIB",		NSSYM0(NEWTLIB),	__LIBDIR__ ":."},
-		{"PLATFORM",	NSSYM(PLATFORM),	__PLATFORM__},
-		{"DYLIBSUFFIX",	NSSYM(DYLIBSUFFIX),	__DYLIBSUFFIX__},
-		{NULL,			kNewtRefUnbind,		NULL}
-	};
-
-	newtRefVar  env;
-	newtRefVar  proto;
-	newtRefVar  v;
-	uint16_t	i;
-
-	env = NcMakeFrame();
-	proto = NcMakeFrame();
-
-	for (i = 0; envs[i].name != NULL; i++)
-	{
-		NcSetSlot(proto, envs[i].slot, NewtMakeString(envs[i].defaultValue, true));
-	}
-
-	/* NEWTLIB is a special case, it can be overridden from the value in
-	   the global variables. */
-	v = NewtGetEnv("NEWTLIB");
-	if (NewtRefIsString(v))
-	{
-		v = NcSplit(v, NewtMakeCharacter(':'));
-		NcSetSlot(proto, NSSYM0(NEWTLIB), v);
-	}
-	else
-	{
-		newtRefVar default_newtlib_array[] = {NSSTR(__LIBDIR__), NSSTR(".")};
-		newtRefVar default_newtlib = NewtMakeArray2(
-				kNewtRefNIL,
-				sizeof(default_newtlib_array) / sizeof(newtRefVar),
-				default_newtlib_array);
-		NcSetSlot(proto, NSSYM0(NEWTLIB), default_newtlib);
-	}
-
-	NcSetSlot(env, NSSYM0(_proto), NewtPackLiteral(proto));
+    struct {
+        char *			name;
+        newtRefVar  	slot;
+        const char *	defaultValue;
+    } envs[] = {
+        {"NEWTLIB",		NSSYM0(NEWTLIB),	__LIBDIR__ ":."},
+        {"PLATFORM",	NSSYM(PLATFORM),	__PLATFORM__},
+        {"DYLIBSUFFIX",	NSSYM(DYLIBSUFFIX),	__DYLIBSUFFIX__},
+        {NULL,			kNewtRefUnbind,		NULL}
+    };
+    
+    newtRefVar  env;
+    newtRefVar  proto;
+    newtRefVar  v;
+    uint16_t	i;
+    
+    env = NcMakeFrame();
+    proto = NcMakeFrame();
+    
+    for (i = 0; envs[i].name != NULL; i++)
+    {
+        NcSetSlot(proto, envs[i].slot, NewtMakeString(envs[i].defaultValue, true));
+    }
+    
+    /* NEWTLIB is a special case, it can be overridden from the value in
+     the global variables. */
+    v = NewtGetEnv("NEWTLIB");
+    if (NewtRefIsString(v))
+    {
+        v = NcSplit(v, NewtMakeCharacter(':'));
+        NcSetSlot(proto, NSSYM0(NEWTLIB), v);
+    }
+    else
+    {
+        newtRefVar default_newtlib_array[] = {NSSTR(__LIBDIR__), NSSTR(".")};
+        newtRefVar default_newtlib = NewtMakeArray2(
+                                                    kNewtRefNIL,
+                                                    sizeof(default_newtlib_array) / sizeof(newtRefVar),
+                                                    default_newtlib_array);
+        NcSetSlot(proto, NSSYM0(NEWTLIB), default_newtlib);
+    }
+    
+    NcSetSlot(env, NSSYM0(_proto), NewtPackLiteral(proto));
     NcSetSlot(GLOBALS, NSSYM0(_ENV_), env);
 }
 
@@ -292,55 +292,55 @@ void NewtInitSysEnv(void)
  *
  * @return			なし
  */
- 
+
 void NewtInitARGV(int argc, const char * argv[], int n)
 {
-	newtRefVar  exepath = kNewtRefUnbind;
-	newtRefVar  r;
-	uint16_t	j;
-	uint16_t	i;
-
-	r = NewtMakeArray(kNewtRefUnbind, argc - n);
+    newtRefVar  exepath = kNewtRefUnbind;
+    newtRefVar  r;
+    uint16_t	j;
+    uint16_t	i;
+    
+    r = NewtMakeArray(kNewtRefUnbind, argc - n);
     NcSetSlot(GLOBALS, NSSYM0(_ARGV_), r);
-
-	for (i = n, j = 0; i < argc; i++, j++)
-	{
-		NewtSetArraySlot(r, j, NewtMakeString(argv[i], true));
-	}
-
+    
+    for (i = n, j = 0; i < argc; i++, j++)
+    {
+        NewtSetArraySlot(r, j, NewtMakeString(argv[i], true));
+    }
+    
 #ifdef __WIN32__
-	{
-		char	sep;
-
-		sep = NewtGetFileSeparator();
-
-		if (sep != '\\')
-		{
-			char *	path;
-
-			path = strdup(argv[0]);
-
-			if (path)
-			{
-				replacechr(path, '\\', sep);
-				exepath = NewtExpandPath(path);
-				free(path);
-			}
-			else
-			{
-				exit(errno);
-			}
-		}
-	}
+    {
+        char	sep;
+        
+        sep = NewtGetFileSeparator();
+        
+        if (sep != '\\')
+        {
+            char *	path;
+            
+            path = strdup(argv[0]);
+            
+            if (path)
+            {
+                replacechr(path, '\\', sep);
+                exepath = NewtExpandPath(path);
+                free(path);
+            }
+            else
+            {
+                exit(errno);
+            }
+        }
+    }
 #endif
-
-	if (NewtRefIsNIL(exepath) && argc > 0) {
-    exepath = NewtExpandPath(argv[0]);
-  }
-
-  if (exepath != kNewtRefUnbind) {
-    NcSetSlot(GLOBALS, NSSYM0(_EXEDIR_), NcDirName(exepath));
-  }
+    
+    if (NewtRefIsNIL(exepath) && argc > 0) {
+        exepath = NewtExpandPath(argv[0]);
+    }
+    
+    if (exepath != kNewtRefUnbind) {
+        NcSetSlot(GLOBALS, NSSYM0(_EXEDIR_), NcDirName(exepath));
+    }
 }
 
 
@@ -352,24 +352,24 @@ void NewtInitARGV(int argc, const char * argv[], int n)
 
 void NewtInitVersInfo(void)
 {
-	newtRefVar  versInfo;
-
-	versInfo = NcMakeFrame();
-
-	// プロダクト名
+    newtRefVar  versInfo;
+    
+    versInfo = NcMakeFrame();
+    
+    // プロダクト名
     NcSetSlot(versInfo, NSSYM(name), NewtMakeString(NEWT_NAME, true));
-	// プロト番号
+    // プロト番号
     NcSetSlot(versInfo, NSSYM(proto), NewtMakeString(NEWT_PROTO, true));
-	// バージョン番号
+    // バージョン番号
     NcSetSlot(versInfo, NSSYM(version), NewtMakeString(NEWT_VERSION, true));
-	// ビルド番号
+    // ビルド番号
     NcSetSlot(versInfo, NSSYM(build), NewtMakeString(NEWT_BUILD, true));
-	// コピーライト
+    // コピーライト
     NcSetSlot(versInfo, NSSYM(copyright), NewtMakeString(NEWT_COPYRIGHT, true));
-	// スタッフロール
+    // スタッフロール
     NcSetSlot(versInfo, NSSYM(staff), NewtMakeString(NEWT_STAFF, true));
-
-	// リードオンリーにしてグローバル変数に入れる
+    
+    // リードオンリーにしてグローバル変数に入れる
     NcSetSlot(GLOBALS, NSSYM(_VERSION_), NewtPackLiteral(versInfo));
 }
 
@@ -386,38 +386,38 @@ void NewtInitVersInfo(void)
 
 void NewtInitEnv(int argc, const char * argv[], int n)
 {
-	// シンボルテーブルの作成
+    // シンボルテーブルの作成
     SYM_TABLE = NewtMakeArray(kNewtRefUnbind, 0);
     NewtInitSYM();
-
-	// ルートフレームの作成
+    
+    // ルートフレームの作成
     ROOT = NcMakeFrame();
-	// グローバル変数テーブルの作成
+    // グローバル変数テーブルの作成
     GLOBALS = NcMakeFrame();
-	// グローバル関数テーブルの作成
+    // グローバル関数テーブルの作成
     GLOBAL_FNS = NcMakeFrame();
-	// マジックポインタテーブルの作成
+    // マジックポインタテーブルの作成
     MAGIC_POINTERS = NewtMakeArray(kNewtRefUnbind, 0);
-
-	// ルートフレームに各テーブルを格納
+    
+    // ルートフレームに各テーブルを格納
     NcSetSlot(ROOT, NSSYM0(globals), GLOBALS);
     NcSetSlot(ROOT, NSSYM0(global_fns), GLOBAL_FNS);
     NcSetSlot(ROOT, NSSYM0(magic_pointers), MAGIC_POINTERS);
     NcSetSlot(ROOT, NSSYM0(sym_table), SYM_TABLE);
-
+    
 #ifdef __NAMED_MAGIC_POINTER__
-	// 名前付マジックポインタテーブルの作成
+    // 名前付マジックポインタテーブルの作成
     NAMED_MPS = NcMakeFrame();
-	// ルートフレームに名前付マジックポインタテーブルの格納
+    // ルートフレームに名前付マジックポインタテーブルの格納
     NcSetSlot(ROOT, NSSYM0(named_mps), NAMED_MPS);
 #endif /* __NAMED_MAGIC_POINTER__ */
-
-	// 環境変数の初期化
-	NewtInitSysEnv();
-	// ARGV の初期化
-	NewtInitARGV(argc, argv, n);
-	// バージョン情報の初期化
-	NewtInitVersInfo();
+    
+    // 環境変数の初期化
+    NewtInitSysEnv();
+    // ARGV の初期化
+    NewtInitARGV(argc, argv, n);
+    // バージョン情報の初期化
+    NewtInitVersInfo();
 }
 
 
@@ -433,9 +433,9 @@ void NewtInitEnv(int argc, const char * argv[], int n)
 
 void NewtInit(int argc, const char * argv[], int n)
 {
-	// メモリプールの確保
+    // メモリプールの確保
     NEWT_POOL = NewtPoolAlloc(NEWT_POOL_EXPANDSPACE);
-	// 実行環境の初期化
+    // 実行環境の初期化
     NewtInitEnv(argc, argv, n);
 }
 
@@ -449,8 +449,8 @@ void NewtInit(int argc, const char * argv[], int n)
 void NewtCleanup(void)
 {
     // 後始末をすること
-
-	// メモリプールの解放
+    
+    // メモリプールの解放
     if (NEWT_POOL != NULL)
     {
         NewtPoolRelease(NEWT_POOL);
@@ -713,17 +713,17 @@ newtRef NsUndefGlobalVar(newtRefArg rcvr, newtRefArg r)
 
 newtRef NcResolveNamedMP(newtRefArg r)
 {
-	newtRefVar	sym;
-
-	if (! NewtRefIsNamedMP(r))
-		return r;
-
-	sym = NewtMPToSymbol(r);
-
-	if (NewtHasSlot(NAMED_MPS, sym))
-		return NcGetSlot(NAMED_MPS, sym);
-	else
-		return r;
+    newtRefVar	sym;
+    
+    if (! NewtRefIsNamedMP(r))
+        return r;
+    
+    sym = NewtMPToSymbol(r);
+    
+    if (NewtHasSlot(NAMED_MPS, sym))
+        return NcGetSlot(NAMED_MPS, sym);
+    else
+        return r;
 }
 
 
@@ -739,21 +739,21 @@ newtRef NcResolveNamedMP(newtRefArg r)
 
 newtRef NsDefNamedMP(newtRefArg rcvr, newtRefArg r, newtRefArg v)
 {
-	newtRefVar	sym;
-
-	if (NewtRefIsNamedMP(r))
-	{
-		sym = NewtMPToSymbol(r);
-	}
-	else if (NewtRefIsSymbol(r))
-	{
-		sym = r;
-	}
-	else
-	{
-		return r;
-	}
-
+    newtRefVar	sym;
+    
+    if (NewtRefIsNamedMP(r))
+    {
+        sym = NewtMPToSymbol(r);
+    }
+    else if (NewtRefIsSymbol(r))
+    {
+        sym = r;
+    }
+    else
+    {
+        return r;
+    }
+    
     return NcSetSlot(NAMED_MPS, sym, v);
 }
 
@@ -770,37 +770,37 @@ newtRef NsDefNamedMP(newtRefArg rcvr, newtRefArg r, newtRefArg v)
 
 newtRef NcResolveMagicPointer(newtRefArg r)
 {
-	int32_t	table = 0;
-	int32_t	index;
-
-	if (! NewtRefIsNumberedMP(r))
-	{
+    int32_t	table = 0;
+    int32_t	index;
+    
+    if (! NewtRefIsNumberedMP(r))
+    {
 #ifdef __NAMED_MAGIC_POINTER__
-		return NcResolveNamedMP(r);
+        return NcResolveNamedMP(r);
 #else
-		return r;
+        return r;
 #endif
-	}
-
-	table = NewtMPToTable(r);
-	index = NewtMPToIndex(r);
-
-	if (table != 0)
-	{	// テーブル番号 0 以外は未サポート
-		return r;
-	}
-
-	if (index < NewtLength(MAGIC_POINTERS))
-	{
-		newtRefVar	result;
-
-		result = NewtGetArraySlot(MAGIC_POINTERS, index);
-
-		if (result != kNewtRefUnbind)
-			return result;
-	}
-
-	return r;
+    }
+    
+    table = NewtMPToTable(r);
+    index = NewtMPToIndex(r);
+    
+    if (table != 0)
+    {	// テーブル番号 0 以外は未サポート
+        return r;
+    }
+    
+    if (index < NewtLength(MAGIC_POINTERS))
+    {
+        newtRefVar	result;
+        
+        result = NewtGetArraySlot(MAGIC_POINTERS, index);
+        
+        if (result != kNewtRefUnbind)
+            return result;
+    }
+    
+    return r;
 }
 
 
@@ -816,38 +816,38 @@ newtRef NcResolveMagicPointer(newtRefArg r)
 
 newtRef NsDefMagicPointer(newtRefArg rcvr, newtRefArg r, newtRefArg v)
 {
-	int32_t	table = 0;
-	int32_t	index;
-
-	if (NewtRefIsNumberedMP(r))
-	{
-		table = NewtMPToTable(r);
-		index = NewtMPToIndex(r);
-
-		if (table != 0)
-		{	// テーブル番号 0 以外は未サポート
-			return kNewtRefUnbind;
-		}
-	}
-	else if (NewtRefIsInteger(r))
-	{
-		index = NewtRefToInteger(r);
-	}
-	else
-	{
+    int32_t	table = 0;
+    int32_t	index;
+    
+    if (NewtRefIsNumberedMP(r))
+    {
+        table = NewtMPToTable(r);
+        index = NewtMPToIndex(r);
+        
+        if (table != 0)
+        {	// テーブル番号 0 以外は未サポート
+            return kNewtRefUnbind;
+        }
+    }
+    else if (NewtRefIsInteger(r))
+    {
+        index = NewtRefToInteger(r);
+    }
+    else
+    {
 #ifdef __NAMED_MAGIC_POINTER__
-		return NsDefNamedMP(rcvr, r, v);
+        return NsDefNamedMP(rcvr, r, v);
 #else
-		return kNewtRefUnbind;
+        return kNewtRefUnbind;
 #endif
-	}
-
-	if (NewtLength(MAGIC_POINTERS) <= index)
-	{	// テーブルの長さを拡張
-		NewtSetLength(MAGIC_POINTERS, index + 1);
-	}
-
-	return NewtSetArraySlot(MAGIC_POINTERS, index, v);
+    }
+    
+    if (NewtLength(MAGIC_POINTERS) <= index)
+    {	// テーブルの長さを拡張
+        NewtSetLength(MAGIC_POINTERS, index + 1);
+    }
+    
+    return NewtSetArraySlot(MAGIC_POINTERS, index, v);
 }
 
 

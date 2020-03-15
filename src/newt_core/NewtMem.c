@@ -26,14 +26,14 @@
 newtPool NewtPoolAlloc(int32_t expandspace)
 {
     newtPool	pool;
-
+    
     pool = (newtPool)calloc(1, sizeof(newtpool_t));
-
+    
     if (pool != NULL)
     {
         pool->maxspace = pool->expandspace = expandspace;
     }
-
+    
     return pool;
 }
 
@@ -54,7 +54,7 @@ void * NewtMemAlloc(newtPool pool, size_t size)
     if (pool != NULL)
     {
     }
-
+    
     return malloc(size);
 }
 
@@ -76,7 +76,7 @@ void * NewtMemCalloc(newtPool pool, size_t number, size_t size)
     if (pool != NULL)
     {
     }
-
+    
     return calloc(number, size);
 }
 
@@ -98,7 +98,7 @@ void * NewtMemRealloc(newtPool pool, void * ptr, size_t size)
     if (pool != NULL)
     {
     }
-
+    
     return realloc(ptr, size);
 }
 
@@ -134,10 +134,10 @@ void NewtMemFree(void * ptr)
  */
 
 void NewtStackSetup(newtStack * stackinfo,
-        newtPool pool, uint32_t datasize, uint32_t blocksize)
+                    newtPool pool, uint32_t datasize, uint32_t blocksize)
 {
     memset(stackinfo, 0, sizeof(newtStack));
-
+    
     stackinfo->pool = pool;
     stackinfo->datasize = datasize;
     stackinfo->blocksize = blocksize;
@@ -159,7 +159,7 @@ void NewtStackFree(newtStack * stackinfo)
         NewtMemFree(stackinfo->stackp);
         stackinfo->stackp = NULL;
     }
-
+    
     stackinfo->nums = 0;
     stackinfo->sp = 0;
 }
@@ -182,18 +182,18 @@ bool NewtStackExpand(newtStack * stackinfo, uint32_t n)
         uint32_t	newsize;
         uint32_t	nums;
         void *		newp;
-    
+        
         nums = stackinfo->nums + stackinfo->blocksize;
         newsize = stackinfo->datasize * nums;
-
+        
         newp = NewtMemRealloc(stackinfo->pool, stackinfo->stackp, newsize);
-
+        
         if (newp == NULL) return false;
-    
+        
         stackinfo->stackp = newp;
         stackinfo->nums = nums;
     }
-
+    
     return true;
 }
 
@@ -212,16 +212,16 @@ void NewtStackSlim(newtStack * stackinfo, uint32_t n)
     if (0 < n)
     {
         uint32_t	newsize;
-		void *		newp;
-
+        void *		newp;
+        
         newsize = stackinfo->datasize * n;
-		newp = NewtMemRealloc(stackinfo->pool, stackinfo->stackp, newsize);
-
-		if (newp != NULL)
-		{
-			stackinfo->stackp = newp;
-			stackinfo->nums = n;
-		}
+        newp = NewtMemRealloc(stackinfo->pool, stackinfo->stackp, newsize);
+        
+        if (newp != NULL)
+        {
+            stackinfo->stackp = newp;
+            stackinfo->nums = n;
+        }
     }
     else
     {
@@ -245,9 +245,9 @@ void NewtStackSlim(newtStack * stackinfo, uint32_t n)
 uint32_t NewtAlign(uint32_t n, uint16_t byte)
 {
     uint32_t	mod;
-
+    
     mod = n % byte;
     if (0 < mod) n += byte - mod;
-
+    
     return n;
 }

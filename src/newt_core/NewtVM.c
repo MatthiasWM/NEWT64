@@ -212,152 +212,152 @@ static newtRef		NVMMessageSendWithValist(newtRefArg impl, newtRefArg receiver, n
 
 /// シンプル命令テーブル
 static simple_instruction_t	simple_instructions[] =
-            {
-                si_pop,				// 000 pop
-                si_dup,				// 001 dup
-                si_return,			// 002 return
-                si_pushself,		// 003 push-self
-                si_set_lex_scope,	// 004 set-lex-scope
-                si_iternext,		// 005 iter-next
-                si_iterdone,		// 006 iter-done
-                si_pop_handlers		// 007 000 001 pop-handlers
-            };
+{
+    si_pop,				// 000 pop
+    si_dup,				// 001 dup
+    si_return,			// 002 return
+    si_pushself,		// 003 push-self
+    si_set_lex_scope,	// 004 set-lex-scope
+    si_iternext,		// 005 iter-next
+    si_iterdone,		// 006 iter-done
+    si_pop_handlers		// 007 000 001 pop-handlers
+};
 
 
 /// 関数命令テーブル
 static simple_instruction_t	fn_instructions[] =
-            {
-                fn_add,					//  0 add				|+|
-                fn_subtract,			//  1 subtract			|-|
-                fn_aref,				//  2 aref				aref
-                fn_set_aref,	        //  3 set-aref			setAref
-                fn_equals,				//  4 equals			|=|
-                fn_not,					//  5 not				|not|
-                fn_not_equals,	        //  6 not-equals		|<>|
-                fn_multiply,	        //  7 multiply			|*|
-                fn_divide,				//  8 divide			|/|
-                fn_div,					//  9 div				|div|
-                fn_less_than,	        // 10 less-than			|<|
-                fn_greater_than,		// 11 greater-than		|>|
-                fn_greater_or_equal,	// 12 greater-or-equal	|>=|
-                fn_less_or_equal,		// 13 less-or-equal		|<=|
-                fn_bit_and,				// 14 bit-and			BAnd
-                fn_bit_or,				// 15 bit-or			BOr
-                fn_bit_not,				// 16 bit-not			BNot
-                fn_new_iterator,		// 17 new-iterator		newIterator
-                fn_length,				// 18 length			Length
-                fn_clone,				// 19 clone				Clone
-                fn_set_class,			// 20 set-class			SetClass
-                fn_add_array_slot,		// 21 add-array-slot	AddArraySlot
-                fn_stringer,			// 22 stringer			Stringer
-                fn_has_path,			// 23 has-path			none
-                fn_classof				// 24 class-of			ClassOf
-            };
+{
+    fn_add,					//  0 add				|+|
+    fn_subtract,			//  1 subtract			|-|
+    fn_aref,				//  2 aref				aref
+    fn_set_aref,	        //  3 set-aref			setAref
+    fn_equals,				//  4 equals			|=|
+    fn_not,					//  5 not				|not|
+    fn_not_equals,	        //  6 not-equals		|<>|
+    fn_multiply,	        //  7 multiply			|*|
+    fn_divide,				//  8 divide			|/|
+    fn_div,					//  9 div				|div|
+    fn_less_than,	        // 10 less-than			|<|
+    fn_greater_than,		// 11 greater-than		|>|
+    fn_greater_or_equal,	// 12 greater-or-equal	|>=|
+    fn_less_or_equal,		// 13 less-or-equal		|<=|
+    fn_bit_and,				// 14 bit-and			BAnd
+    fn_bit_or,				// 15 bit-or			BOr
+    fn_bit_not,				// 16 bit-not			BNot
+    fn_new_iterator,		// 17 new-iterator		newIterator
+    fn_length,				// 18 length			Length
+    fn_clone,				// 19 clone				Clone
+    fn_set_class,			// 20 set-class			SetClass
+    fn_add_array_slot,		// 21 add-array-slot	AddArraySlot
+    fn_stringer,			// 22 stringer			Stringer
+    fn_has_path,			// 23 has-path			none
+    fn_classof				// 24 class-of			ClassOf
+};
 
 /// 命令セットテーブル
 static instruction_t	is_instructions[] =
-            {
-                is_simple_instructions,		// 00x simple instructions
-                is_dummy,					// 01x
-                is_dummy,					// 02x
-                is_push,					// 03x push
-                is_push_constant,			// 04x (B signed) push-constant
-                is_call,					// 05x call
-                is_invoke,					// 06x invoke
-                is_send,					// 07x send
-                is_send_if_defined,			// 10x send-if-defined
-                is_resend,					// 11x resend
-                is_resend_if_defined,		// 12x resend-if-defined
-                is_branch,					// 13x branch
-                is_branch_if_true,			// 14x branch-if-true
-                is_branch_if_false,			// 15x branch-if-false
-                is_find_var,				// 16x find-var
-                is_get_var,					// 17x get-var
-                is_make_frame,				// 20x make-frame
-                is_make_array,				// 21x make-array
-                is_get_path,				// 220/221 get-path
-                is_set_path,				// 230/231 set-path
-                is_set_var,					// 24x set-var
-                is_find_and_set_var,		// 25x find-and-set-var
-                is_incr_var,				// 26x incr-var
-                is_branch_if_loop_not_done,	// 27x branch-if-loop-not-done
-                is_freq_func,				// 30x freq-func
-                is_new_handlers				// 31x new-handlers
-            };
+{
+    is_simple_instructions,		// 00x simple instructions
+    is_dummy,					// 01x
+    is_dummy,					// 02x
+    is_push,					// 03x push
+    is_push_constant,			// 04x (B signed) push-constant
+    is_call,					// 05x call
+    is_invoke,					// 06x invoke
+    is_send,					// 07x send
+    is_send_if_defined,			// 10x send-if-defined
+    is_resend,					// 11x resend
+    is_resend_if_defined,		// 12x resend-if-defined
+    is_branch,					// 13x branch
+    is_branch_if_true,			// 14x branch-if-true
+    is_branch_if_false,			// 15x branch-if-false
+    is_find_var,				// 16x find-var
+    is_get_var,					// 17x get-var
+    is_make_frame,				// 20x make-frame
+    is_make_array,				// 21x make-array
+    is_get_path,				// 220/221 get-path
+    is_set_path,				// 230/231 set-path
+    is_set_var,					// 24x set-var
+    is_find_and_set_var,		// 25x find-and-set-var
+    is_incr_var,				// 26x incr-var
+    is_branch_if_loop_not_done,	// 27x branch-if-loop-not-done
+    is_freq_func,				// 30x freq-func
+    is_new_handlers				// 31x new-handlers
+};
 
 /// シンプル命令名テーブル
 static char *	simple_instruction_names[] =
-            {
-                "pop",				// 000 pop
-                "dup",				// 001 dup
-                "return",			// 002 return
-                "push-self",		// 003 push-self
-                "set-lex-scope",	// 004 set-lex-scope
-                "iter-next",		// 005 iter-next
-                "iter-done",		// 006 iter-done
-                "pop-handlers"		// 007 000 001 pop-handlers
-            };
+{
+    "pop",				// 000 pop
+    "dup",				// 001 dup
+    "return",			// 002 return
+    "push-self",		// 003 push-self
+    "set-lex-scope",	// 004 set-lex-scope
+    "iter-next",		// 005 iter-next
+    "iter-done",		// 006 iter-done
+    "pop-handlers"		// 007 000 001 pop-handlers
+};
 
 /// 関数命令名テーブル
 static char *	fn_instruction_names[] =
-            {
-                "add",				//  0 add		|+|
-                "subtract",			//  1 subtract		|-|
-                "aref",				//  2 aref		aref
-                "set-aref",			//  3 set-aref		setAref
-                "equals",			//  4 equals		|=|
-                "not",				//  5 not		|not|
-                "not-equals",		//  6 not-equals	|<>|
-                "multiply",			//  7 multiply		|*|
-                "divide",			//  8 divide		|/|
-                "div",				//  9 div		|div|
-                "less-than",		// 10 less-than		|<|
-                "greater-than",		// 11 greater-than	|>|
-                "greateror-equal",	// 12 greater-or-equal	|>=|
-                "lessor-equal",		// 13 less-or-equal	|<=|
-                "bit-and",			// 14 bit-and		BAnd
-                "bit-or",			// 15 bit-or		BOr
-                "bit-not",			// 16 bit-not		BNot
-                "new-iterator",		// 17 new-iterator	newIterator
-                "length",			// 18 length		Length
-                "clone",			// 19 clone		Clone
-                "set-class",		// 20 set-class		SetClass
-                "add-array-slot",	// 21 add-array-slot	AddArraySlot
-                "stringer",			// 22 stringer		Stringer
-                "has-path",			// 23 has-path		none
-                "class-of"			// 24 class-of		ClassOf
-            };
+{
+    "add",				//  0 add		|+|
+    "subtract",			//  1 subtract		|-|
+    "aref",				//  2 aref		aref
+    "set-aref",			//  3 set-aref		setAref
+    "equals",			//  4 equals		|=|
+    "not",				//  5 not		|not|
+    "not-equals",		//  6 not-equals	|<>|
+    "multiply",			//  7 multiply		|*|
+    "divide",			//  8 divide		|/|
+    "div",				//  9 div		|div|
+    "less-than",		// 10 less-than		|<|
+    "greater-than",		// 11 greater-than	|>|
+    "greateror-equal",	// 12 greater-or-equal	|>=|
+    "lessor-equal",		// 13 less-or-equal	|<=|
+    "bit-and",			// 14 bit-and		BAnd
+    "bit-or",			// 15 bit-or		BOr
+    "bit-not",			// 16 bit-not		BNot
+    "new-iterator",		// 17 new-iterator	newIterator
+    "length",			// 18 length		Length
+    "clone",			// 19 clone		Clone
+    "set-class",		// 20 set-class		SetClass
+    "add-array-slot",	// 21 add-array-slot	AddArraySlot
+    "stringer",			// 22 stringer		Stringer
+    "has-path",			// 23 has-path		none
+    "class-of"			// 24 class-of		ClassOf
+};
 
 /// 命令セット名テーブル
 static char *	vm_instruction_names[] =
-            {
-                "simple-instructions",		// 00x simple instructions
-                NULL,						// 01x
-                NULL,						// 02x
-                "push",						// 03x push
-                "push-constant",			// 04x (B signed) push-constant
-                "call",						// 05x call
-                "invoke",					// 06x invoke
-                "send",						// 07x send
-                "send-if-defined",			// 10x send-if-defined
-                "resend",					// 11x resend
-                "resend-if-defined",		// 12x resend-if-defined
-                "branch",					// 13x branch
-                "branch-if-true",			// 14x branch-if-true
-                "branch-if-false",			// 15x branch-if-false
-                "find-var",					// 16x find-var
-                "get-var",					// 17x get-var
-                "make-frame",				// 20x make-frame
-                "make-array",				// 21x make-array
-                "get-path",					// 220/221 get-path
-                "set-path",					// 230/231 set-path
-                "set-var",					// 24x set-var
-                "find-and-set-var",			// 25x find-and-set-var
-                "incr-var",					// 26x incr-var
-                "branch-if-loop-not-done",	// 27x branch-if-loop-not-done
-                "freq-func",				// 30x freq-func
-                "new-handlers"				// 31x new-handlers
-            };
+{
+    "simple-instructions",		// 00x simple instructions
+    NULL,						// 01x
+    NULL,						// 02x
+    "push",						// 03x push
+    "push-constant",			// 04x (B signed) push-constant
+    "call",						// 05x call
+    "invoke",					// 06x invoke
+    "send",						// 07x send
+    "send-if-defined",			// 10x send-if-defined
+    "resend",					// 11x resend
+    "resend-if-defined",		// 12x resend-if-defined
+    "branch",					// 13x branch
+    "branch-if-true",			// 14x branch-if-true
+    "branch-if-false",			// 15x branch-if-false
+    "find-var",					// 16x find-var
+    "get-var",					// 17x get-var
+    "make-frame",				// 20x make-frame
+    "make-array",				// 21x make-array
+    "get-path",					// 220/221 get-path
+    "set-path",					// 230/231 set-path
+    "set-var",					// 24x set-var
+    "find-and-set-var",			// 25x find-and-set-var
+    "incr-var",					// 26x incr-var
+    "branch-if-loop-not-done",	// 27x branch-if-loop-not-done
+    "freq-func",				// 30x freq-func
+    "new-handlers"				// 31x new-handlers
+};
 
 
 #if 0
@@ -373,7 +373,7 @@ static char *	vm_instruction_names[] =
 
 newtRef NVMSelf(void)
 {
-	return RCVR;
+    return RCVR;
 }
 
 
@@ -492,8 +492,8 @@ void NVMThrowData(newtRefArg name, newtRefArg data)
     vm_excp_t *	excp;
     uint32_t	i;
 
-	// 例外処理中ならクリアする
-	NVMClearCurrException();
+    // 例外処理中ならクリアする
+    NVMClearCurrException();
 
     CURREXCP = data;
 
@@ -544,10 +544,10 @@ void NVMRethrow(void)
         newtRefVar	currexcp;
         newtRefVar	name;
 
-		currexcp = CURREXCP;
+        currexcp = CURREXCP;
         name = NcGetSlot(currexcp, NSSYM0(name));
 
-//        excp_pop_handlers();
+        //        excp_pop_handlers();
         NVMThrowData(name, currexcp);
     }
 }
@@ -574,10 +574,10 @@ newtRef NVMCurrentException(void)
 void NVMClearCurrException(void)
 {
     if (NewtRefIsNotNIL(CURREXCP))
-	{
-		excp_pop_handlers();
-		CURREXCP = kNewtRefUnbind;
-	}
+    {
+        excp_pop_handlers();
+        CURREXCP = kNewtRefUnbind;
+    }
 }
 
 
@@ -591,7 +591,7 @@ void NVMClearCurrException(void)
 
 void NVMClearException(void)
 {
-	CURREXCP = kNewtRefUnbind;
+    CURREXCP = kNewtRefUnbind;
 }
 
 
@@ -677,7 +677,7 @@ void reg_rewind(int32_t sp)
 
 void reg_pop(void)
 {
-	reg_rewind(CALLSP - 1);
+    reg_rewind(CALLSP - 1);
 }
 
 
@@ -710,7 +710,7 @@ void reg_push(int32_t sp)
 
 void reg_save(int32_t sp)
 {
-//    PC++;
+    //    PC++;
     reg_push(sp);
 }
 
@@ -746,7 +746,7 @@ newtRef stk_pop0(void)
 
 newtRef stk_pop(void)
 {
-	return NcResolveMagicPointer(stk_pop0());
+    return NcResolveMagicPointer(stk_pop0());
 }
 
 
@@ -827,12 +827,12 @@ void stk_push(newtRefArg value)
 
 void stk_push_varg(int argc, va_list ap)
 {
-	int		i;
+    int		i;
 
-	for (i = 0; i < argc; i++)
-	{
-		stk_push(va_arg(ap, newtRefArg));
-	}
+    for (i = 0; i < argc; i++)
+    {
+        stk_push(va_arg(ap, newtRefArg));
+    }
 }
 
 
@@ -846,15 +846,15 @@ void stk_push_varg(int argc, va_list ap)
 
 void stk_push_array(newtRefVar argArray)
 {
-	int		numArgs;
-	int		i;
+    int		numArgs;
+    int		i;
 
-	numArgs = NewtArrayLength(argArray);
+    numArgs = NewtArrayLength(argArray);
 
-	for (i = 0; i < numArgs; i++)
-	{
-		stk_push(NewtGetArraySlot(argArray, i));
-	}
+    for (i = 0; i < numArgs; i++)
+    {
+        stk_push(NewtGetArraySlot(argArray, i));
+    }
 }
 
 
@@ -1135,17 +1135,17 @@ bool iter_done(newtRefArg iter)
 
 newtRef NVMMakeArgsArray(uint16_t numArgs)
 {
-	newtRefVar	args;
-	int16_t		i;
+    newtRefVar	args;
+    int16_t		i;
 
-	args = NewtMakeArray(kNewtRefUnbind, numArgs);
+    args = NewtMakeArray(kNewtRefUnbind, numArgs);
 
-	for (i = numArgs - 1; 0 <= i; i--)
-	{
-		NewtSetArraySlot(args, i, stk_pop());
-	}
+    for (i = numArgs - 1; 0 <= i; i--)
+    {
+        NewtSetArraySlot(args, i, stk_pop());
+    }
 
-	return args;
+    return args;
 }
 
 
@@ -1160,20 +1160,20 @@ newtRef NVMMakeArgsArray(uint16_t numArgs)
 void NVMBindArgs(uint16_t numArgs)
 {
     newtRefVar	indefinite;
-	int32_t		minArgs;
-	int16_t		i;
+    int32_t		minArgs;
+    int16_t		i;
     newtRefVar	v;
 
-	minArgs = NewtRefToInteger(NcGetSlot(FUNC, NSSYM0(numArgs)));
+    minArgs = NewtRefToInteger(NcGetSlot(FUNC, NSSYM0(numArgs)));
     indefinite = NcGetSlot(FUNC, NSSYM0(indefinite));
 
-	if (NewtRefIsNotNIL(indefinite))
-	{
-		newtRefVar	args;
+    if (NewtRefIsNotNIL(indefinite))
+    {
+        newtRefVar	args;
 
-		args = NVMMakeArgsArray(numArgs - minArgs);
-		NewtSetFrameSlot(LOCALS, START_LOCALARGS + minArgs, args);
-	}
+        args = NVMMakeArgsArray(numArgs - minArgs);
+        NewtSetFrameSlot(LOCALS, START_LOCALARGS + minArgs, args);
+    }
 
     for (i = START_LOCALARGS + minArgs - 1; START_LOCALARGS <= i; i--)
     {
@@ -1201,10 +1201,10 @@ void NVMThrowBC(newtErr err, newtRefArg value, int16_t pop, bool push)
     if (push)
         stk_push(kNewtRefUnbind);
 
-	if (NewtRefIsSymbol(value))
-		NewtThrowSymbol(err, value);
-	else
-		NewtThrow(err, value);
+    if (NewtRefIsSymbol(value))
+        NewtThrowSymbol(err, value);
+    else
+        NewtThrow(err, value);
 }
 
 
@@ -1226,10 +1226,10 @@ bool NVMFuncCheckNumArgs(newtRefArg fn, int16_t numArgs)
     minArgs = NewtRefToInteger(NcGetSlot(fn, NSSYM0(numArgs)));
     indefinite = NcGetSlot(fn, NSSYM0(indefinite));
 
-	if (NewtRefIsNIL(indefinite))
-		return (minArgs == numArgs);
-	else
-		return (minArgs <= numArgs);
+    if (NewtRefIsNIL(indefinite))
+        return (minArgs == numArgs);
+    else
+        return (minArgs <= numArgs);
 }
 
 
@@ -1272,210 +1272,210 @@ void NVMCallNativeFn(newtRefArg fn, int16_t numArgs)
     newtRefVar	r = kNewtRefUnbind;
     newtRefVar	indefinite;
     nvm_func_t	funcPtr;
-	int32_t		minArgs;
+    int32_t		minArgs;
 
     funcPtr = (nvm_func_t)NewtRefToAddress(NcGetSlot(fn, NSSYM0(funcPtr)));
 
-	if (funcPtr == NULL)
-		return;
+    if (funcPtr == NULL)
+        return;
 
-	minArgs = NewtRefToInteger(NcGetSlot(fn, NSSYM0(numArgs)));
+    minArgs = NewtRefToInteger(NcGetSlot(fn, NSSYM0(numArgs)));
     indefinite = NcGetSlot(fn, NSSYM0(indefinite));
 
-	if (NewtRefIsNIL(indefinite))
-	{
-		switch (minArgs)
-		{
-			case 0:
-				r = (*funcPtr)();
-				break;
+    if (NewtRefIsNIL(indefinite))
+    {
+        switch (minArgs)
+        {
+            case 0:
+                r = (*funcPtr)();
+                break;
 
-			case 1:
-				{
-					newtRefVar	a;
+            case 1:
+            {
+                newtRefVar	a;
 
-					a = stk_pop();
-					r = (*funcPtr)(a);
-				}
-				break;
+                a = stk_pop();
+                r = (*funcPtr)(a);
+            }
+                break;
 
-			case 2:
-				{
-					newtRefVar	a[2];
+            case 2:
+            {
+                newtRefVar	a[2];
 
-					stk_pop_n(2, a);
-					r = (*funcPtr)(a[0], a[1]);
-				}
-				break;
+                stk_pop_n(2, a);
+                r = (*funcPtr)(a[0], a[1]);
+            }
+                break;
 
-			case 3:
-				{
-					newtRefVar	a[3];
+            case 3:
+            {
+                newtRefVar	a[3];
 
-					stk_pop_n(3, a);
-					r = (*funcPtr)(a[0], a[1], a[2]);
-				}
-				break;
+                stk_pop_n(3, a);
+                r = (*funcPtr)(a[0], a[1], a[2]);
+            }
+                break;
 
-			case 4:
-				{
-					newtRefVar	a[4];
+            case 4:
+            {
+                newtRefVar	a[4];
 
-					stk_pop_n(4, a);
-					r = (*funcPtr)(a[0], a[1], a[2], a[3]);
-				}
-				break;
+                stk_pop_n(4, a);
+                r = (*funcPtr)(a[0], a[1], a[2], a[3]);
+            }
+                break;
 
-			case 5:
-				{
-					newtRefVar	a[5];
+            case 5:
+            {
+                newtRefVar	a[5];
 
-					stk_pop_n(5, a);
-					r = (*funcPtr)(a[0], a[1], a[2], a[3], a[4]);
-				}
-				break;
+                stk_pop_n(5, a);
+                r = (*funcPtr)(a[0], a[1], a[2], a[3], a[4]);
+            }
+                break;
 
-			case 6:
-				{
-					newtRefVar	a[6];
+            case 6:
+            {
+                newtRefVar	a[6];
 
-					stk_pop_n(6, a);
-					r = (*funcPtr)(a[0], a[1], a[2], a[3], a[4], a[5]);
-				}
-				break;
+                stk_pop_n(6, a);
+                r = (*funcPtr)(a[0], a[1], a[2], a[3], a[4], a[5]);
+            }
+                break;
 
-			case 7:
-				{
-					newtRefVar	a[7];
+            case 7:
+            {
+                newtRefVar	a[7];
 
-					stk_pop_n(7, a);
-					r = (*funcPtr)(a[0], a[1], a[2], a[3], a[4], a[5], a[6]);
-				}
-				break;
-
-
-			case 8:
-				{
-					newtRefVar	a[8];
-
-					stk_pop_n(8, a);
-					r = (*funcPtr)(a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7]);
-				}
-				break;
-
-			case 9:
-				{
-					newtRefVar	a[9];
-
-					stk_pop_n(9, a);
-					r = (*funcPtr)(a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8]);
-				}
-				break;
-
-			default:
-				stk_remove(minArgs);
-				break;
-		}
-	}
-	else
-	{
-		newtRefVar	args;
-
-		args = NVMMakeArgsArray(numArgs - minArgs);
-
-		switch (minArgs)
-		{
-			case 0:
-				r = (*funcPtr)(args);
-				break;
-
-			case 1:
-				{
-					newtRefVar	a;
-
-					a = stk_pop();
-					r = (*funcPtr)(a, args);
-				}
-				break;
-
-			case 2:
-				{
-					newtRefVar	a[2];
-
-					stk_pop_n(2, a);
-					r = (*funcPtr)(a[0], a[1], args);
-				}
-				break;
-
-			case 3:
-				{
-					newtRefVar	a[3];
-
-					stk_pop_n(3, a);
-					r = (*funcPtr)(a[0], a[1], a[2], args);
-				}
-				break;
-
-			case 4:
-				{
-					newtRefVar	a[4];
-
-					stk_pop_n(4, a);
-					r = (*funcPtr)(a[0], a[1], a[2], a[3], args);
-				}
-				break;
-
-			case 5:
-				{
-					newtRefVar	a[5];
-
-					stk_pop_n(5, a);
-					r = (*funcPtr)(a[0], a[1], a[2], a[3], a[4], args);
-				}
-				break;
-
-			case 6:
-				{
-					newtRefVar	a[6];
-
-					stk_pop_n(6, a);
-					r = (*funcPtr)(a[0], a[1], a[2], a[3], a[4], a[5], args);
-				}
-				break;
-
-			case 7:
-				{
-					newtRefVar	a[7];
-
-					stk_pop_n(7, a);
-					r = (*funcPtr)(a[0], a[1], a[2], a[3], a[4], a[5], a[6], args);
-				}
-				break;
+                stk_pop_n(7, a);
+                r = (*funcPtr)(a[0], a[1], a[2], a[3], a[4], a[5], a[6]);
+            }
+                break;
 
 
-			case 8:
-				{
-					newtRefVar	a[8];
+            case 8:
+            {
+                newtRefVar	a[8];
 
-					stk_pop_n(8, a);
-					r = (*funcPtr)(a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], args);
-				}
-				break;
+                stk_pop_n(8, a);
+                r = (*funcPtr)(a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7]);
+            }
+                break;
 
-			case 9:
-				{
-					newtRefVar	a[9];
+            case 9:
+            {
+                newtRefVar	a[9];
 
-					stk_pop_n(9, a);
-					r = (*funcPtr)(a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], args);
-				}
-				break;
+                stk_pop_n(9, a);
+                r = (*funcPtr)(a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8]);
+            }
+                break;
 
-			default:
-				stk_remove(minArgs);
-				break;
-		}
-	}
+            default:
+                stk_remove(minArgs);
+                break;
+        }
+    }
+    else
+    {
+        newtRefVar	args;
+
+        args = NVMMakeArgsArray(numArgs - minArgs);
+
+        switch (minArgs)
+        {
+            case 0:
+                r = (*funcPtr)(args);
+                break;
+
+            case 1:
+            {
+                newtRefVar	a;
+
+                a = stk_pop();
+                r = (*funcPtr)(a, args);
+            }
+                break;
+
+            case 2:
+            {
+                newtRefVar	a[2];
+
+                stk_pop_n(2, a);
+                r = (*funcPtr)(a[0], a[1], args);
+            }
+                break;
+
+            case 3:
+            {
+                newtRefVar	a[3];
+
+                stk_pop_n(3, a);
+                r = (*funcPtr)(a[0], a[1], a[2], args);
+            }
+                break;
+
+            case 4:
+            {
+                newtRefVar	a[4];
+
+                stk_pop_n(4, a);
+                r = (*funcPtr)(a[0], a[1], a[2], a[3], args);
+            }
+                break;
+
+            case 5:
+            {
+                newtRefVar	a[5];
+
+                stk_pop_n(5, a);
+                r = (*funcPtr)(a[0], a[1], a[2], a[3], a[4], args);
+            }
+                break;
+
+            case 6:
+            {
+                newtRefVar	a[6];
+
+                stk_pop_n(6, a);
+                r = (*funcPtr)(a[0], a[1], a[2], a[3], a[4], a[5], args);
+            }
+                break;
+
+            case 7:
+            {
+                newtRefVar	a[7];
+
+                stk_pop_n(7, a);
+                r = (*funcPtr)(a[0], a[1], a[2], a[3], a[4], a[5], a[6], args);
+            }
+                break;
+
+
+            case 8:
+            {
+                newtRefVar	a[8];
+
+                stk_pop_n(8, a);
+                r = (*funcPtr)(a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], args);
+            }
+                break;
+
+            case 9:
+            {
+                newtRefVar	a[9];
+
+                stk_pop_n(9, a);
+                r = (*funcPtr)(a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], args);
+            }
+                break;
+
+            default:
+                stk_remove(minArgs);
+                break;
+        }
+    }
 
     stk_push(r);
 }
@@ -1496,210 +1496,210 @@ void NVMCallNativeFunc(newtRefArg fn, newtRefArg rcvr, int16_t numArgs)
     newtRefVar	r = kNewtRefUnbind;
     newtRefVar	indefinite;
     nvm_func_t	funcPtr;
-	int32_t		minArgs;
+    int32_t		minArgs;
 
     funcPtr = (nvm_func_t)NewtRefToAddress(NcGetSlot(fn, NSSYM0(funcPtr)));
 
-	if (funcPtr == NULL)
-		return;
+    if (funcPtr == NULL)
+        return;
 
-	minArgs = NewtRefToInteger(NcGetSlot(fn, NSSYM0(numArgs)));
+    minArgs = NewtRefToInteger(NcGetSlot(fn, NSSYM0(numArgs)));
     indefinite = NcGetSlot(fn, NSSYM0(indefinite));
 
-	if (NewtRefIsNIL(indefinite))
-	{
-		switch (minArgs)
-		{
-			case 0:
-				r = (*funcPtr)(rcvr);
-				break;
+    if (NewtRefIsNIL(indefinite))
+    {
+        switch (minArgs)
+        {
+            case 0:
+                r = (*funcPtr)(rcvr);
+                break;
 
-			case 1:
-				{
-					newtRefVar	a;
+            case 1:
+            {
+                newtRefVar	a;
 
-					a = stk_pop();
-					r = (*funcPtr)(rcvr, a);
-				}
-				break;
+                a = stk_pop();
+                r = (*funcPtr)(rcvr, a);
+            }
+                break;
 
-			case 2:
-				{
-					newtRefVar	a[2];
+            case 2:
+            {
+                newtRefVar	a[2];
 
-					stk_pop_n(2, a);
-					r = (*funcPtr)(rcvr, a[0], a[1]);
-				}
-				break;
+                stk_pop_n(2, a);
+                r = (*funcPtr)(rcvr, a[0], a[1]);
+            }
+                break;
 
-			case 3:
-				{
-					newtRefVar	a[3];
+            case 3:
+            {
+                newtRefVar	a[3];
 
-					stk_pop_n(3, a);
-					r = (*funcPtr)(rcvr, a[0], a[1], a[2]);
-				}
-				break;
+                stk_pop_n(3, a);
+                r = (*funcPtr)(rcvr, a[0], a[1], a[2]);
+            }
+                break;
 
-			case 4:
-				{
-					newtRefVar	a[4];
+            case 4:
+            {
+                newtRefVar	a[4];
 
-					stk_pop_n(4, a);
-					r = (*funcPtr)(rcvr, a[0], a[1], a[2], a[3]);
-				}
-				break;
+                stk_pop_n(4, a);
+                r = (*funcPtr)(rcvr, a[0], a[1], a[2], a[3]);
+            }
+                break;
 
-			case 5:
-				{
-					newtRefVar	a[5];
+            case 5:
+            {
+                newtRefVar	a[5];
 
-					stk_pop_n(5, a);
-					r = (*funcPtr)(rcvr, a[0], a[1], a[2], a[3], a[4]);
-				}
-				break;
+                stk_pop_n(5, a);
+                r = (*funcPtr)(rcvr, a[0], a[1], a[2], a[3], a[4]);
+            }
+                break;
 
-			case 6:
-				{
-					newtRefVar	a[6];
+            case 6:
+            {
+                newtRefVar	a[6];
 
-					stk_pop_n(6, a);
-					r = (*funcPtr)(rcvr, a[0], a[1], a[2], a[3], a[4], a[5]);
-				}
-				break;
+                stk_pop_n(6, a);
+                r = (*funcPtr)(rcvr, a[0], a[1], a[2], a[3], a[4], a[5]);
+            }
+                break;
 
-			case 7:
-				{
-					newtRefVar	a[7];
+            case 7:
+            {
+                newtRefVar	a[7];
 
-					stk_pop_n(7, a);
-					r = (*funcPtr)(rcvr, a[0], a[1], a[2], a[3], a[4], a[5], a[6]);
-				}
-				break;
-
-
-			case 8:
-				{
-					newtRefVar	a[8];
-
-					stk_pop_n(8, a);
-					r = (*funcPtr)(rcvr, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7]);
-				}
-				break;
-
-			case 9:
-				{
-					newtRefVar	a[9];
-
-					stk_pop_n(9, a);
-					r = (*funcPtr)(rcvr, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8]);
-				}
-				break;
-
-			default:
-				stk_remove(minArgs);
-				break;
-		}
-	}
-	else
-	{
-		newtRefVar	args;
-
-		args = NVMMakeArgsArray(numArgs - minArgs);
-
-		switch (minArgs)
-		{
-			case 0:
-				r = (*funcPtr)(rcvr, args);
-				break;
-
-			case 1:
-				{
-					newtRefVar	a;
-
-					a = stk_pop();
-					r = (*funcPtr)(rcvr, a, args);
-				}
-				break;
-
-			case 2:
-				{
-					newtRefVar	a[2];
-
-					stk_pop_n(2, a);
-					r = (*funcPtr)(rcvr, a[0], a[1], args);
-				}
-				break;
-
-			case 3:
-				{
-					newtRefVar	a[3];
-
-					stk_pop_n(3, a);
-					r = (*funcPtr)(rcvr, a[0], a[1], a[2], args);
-				}
-				break;
-
-			case 4:
-				{
-					newtRefVar	a[4];
-
-					stk_pop_n(4, a);
-					r = (*funcPtr)(rcvr, a[0], a[1], a[2], a[3], args);
-				}
-				break;
-
-			case 5:
-				{
-					newtRefVar	a[5];
-
-					stk_pop_n(5, a);
-					r = (*funcPtr)(rcvr, a[0], a[1], a[2], a[3], a[4], args);
-				}
-				break;
-
-			case 6:
-				{
-					newtRefVar	a[6];
-
-					stk_pop_n(6, a);
-					r = (*funcPtr)(rcvr, a[0], a[1], a[2], a[3], a[4], a[5], args);
-				}
-				break;
-
-			case 7:
-				{
-					newtRefVar	a[7];
-
-					stk_pop_n(7, a);
-					r = (*funcPtr)(rcvr, a[0], a[1], a[2], a[3], a[4], a[5], a[6], args);
-				}
-				break;
+                stk_pop_n(7, a);
+                r = (*funcPtr)(rcvr, a[0], a[1], a[2], a[3], a[4], a[5], a[6]);
+            }
+                break;
 
 
-			case 8:
-				{
-					newtRefVar	a[8];
+            case 8:
+            {
+                newtRefVar	a[8];
 
-					stk_pop_n(8, a);
-					r = (*funcPtr)(rcvr, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], args);
-				}
-				break;
+                stk_pop_n(8, a);
+                r = (*funcPtr)(rcvr, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7]);
+            }
+                break;
 
-			case 9:
-				{
-					newtRefVar	a[9];
+            case 9:
+            {
+                newtRefVar	a[9];
 
-					stk_pop_n(9, a);
-					r = (*funcPtr)(rcvr, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], args);
-				}
-				break;
+                stk_pop_n(9, a);
+                r = (*funcPtr)(rcvr, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8]);
+            }
+                break;
 
-			default:
-				stk_remove(minArgs);
-				break;
-		}
-	}
+            default:
+                stk_remove(minArgs);
+                break;
+        }
+    }
+    else
+    {
+        newtRefVar	args;
+
+        args = NVMMakeArgsArray(numArgs - minArgs);
+
+        switch (minArgs)
+        {
+            case 0:
+                r = (*funcPtr)(rcvr, args);
+                break;
+
+            case 1:
+            {
+                newtRefVar	a;
+
+                a = stk_pop();
+                r = (*funcPtr)(rcvr, a, args);
+            }
+                break;
+
+            case 2:
+            {
+                newtRefVar	a[2];
+
+                stk_pop_n(2, a);
+                r = (*funcPtr)(rcvr, a[0], a[1], args);
+            }
+                break;
+
+            case 3:
+            {
+                newtRefVar	a[3];
+
+                stk_pop_n(3, a);
+                r = (*funcPtr)(rcvr, a[0], a[1], a[2], args);
+            }
+                break;
+
+            case 4:
+            {
+                newtRefVar	a[4];
+
+                stk_pop_n(4, a);
+                r = (*funcPtr)(rcvr, a[0], a[1], a[2], a[3], args);
+            }
+                break;
+
+            case 5:
+            {
+                newtRefVar	a[5];
+
+                stk_pop_n(5, a);
+                r = (*funcPtr)(rcvr, a[0], a[1], a[2], a[3], a[4], args);
+            }
+                break;
+
+            case 6:
+            {
+                newtRefVar	a[6];
+
+                stk_pop_n(6, a);
+                r = (*funcPtr)(rcvr, a[0], a[1], a[2], a[3], a[4], a[5], args);
+            }
+                break;
+
+            case 7:
+            {
+                newtRefVar	a[7];
+
+                stk_pop_n(7, a);
+                r = (*funcPtr)(rcvr, a[0], a[1], a[2], a[3], a[4], a[5], a[6], args);
+            }
+                break;
+
+
+            case 8:
+            {
+                newtRefVar	a[8];
+
+                stk_pop_n(8, a);
+                r = (*funcPtr)(rcvr, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], args);
+            }
+                break;
+
+            case 9:
+            {
+                newtRefVar	a[9];
+
+                stk_pop_n(9, a);
+                r = (*funcPtr)(rcvr, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], args);
+            }
+                break;
+
+            default:
+                stk_remove(minArgs);
+                break;
+        }
+    }
 
     stk_push(r);
 }
@@ -1717,7 +1717,7 @@ void NVMCallNativeFunc(newtRefArg fn, newtRefArg rcvr, int16_t numArgs)
 void NVMFuncCall(newtRefArg fn, int16_t numArgs)
 {
     newtErr	err;
-	int		type;
+    int		type;
 
     // 1. 関数オブジェクトでなければ例外を発生
     // 2. 引数の数が一致さなければ WrongNumberOfArgs 例外を発生
@@ -1730,33 +1730,33 @@ void NVMFuncCall(newtRefArg fn, int16_t numArgs)
         return;
     }
 
-	type = NewtRefFunctionType(fn);
+    type = NewtRefFunctionType(fn);
 
     if (type == kNewtNativeFn || type == kNewtNativeFunc)
     {	// ネイティブ関数の呼出し
-    	// Save CALLSP to know if an exception occurred.
-    	uint32_t saveCALLSP;
-		reg_save(SP - numArgs + 1);
-		FUNC = fn;
-		saveCALLSP = CALLSP;
+        // Save CALLSP to know if an exception occurred.
+        uint32_t saveCALLSP;
+        reg_save(SP - numArgs + 1);
+        FUNC = fn;
+        saveCALLSP = CALLSP;
 
-		switch (type)
-		{
-			case kNewtNativeFn:
-				// rcvrなし(old style)
-				NVMCallNativeFn(fn, numArgs);
-				break;
+        switch (type)
+        {
+            case kNewtNativeFn:
+                // rcvrなし(old style)
+                NVMCallNativeFn(fn, numArgs);
+                break;
 
-			case kNewtNativeFunc:
-				// rcvrあり(new style)
-				NVMCallNativeFunc(fn, kNewtRefUnbind, numArgs);
-				break;
-		}
+            case kNewtNativeFunc:
+                // rcvrあり(new style)
+                NVMCallNativeFunc(fn, kNewtRefUnbind, numArgs);
+                break;
+        }
 
         if (saveCALLSP == CALLSP)
         {
-			reg_pop();
-		}
+            reg_pop();
+        }
         return;
     }
 
@@ -1795,7 +1795,7 @@ void NVMFuncCall(newtRefArg fn, int16_t numArgs)
 void NVMMessageSend(newtRefArg impl, newtRefArg receiver, newtRefArg fn, int16_t numArgs)
 {
     newtErr	err;
-	int		type;
+    int		type;
 
     // 1. メソッドが関数オブジェクトでなければ例外を発生
     // 2. 引数の数が一致さなければ WrongNumberOfArgs 例外を発生
@@ -1808,35 +1808,35 @@ void NVMMessageSend(newtRefArg impl, newtRefArg receiver, newtRefArg fn, int16_t
         return;
     }
 
-	type = NewtRefFunctionType(fn);
+    type = NewtRefFunctionType(fn);
 
     if (type == kNewtNativeFn || type == kNewtNativeFunc)
     {	// ネイティブ関数の呼出し
-    	// Save CALLSP to know if an exception occurred.
-    	uint32_t saveCALLSP;
-		reg_save(SP - numArgs + 1);
-		FUNC = fn;
-		RCVR = receiver;
-		IMPL = impl;
-		saveCALLSP = CALLSP;
+        // Save CALLSP to know if an exception occurred.
+        uint32_t saveCALLSP;
+        reg_save(SP - numArgs + 1);
+        FUNC = fn;
+        RCVR = receiver;
+        IMPL = impl;
+        saveCALLSP = CALLSP;
 
-		switch (type)
-		{
-			case kNewtNativeFn:
-				// rcvrなし(old style)
-				NVMCallNativeFn(fn, numArgs);
-				break;
+        switch (type)
+        {
+            case kNewtNativeFn:
+                // rcvrなし(old style)
+                NVMCallNativeFn(fn, numArgs);
+                break;
 
-			case kNewtNativeFunc:
-				// rcvrあり(new style)
-				NVMCallNativeFunc(fn, receiver, numArgs);
-				break;
-		}
+            case kNewtNativeFunc:
+                // rcvrあり(new style)
+                NVMCallNativeFunc(fn, receiver, numArgs);
+                break;
+        }
 
-		if (saveCALLSP == CALLSP)
-		{
-			reg_pop();
-		}
+        if (saveCALLSP == CALLSP)
+        {
+            reg_pop();
+        }
         return;
     }
 
@@ -1874,7 +1874,7 @@ void NVMMessageSend(newtRefArg impl, newtRefArg receiver, newtRefArg fn, int16_t
 
 newtRef	vm_send(int16_t b, newtErr * errP)
 {
-	// NewtonFormats say:
+    // NewtonFormats say:
     // arg1 arg2 ... argN name receiver -- result
     // But in the Newton, this is:
     // arg1 arg2 ... argN receiver name -- result
@@ -1885,38 +1885,38 @@ newtRef	vm_send(int16_t b, newtErr * errP)
     newtRefVar	fn;
     newtErr	err = kNErrNone;
 
-	if (errP != NULL)
-		*errP = kNErrNone;
+    if (errP != NULL)
+        *errP = kNErrNone;
 
     name = stk_pop();
     receiver = stk_pop();
 
-	if (! NewtRefIsSymbol(name))
-	{
-		NVMThrowBC(kNErrNotASymbol, name, b, true);
-		return name;
-	}
+    if (! NewtRefIsSymbol(name))
+    {
+        NVMThrowBC(kNErrNotASymbol, name, b, true);
+        return name;
+    }
 
-	if (! NewtRefIsFrame(receiver) && ! NewtRefIsNIL(receiver))
-	{
-		NVMThrowBC(kNErrNotAFrame, receiver, b, true);
-		return name;
-	}
+    if (! NewtRefIsFrame(receiver) && ! NewtRefIsNIL(receiver))
+    {
+        NVMThrowBC(kNErrNotAFrame, receiver, b, true);
+        return name;
+    }
 
     impl = NcFullLookupFrame(receiver, name);
 
     if (impl != kNewtRefUnbind)
-	{
-		fn = NcGetSlot(impl, name);
+    {
+        fn = NcGetSlot(impl, name);
         NVMMessageSend(impl, receiver, fn, b);
     }
-	else
-	{
+    else
+    {
         err = kNErrUndefinedMethod;
-	}
+    }
 
-	if (errP != NULL)
-		*errP = err;
+    if (errP != NULL)
+        *errP = err;
 
     return name;
 }
@@ -1936,44 +1936,44 @@ newtRef vm_resend(int16_t b, newtErr * errP)
     newtRefVar	name;
     newtErr	err = kNErrNone;
 
-	if (errP != NULL)
-		*errP = kNErrNone;
+    if (errP != NULL)
+        *errP = kNErrNone;
 
     // arg1 arg2 ... argN name -- result
 
-	name = stk_pop();
+    name = stk_pop();
 
-	if (! NewtRefIsSymbol(name))
-	{
-		NVMThrowBC(kNErrNotASymbol, name, b, true);
-		return name;
-	}
+    if (! NewtRefIsSymbol(name))
+    {
+        NVMThrowBC(kNErrNotASymbol, name, b, true);
+        return name;
+    }
 
     if (NewtHasSlot(IMPL, NSSYM0(_proto)))
-	{
-		newtRefVar	impl;
-		newtRefVar	fn;
+    {
+        newtRefVar	impl;
+        newtRefVar	fn;
 
-		impl = NcGetSlot(IMPL, NSSYM0(_proto));
-		impl = NcProtoLookupFrame(impl, name);
+        impl = NcGetSlot(IMPL, NSSYM0(_proto));
+        impl = NcProtoLookupFrame(impl, name);
 
-		if (impl != kNewtRefUnbind)
-		{
-			fn = NcGetSlot(impl, name);
-			NVMMessageSend(impl, RCVR, fn, b);
-		}
-		else
-		{
-			err= kNErrUndefinedMethod;
-		}
-	}
-	else
-	{
-		err = kNErrUndefinedMethod;
-	}
+        if (impl != kNewtRefUnbind)
+        {
+            fn = NcGetSlot(impl, name);
+            NVMMessageSend(impl, RCVR, fn, b);
+        }
+        else
+        {
+            err= kNErrUndefinedMethod;
+        }
+    }
+    else
+    {
+        err = kNErrUndefinedMethod;
+    }
 
-	if (errP != NULL)
-		*errP = err;
+    if (errP != NULL)
+        *errP = err;
 
     return name;
 }
@@ -2610,21 +2610,21 @@ void is_push_constant(int16_t b)
     r = (newtRef)b;
 
     if (NewtRefIsInteger(r))
-	{
-		int32_t	n;
+    {
+        int32_t	n;
 
-		n = NewtRefToInteger(r);
+        n = NewtRefToInteger(r);
 
-		if (8191 < n)
-		{	// 負の数
-			n |= 0xFFFFC000;
-			r = NewtMakeInt30(r);
-		}
-	}
-	else
-	{
+        if (8191 < n)
+        {	// 負の数
+            n |= 0xFFFFC000;
+            r = NewtMakeInt30(r);
+        }
+    }
+    else
+    {
         r = (r & 0xffff);
-	}
+    }
 
     stk_push(r);
 }
@@ -2680,7 +2680,7 @@ void is_invoke(int16_t b)
 
 void is_send(int16_t b)
 {
-	newtRef name;
+    newtRef name;
     newtErr	err;
 
     name = vm_send(b, &err);
@@ -2721,7 +2721,7 @@ void is_send_if_defined(int16_t b)
 
 void is_resend(int16_t b)
 {
-	newtRef name;
+    newtRef name;
     newtErr	err;
 
     name = vm_resend(b, &err);
@@ -2875,20 +2875,20 @@ void is_make_frame(int16_t b)
     newtRefVar	v;
     int16_t	i;
 
-  int16_t mapLength;
+    int16_t mapLength;
 
     map = stk_pop();
-  mapLength = NewtLength(map) - 1;
+    mapLength = NewtLength(map) - 1;
 
-  // NewtonScript Bytecode Interpreter Specification:
-  // The B field may contain a number less than the number of slots in the frame, in which
-  // case the remaining slots at the end of the frame are set to nil.
-  
-  f = NewtMakeFrame(map, mapLength);
-  
-  for (i = mapLength - 1; b <= i; i--) {
-    NewtSetFrameSlot(f, i, kNewtRefNIL);
-  }
+    // NewtonScript Bytecode Interpreter Specification:
+    // The B field may contain a number less than the number of slots in the frame, in which
+    // case the remaining slots at the end of the frame are set to nil.
+
+    f = NewtMakeFrame(map, mapLength);
+
+    for (i = mapLength - 1; b <= i; i--) {
+        NewtSetFrameSlot(f, i, kNewtRefNIL);
+    }
 
     for (i = b - 1; 0 <= i; i--)
     {
@@ -3324,7 +3324,7 @@ void NVMDumpCode(FILE * f, uint8_t * bc, uint32_t len)
 
             b = (int16_t)bc[pc + 1] << 8;
             b += bc[pc + 2];
-    
+
             if (a == 0)
             {
                 if (b == 0x01)
@@ -3360,7 +3360,7 @@ void NVMDumpBC(FILE * f, newtRefArg instructions)
     {
         uint8_t *	bc;
         uint32_t	len;
-    
+
         len = NewtLength(instructions);
         bc = NewtRefToBinary(instructions);
 
@@ -3386,16 +3386,16 @@ void NVMDumpFn(FILE * f, newtRefArg func)
 
     if (NewtRefIsNIL(fn))
         fn = FUNC;
-	else if (NewtRefIsSymbol(fn))
-		fn = NcGetGlobalFn(fn);
+    else if (NewtRefIsSymbol(fn))
+        fn = NcGetGlobalFn(fn);
 
     if (NewtRefIsFunction(fn))
     {
         newtRefVar	instructions;
-    
+
         NewtPrintObject(f, fn);
         NewtFprintf(f, "\n");
-    
+
         instructions = NcGetSlot(fn, NSSYM0(instructions));
         NVMDumpBC(f, instructions);
     }
@@ -3435,8 +3435,8 @@ void NVMDumpStacks(FILE * f)
 
 void vm_env_push(vm_env_t * next)
 {
-	*next = vm_env;
-	vm_env.next = next;
+    *next = vm_env;
+    vm_env.next = next;
 }
 
 
@@ -3448,12 +3448,12 @@ void vm_env_push(vm_env_t * next)
 
 void vm_env_pop(void)
 {
-	vm_env_t *	next = vm_env.next;
+    vm_env_t *	next = vm_env.next;
 
-	if (next)
-	{
-		vm_env = *next;
-	}
+    if (next)
+    {
+        vm_env = *next;
+    }
 }
 
 
@@ -3517,18 +3517,18 @@ void NVMInitGlobalFns0(void)
 {
     NewtDefGlobalFunc(NSSYM0(hasVariable),	NsHasVariable,		2, "HasVariable(frame, name)");
     NewtDefGlobalFunc(NSSYM0(hasVar),		NsHasVar,			1, "HasVar(name)");
-  NewtDefGlobalFunc(NSSYM(Ref),		NsRef,			1, "Ref(integer)");
-  NewtDefGlobalFunc(NSSYM(RefOf),		NsRefOf,			1, "RefOf(object)");
+    NewtDefGlobalFunc(NSSYM(Ref),		NsRef,			1, "Ref(integer)");
+    NewtDefGlobalFunc(NSSYM(RefOf),		NsRefOf,			1, "RefOf(object)");
     NewtDefGlobalFunc(NSSYM0(defGlobalFn),	NsDefGlobalFn,		2, "DefGlobalFn(name, fn)");
     NewtDefGlobalFunc(NSSYM0(defGlobalVar),	NsDefGlobalVar,		2, "DefGlobalVar(name, value)");
-//    NewtDefGlobalFunc(NSSYM0(and),			NsAnd,				2, "And(n1, n2)");
-//    NewtDefGlobalFunc(NSSYM0(or),			NsOr,				2, "Or(n1, n2)");
+    //    NewtDefGlobalFunc(NSSYM0(and),			NsAnd,				2, "And(n1, n2)");
+    //    NewtDefGlobalFunc(NSSYM0(or),			NsOr,				2, "Or(n1, n2)");
     NewtDefGlobalFunc(NSSYM0(mod),			NsMod,				2, "Mod(n1, n2)");
     NewtDefGlobalFunc(NSSYM0(shiftLeft),	NsShiftLeft,		2, "ShiftLeft(n1, n2)");
     NewtDefGlobalFunc(NSSYM0(shiftRight),	NsShiftRight,		2, "ShiftRight(n1, n2)");
-  NewtDefGlobalFunc(NSSYM(negate),	NsNegate,		1, "negate(number)");
-  NewtDefGlobalFunc(NSSYM(<<),	NsShiftLeft,		2, "<<(n1, n2)");
-  NewtDefGlobalFunc(NSSYM(>>),	NsShiftRight,		2, ">>(n1, n2)");
+    NewtDefGlobalFunc(NSSYM(negate),	NsNegate,		1, "negate(number)");
+    NewtDefGlobalFunc(NSSYM(<<),	NsShiftLeft,		2, "<<(n1, n2)");
+    NewtDefGlobalFunc(NSSYM(>>),	NsShiftRight,		2, ">>(n1, n2)");
     NewtDefGlobalFunc(NSSYM0(objectEqual),	NsObjectEqual,		2, "ObjectEqual(obj1, obj2)");		// 独自拡張
     NewtDefGlobalFunc(NSSYM0(defMagicPointer),NsDefMagicPointer,2, "DefMagicPointer(mp, value)");	// 独自拡張
 
@@ -3536,7 +3536,7 @@ void NVMInitGlobalFns0(void)
     NewtDefGlobalFunc(NSSYM0(makeRegex),	NsMakeRegex,		2, "MakeRegex(pattern, opt)");		// 独自拡張
 #endif /* __NAMED_MAGIC_POINTER__ */
 
-	NewtDefGlobalFunc(NSSYM(RemoveSlot),	NsRemoveSlot,		2, "RemoveSlot(obj, slot)");
+    NewtDefGlobalFunc(NSSYM(RemoveSlot),	NsRemoveSlot,		2, "RemoveSlot(obj, slot)");
 
     NewtDefGlobalFunc(NSSYM(Throw),			NsThrow,			2, "Throw(name, data)");
     NewtDefGlobalFunc(NSSYM(Rethrow),		NsRethrow,			0, "Rethrow()");
@@ -3586,7 +3586,7 @@ void NVMInitGlobalFns1(void)
     NewtDefGlobalFunc(NSSYM(Compile),		NsCompile,			1, "Compile(str)");
 
     NewtDefGlobalFunc(NSSYM(GetGlobalFn),	NsGetGlobalFn,		1, "GetGlobalFn(symbol)");
-	NewtDefGlobalFunc(NSSYM(GetGlobalVar),	NsGetGlobalVar,		1, "GetGlobalVar(symbol)");
+    NewtDefGlobalFunc(NSSYM(GetGlobalVar),	NsGetGlobalVar,		1, "GetGlobalVar(symbol)");
     NewtDefGlobalFunc(NSSYM(GlobalFnExists),NsGlobalFnExists,	1, "GlobalFnExists(symbol)");
     NewtDefGlobalFunc(NSSYM(GlobalVarExists),NsGlobalVarExists,	1, "GlobalVarExists(symbol)");
     NewtDefGlobalFunc(NSSYM(UndefGlobalFn),	NsUndefGlobalFn,	1, "UndefGlobalFn(symbol)");
@@ -3608,9 +3608,9 @@ void NVMInitGlobalFns1(void)
     NewtDefGlobalFunc(NSSYM(EndsWith),		NsEndsWith,			2, "EndsWith(str, sub)");
     NewtDefGlobalFunc(NSSYM(SPrintObject),	NsSPrintObject,		1, "SPrintObject(obj)");
     NewtDefGlobalFunc(NSSYM(SymbolCompareLex),	NsSymbolCompareLex,	2, "SymbolCompareLex(symbol1, symbol2)");
-  
-  NewtDefGlobalFunc(NSSYM(Array),	NsMakeArray,	2, "Array(size, initialValue)");
-  NewtDefGlobalFunc(NSSYM(SetContains),	NsSetContains,	2, "SetContains( array, item )");
+
+    NewtDefGlobalFunc(NSSYM(Array),	NsMakeArray,	2, "Array(size, initialValue)");
+    NewtDefGlobalFunc(NSSYM(SetContains),	NsSetContains,	2, "SetContains( array, item )");
 }
 
 
@@ -3632,17 +3632,17 @@ void NVMInitExGlobalFns(void)
 #endif /* HAVE_DLOPEN */
 
     NewtDefGlobalFunc(NSSYM(Load),		NsLoad,				1, "Load(file)");
-	NewtDefGlobalFunc(NSSYM(Require),	NsRequire,			1, "Require(str)");
+    NewtDefGlobalFunc(NSSYM(Require),	NsRequire,			1, "Require(str)");
 
     NewtDefGlobalFunc(NSSYM(LoadBinary),		NsLoadBinary,		1, "LoadBinary(filename)");
     NewtDefGlobalFunc(NSSYM(SaveBinary),		NsSaveBinary,		2, "SaveBinary(data, filename)");
     NewtDefGlobalFunc(NSSYM(MakeBinaryFromHex),		NsMakeBinaryFromHex,	2, "MakeBinaryFromHex(hexString, class)");
 
-	NewtDefGlobalFunc(NSSYM(MakeNSOF),	NsMakeNSOF,			2, "MakeNSOF(obj, ver)");
-	NewtDefGlobalFunc(NSSYM(ReadNSOF),	NsReadNSOF,			1, "ReadNSOF(nsof)");
+    NewtDefGlobalFunc(NSSYM(MakeNSOF),	NsMakeNSOF,			2, "MakeNSOF(obj, ver)");
+    NewtDefGlobalFunc(NSSYM(ReadNSOF),	NsReadNSOF,			1, "ReadNSOF(nsof)");
 
-	NewtDefGlobalFunc(NSSYM(MakePkg),	NsMakePkg,			1, "MakePkg(obj)");
-	NewtDefGlobalFunc(NSSYM(ReadPkg),	NsReadPkg,			1, "ReadPkg(pkg)");
+    NewtDefGlobalFunc(NSSYM(MakePkg),	NsMakePkg,			1, "MakePkg(obj)");
+    NewtDefGlobalFunc(NSSYM(ReadPkg),	NsReadPkg,			1, "ReadPkg(pkg)");
 
     NewtDefGlobalFunc(NSSYM(GetEnv),	NsGetEnv,			1, "GetEnv(str)");
 
@@ -3654,13 +3654,13 @@ void NVMInitExGlobalFns(void)
     NewtDefGlobalFunc(NSSYM(ExpandPath),NsExpandPath,		1, "ExpandPath(path)");
 
     NewtDefGlobalFunc(NSSYM(Split),		NsSplit,			2, "Split(str, sep)");
-  NewtDefGlobalFunc(NSSYM(StrPos),		NsStrPos,			3, "StrPos(hastack, needle, position)");
-  NewtDefGlobalFunc(NSSYM(StrReplace),		NsStrReplace,			4, "StrReplace(string, substr, replacement, count)");
+    NewtDefGlobalFunc(NSSYM(StrPos),		NsStrPos,			3, "StrPos(hastack, needle, position)");
+    NewtDefGlobalFunc(NSSYM(StrReplace),		NsStrReplace,			4, "StrReplace(string, substr, replacement, count)");
     NewtDefGlobalFunc(NSSYM(ParamStr),	NsParamStr,			2, "ParamStr(baseString, paramStrArray)");
     NewtDefGlobalFunc(NSSYM(StrCat),	NsStrCat,			2, "StrCat(str1, str2)");
 
     NewtDefGlobalFunc(NSSYM(ExtractByte),NsExtractByte,		2, "ExtractByte(data, offset)");
-  NewtDefGlobalFunc(NSSYM(ExtractWord),NsExtractWord,		2, "ExtractWord(data, offset)");
+    NewtDefGlobalFunc(NSSYM(ExtractWord),NsExtractWord,		2, "ExtractWord(data, offset)");
 
     NewtDefGlobalFunc(NSSYM(Gets),		NsGets,				0, "Gets()");
     NewtDefGlobalFunc(NSSYM(Getc),		NsGetc,				0, "Getc()");
@@ -3723,23 +3723,23 @@ void NVMInitGlobalVars(void)
 
 void NVMInit(void)
 {
-	newtRefVar  result;
+    newtRefVar  result;
 
-	vm_env.level = 0;
+    vm_env.level = 0;
 
     NVMInitREG();
     NVMInitSTACK();
     NVMInitGlobalFns();
     NVMInitGlobalVars();
 
-	// 標準ライブラリのロード
-	result = NcRequire0(NSSTR("egg"));
-	NVMClearCurrException();
+    // 標準ライブラリのロード
+    result = NcRequire0(NSSTR("egg"));
+    NVMClearCurrException();
 
-	if (result != kNewtRefUnbind)
-	{
-		stk_pop();
-	}
+    if (result != kNewtRefUnbind)
+    {
+        stk_pop();
+    }
 }
 
 
@@ -3770,10 +3770,10 @@ void NVMLoop(uint32_t callsp)
     uint8_t	op;
     uint8_t	a;
 
-	vm_env.level++;
+    vm_env.level++;
 
-	if (NEWT_DEBUG)
-		NewtDebugMsg("VM", "VM Level = %d\n", vm_env.level);
+    if (NEWT_DEBUG)
+        NewtDebugMsg("VM", "VM Level = %d\n", vm_env.level);
 
     while (callsp < CALLSP && PC < BCLEN)
     {
@@ -3788,7 +3788,7 @@ void NVMLoop(uint32_t callsp)
 
             b = (int16_t)BC[PC + 1] << 8;
             b += BC[PC + 2];
-    
+
             if (a == 0)
             {
                 if (b == 0x01)
@@ -3799,7 +3799,7 @@ void NVMLoop(uint32_t callsp)
         {
             oplen = 1;
         }
-    
+
         if (NEWT_TRACE)
         {
             NVMDumpInstCode(stderr, BC, PC, oplen);
@@ -3807,7 +3807,7 @@ void NVMLoop(uint32_t callsp)
         }
 
         PC += oplen;
-    
+
         if (a < kNBCInstructionsLen)
             (is_instructions[a])(b);
 
@@ -3818,7 +3818,7 @@ void NVMLoop(uint32_t callsp)
             NewtGC();
     }
 
-	vm_env.level--;
+    vm_env.level--;
 }
 
 
@@ -3833,7 +3833,7 @@ void NVMLoop(uint32_t callsp)
 
 void NVMFnCall(newtRefArg fn, int16_t numArgs)
 {
-    stk_push(fn);  
+    stk_push(fn);
     si_set_lex_scope();
     is_invoke(numArgs);
 }
@@ -3851,31 +3851,31 @@ void NVMFnCall(newtRefArg fn, int16_t numArgs)
 
 newtRef NVMCall(newtRefArg fn, int16_t numArgs, newtErr * errP)
 {
-	newtRefVar	result = kNewtRefUnbind;
-	newtErr		err = kNErrNone;
+    newtRefVar	result = kNewtRefUnbind;
+    newtErr		err = kNErrNone;
 
     if (NewtRefIsNotNIL(fn))
     {
-		vm_env_t	saveVM;
+        vm_env_t	saveVM;
 
-		// save the VM
-		vm_env_push(&saveVM);
+        // save the VM
+        vm_env_push(&saveVM);
 
         NVMFnCall(fn, numArgs);
         NVMLoop(CALLSP - 1);
         result = stk_top();
 
-		// restore the VM
-		vm_env_pop();
+        // restore the VM
+        vm_env_pop();
     }
 
     if (errP != NULL)
-	{
-		if (err == kNErrNone)
-			err = NVMGetExceptionErrCode(CURREXCP, true);
+    {
+        if (err == kNErrNone)
+            err = NVMGetExceptionErrCode(CURREXCP, true);
 
         *errP = err;
-	}
+    }
 
     return result;
 }
@@ -3892,16 +3892,16 @@ newtRef NVMCall(newtRefArg fn, int16_t numArgs, newtErr * errP)
 
 newtRef NVMInterpret(newtRefArg fn, newtErr * errP)
 {
-	newtRefVar	result = kNewtRefUnbind;
-	newtErr		err = kNErrNone;
+    newtRefVar	result = kNewtRefUnbind;
+    newtErr		err = kNErrNone;
 
     if (NewtRefIsNotNIL(fn))
     {
         if (NEWT_TRACE)
             NewtFprintf(stderr, "*** trace ***\n");
 
-		NVMInit();
-		NewtGC();
+        NVMInit();
+        NewtGC();
 
         result = NVMCall(fn, 0, &err);
 
@@ -4043,35 +4043,35 @@ newtRef NVMInterpretStr(const char * s, newtErr * errP)
  */
 newtRef
 NVMMessageSendWithArgArray(
-	newtRefArg inImpl,
-	newtRefArg inRcvr,
-	newtRefArg inFunction,
-	newtRefArg inArgs)
+                           newtRefArg inImpl,
+                           newtRefArg inRcvr,
+                           newtRefArg inFunction,
+                           newtRefArg inArgs)
 {
-	newtRefVar	result;
-	vm_env_t	saveVM;
-	int16_t		nbArgs;
-	int			indexArgs;
+    newtRefVar	result;
+    vm_env_t	saveVM;
+    int16_t		nbArgs;
+    int			indexArgs;
 
-	/* save the VM */
-	vm_env_push(&saveVM);
+    /* save the VM */
+    vm_env_push(&saveVM);
 
-	nbArgs = NewtArrayLength(inArgs);
-	/* Push the arguments on the stack */
-	for (indexArgs = 0; indexArgs < nbArgs; indexArgs++)
-	{
-		stk_push(NewtGetArraySlot(inArgs, indexArgs));
-	}
-	
-	/* Send the message */
-	NVMMessageSend(inImpl, inRcvr, inFunction, nbArgs);
-	NVMLoop(CALLSP - 1);
-	result = stk_top();
+    nbArgs = NewtArrayLength(inArgs);
+    /* Push the arguments on the stack */
+    for (indexArgs = 0; indexArgs < nbArgs; indexArgs++)
+    {
+        stk_push(NewtGetArraySlot(inArgs, indexArgs));
+    }
 
-	/* restore the VM */
-	vm_env_pop();
+    /* Send the message */
+    NVMMessageSend(inImpl, inRcvr, inFunction, nbArgs);
+    NVMLoop(CALLSP - 1);
+    result = stk_top();
 
-	return result;
+    /* restore the VM */
+    vm_env_pop();
+
+    return result;
 }
 
 
@@ -4087,24 +4087,24 @@ NVMMessageSendWithArgArray(
 
 newtRef NVMFuncCallWithValist(newtRefArg fn, int argc, va_list ap)
 {
-	vm_env_t	saveVM;
-	newtRefVar	result;
+    vm_env_t	saveVM;
+    newtRefVar	result;
 
-	// save the VM
-	vm_env_push(&saveVM);
+    // save the VM
+    vm_env_push(&saveVM);
 
-	// Push the arguments on the stack
-	stk_push_varg(argc, ap);
+    // Push the arguments on the stack
+    stk_push_varg(argc, ap);
 
-	// Call function
-	NVMFuncCall(fn, argc);
-	NVMLoop(CALLSP - 1);
-	result = stk_top();
+    // Call function
+    NVMFuncCall(fn, argc);
+    NVMLoop(CALLSP - 1);
+    result = stk_top();
 
-	// restore the VM
-	vm_env_pop();
+    // restore the VM
+    vm_env_pop();
 
-	return result;
+    return result;
 }
 
 
@@ -4122,24 +4122,24 @@ newtRef NVMFuncCallWithValist(newtRefArg fn, int argc, va_list ap)
 
 newtRef NVMMessageSendWithValist(newtRefArg impl, newtRefArg receiver, newtRefArg fn, int argc, va_list ap)
 {
-	newtRefVar	result;
-	vm_env_t	saveVM;
+    newtRefVar	result;
+    vm_env_t	saveVM;
 
-	// save the VM
-	vm_env_push(&saveVM);
-	
-	// Push the arguments on the stack
-	stk_push_varg(argc, ap);
+    // save the VM
+    vm_env_push(&saveVM);
 
-	// Send the message
-	NVMMessageSend(impl, receiver, fn, argc);
-	NVMLoop(CALLSP - 1);
-	result = stk_top();
+    // Push the arguments on the stack
+    stk_push_varg(argc, ap);
 
-	/* restore the VM */
-	vm_env_pop();
+    // Send the message
+    NVMMessageSend(impl, receiver, fn, argc);
+    NVMLoop(CALLSP - 1);
+    result = stk_top();
 
-	return result;
+    /* restore the VM */
+    vm_env_pop();
+
+    return result;
 }
 
 
@@ -4154,14 +4154,14 @@ newtRef NVMMessageSendWithValist(newtRefArg impl, newtRefArg receiver, newtRefAr
 
 newtRef NcCall(newtRefArg fn, int argc, ...)
 {
-	newtRefVar	result;
-	va_list		ap;
+    newtRefVar	result;
+    va_list		ap;
 
-	va_start(ap, argc);
-	result = NVMFuncCallWithValist(fn, argc, ap);
-	va_end(ap);
+    va_start(ap, argc);
+    result = NVMFuncCallWithValist(fn, argc, ap);
+    va_end(ap);
 
-	return result;
+    return result;
 }
 
 
@@ -4176,25 +4176,25 @@ newtRef NcCall(newtRefArg fn, int argc, ...)
 
 newtRef NcCallWithArgArray(newtRefArg fn, newtRefArg args)
 {
-	vm_env_t	saveVM;
-	newtRefVar	result;
-	newtErr		err;
+    vm_env_t	saveVM;
+    newtRefVar	result;
+    newtErr		err;
 
-	if (! NewtRefIsArray(args))
-	{
-		return NewtThrow(kNErrNotAnArray, args);
-	}
+    if (! NewtRefIsArray(args))
+    {
+        return NewtThrow(kNErrNotAnArray, args);
+    }
 
-	// save the VM
-	vm_env_push(&saveVM);
+    // save the VM
+    vm_env_push(&saveVM);
 
-	stk_push_array(args);
-	result = NVMCall(fn, NewtArrayLength(args), &err);
+    stk_push_array(args);
+    result = NVMCall(fn, NewtArrayLength(args), &err);
 
-	// restore the VM
-	vm_env_pop();
+    // restore the VM
+    vm_env_pop();
 
-	return result;
+    return result;
 }
 
 
@@ -4209,21 +4209,21 @@ newtRef NcCallWithArgArray(newtRefArg fn, newtRefArg args)
 
 newtRef NcCallGlobalFn(newtRefArg sym, int argc, ...)
 {
-	newtRefVar	result;
+    newtRefVar	result;
     newtRefVar	fn;
-	va_list		ap;
+    va_list		ap;
 
     fn = NcGetGlobalFn(sym);
     if (NewtRefIsNIL(fn))
-	{
-		return NewtThrow(kNErrUndefinedGlobalFunction, sym);
-	}
+    {
+        return NewtThrow(kNErrUndefinedGlobalFunction, sym);
+    }
 
-	va_start(ap, argc);
-	result = NVMFuncCallWithValist(fn, argc, ap);
-	va_end(ap);
+    va_start(ap, argc);
+    result = NVMFuncCallWithValist(fn, argc, ap);
+    va_end(ap);
 
-	return result;
+    return result;
 }
 
 
@@ -4242,11 +4242,11 @@ newtRef NcCallGlobalFnWithArgArray(newtRefArg sym, newtRefArg args)
 
     fn = NcGetGlobalFn(sym);
     if (NewtRefIsNIL(fn))
-	{
-		return NewtThrow(kNErrUndefinedGlobalFunction, sym);
-	}
+    {
+        return NewtThrow(kNErrUndefinedGlobalFunction, sym);
+    }
 
-	return NcCallWithArgArray(fn, args);
+    return NcCallWithArgArray(fn, args);
 }
 
 
@@ -4263,39 +4263,39 @@ newtRef NcCallGlobalFnWithArgArray(newtRefArg sym, newtRefArg args)
 
 newtRef NcSend(newtRefArg receiver, newtRefArg sym, bool ignore, int argc, ...)
 {
-	newtRefVar	result = kNewtRefUnbind;
+    newtRefVar	result = kNewtRefUnbind;
     newtRefVar	impl;
     newtRefVar	fn;
 
-	if (! NewtRefIsSymbol(sym))
-	{
-		return NewtThrow(kNErrNotASymbol, sym);
-	}
+    if (! NewtRefIsSymbol(sym))
+    {
+        return NewtThrow(kNErrNotASymbol, sym);
+    }
 
-	if (! NewtRefIsFrame(receiver) && ! NewtRefIsNIL(receiver))
-	{
-		return NewtThrow(kNErrNotAFrame, receiver);
-	}
+    if (! NewtRefIsFrame(receiver) && ! NewtRefIsNIL(receiver))
+    {
+        return NewtThrow(kNErrNotAFrame, receiver);
+    }
 
     impl = NcFullLookupFrame(receiver, sym);
 
     if (impl != kNewtRefUnbind)
-	{
-		va_list		ap;
+    {
+        va_list		ap;
 
-		fn = NcGetSlot(impl, sym);
+        fn = NcGetSlot(impl, sym);
 
-		va_start(ap, argc);
-		result = NVMMessageSendWithValist(impl, receiver, fn, argc, ap);
-		va_end(ap);
+        va_start(ap, argc);
+        result = NVMMessageSendWithValist(impl, receiver, fn, argc, ap);
+        va_end(ap);
     }
-	else
-	{
-		if (! ignore)
-			return NewtThrow(kNErrUndefinedMethod, sym);
-	}
+    else
+    {
+        if (! ignore)
+            return NewtThrow(kNErrUndefinedMethod, sym);
+    }
 
-	return result;
+    return result;
 }
 
 
@@ -4312,34 +4312,34 @@ newtRef NcSend(newtRefArg receiver, newtRefArg sym, bool ignore, int argc, ...)
 
 newtRef NcSendWithArgArray(newtRefArg receiver, newtRefArg sym, bool ignore, newtRefArg args)
 {
-	newtRefVar	result = kNewtRefUnbind;
+    newtRefVar	result = kNewtRefUnbind;
     newtRefVar	impl;
     newtRefVar	fn;
 
-	if (! NewtRefIsSymbol(sym))
-	{
-		return NewtThrow(kNErrNotASymbol, sym);
-	}
+    if (! NewtRefIsSymbol(sym))
+    {
+        return NewtThrow(kNErrNotASymbol, sym);
+    }
 
-	if (! NewtRefIsFrame(receiver) && ! NewtRefIsNIL(receiver))
-	{
-		return NewtThrow(kNErrNotAFrame, receiver);
-	}
+    if (! NewtRefIsFrame(receiver) && ! NewtRefIsNIL(receiver))
+    {
+        return NewtThrow(kNErrNotAFrame, receiver);
+    }
 
     impl = NcFullLookupFrame(receiver, sym);
 
     if (impl != kNewtRefUnbind)
-	{
-		fn = NcGetSlot(impl, sym);
-		result = NVMMessageSendWithArgArray(impl, receiver, fn, args);
+    {
+        fn = NcGetSlot(impl, sym);
+        result = NVMMessageSendWithArgArray(impl, receiver, fn, args);
     }
-	else
-	{
-		if (! ignore)
-			return NewtThrow(kNErrUndefinedMethod, sym);
-	}
+    else
+    {
+        if (! ignore)
+            return NewtThrow(kNErrUndefinedMethod, sym);
+    }
 
-	return result;
+    return result;
 }
 
 
@@ -4358,39 +4358,39 @@ newtRef NcSendWithArgArray(newtRefArg receiver, newtRefArg sym, bool ignore, new
 
 newtRef NcSendProto(newtRefArg receiver, newtRefArg sym, bool ignore, int argc, ...)
 {
-	newtRefVar	result = kNewtRefUnbind;
+    newtRefVar	result = kNewtRefUnbind;
     newtRefVar	impl;
     newtRefVar	fn;
 
-	if (! NewtRefIsSymbol(sym))
-	{
-		return NewtThrow(kNErrNotASymbol, sym);
-	}
+    if (! NewtRefIsSymbol(sym))
+    {
+        return NewtThrow(kNErrNotASymbol, sym);
+    }
 
-	if (! NewtRefIsFrame(receiver) && ! NewtRefIsNIL(receiver))
-	{
-		return NewtThrow(kNErrNotAFrame, receiver);
-	}
+    if (! NewtRefIsFrame(receiver) && ! NewtRefIsNIL(receiver))
+    {
+        return NewtThrow(kNErrNotAFrame, receiver);
+    }
 
-	impl = NcProtoLookupFrame(receiver, sym);
+    impl = NcProtoLookupFrame(receiver, sym);
 
     if (impl != kNewtRefUnbind)
-	{
-		va_list		ap;
+    {
+        va_list		ap;
 
-		fn = NcGetSlot(impl, sym);
+        fn = NcGetSlot(impl, sym);
 
-		va_start(ap, argc);
-		result = NVMMessageSendWithValist(impl, receiver, fn, argc, ap);
-		va_end(ap);
+        va_start(ap, argc);
+        result = NVMMessageSendWithValist(impl, receiver, fn, argc, ap);
+        va_end(ap);
     }
-	else
-	{
-		if (! ignore)
-			return NewtThrow(kNErrUndefinedMethod, sym);
-	}
+    else
+    {
+        if (! ignore)
+            return NewtThrow(kNErrUndefinedMethod, sym);
+    }
 
-	return result;
+    return result;
 }
 
 
@@ -4409,32 +4409,32 @@ newtRef NcSendProto(newtRefArg receiver, newtRefArg sym, bool ignore, int argc, 
 
 newtRef NcSendProtoWithArgArray(newtRefArg receiver, newtRefArg sym, bool ignore, newtRefArg args)
 {
-	newtRefVar	result = kNewtRefUnbind;
+    newtRefVar	result = kNewtRefUnbind;
     newtRefVar	impl;
     newtRefVar	fn;
 
-	if (! NewtRefIsSymbol(sym))
-	{
-		return NewtThrow(kNErrNotASymbol, sym);
-	}
+    if (! NewtRefIsSymbol(sym))
+    {
+        return NewtThrow(kNErrNotASymbol, sym);
+    }
 
-	if (! NewtRefIsFrame(receiver) && ! NewtRefIsNIL(receiver))
-	{
-		return NewtThrow(kNErrNotAFrame, receiver);
-	}
+    if (! NewtRefIsFrame(receiver) && ! NewtRefIsNIL(receiver))
+    {
+        return NewtThrow(kNErrNotAFrame, receiver);
+    }
 
-	impl = NcProtoLookupFrame(receiver, sym);
+    impl = NcProtoLookupFrame(receiver, sym);
 
     if (impl != kNewtRefUnbind)
-	{
-		fn = NcGetSlot(impl, sym);
-		result = NVMMessageSendWithArgArray(impl, receiver, fn, args);
+    {
+        fn = NcGetSlot(impl, sym);
+        result = NVMMessageSendWithArgArray(impl, receiver, fn, args);
     }
-	else
-	{
-		if (! ignore)
-			return NewtThrow(kNErrUndefinedMethod, sym);
-	}
+    else
+    {
+        if (! ignore)
+            return NewtThrow(kNErrUndefinedMethod, sym);
+    }
 
-	return result;
+    return result;
 }

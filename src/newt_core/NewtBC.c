@@ -29,11 +29,11 @@ typedef struct nbc_env_t	nbc_env_t;
 /// バイトコード環境（構造体定義）
 struct nbc_env_t {
     nbc_env_t *	parent;			///< 呼出し元環境
-
-	newtStack   bytecode;		///< バイトコードバッファ
-	newtStack   breakstack;		///< ブレークスタック
-	newtStack   onexcpstack;	///< 例外スタック
-
+    
+    newtStack   bytecode;		///< バイトコードバッファ
+    newtStack   breakstack;		///< ブレークスタック
+    newtStack   onexcpstack;	///< 例外スタック
+    
     newtRefVar	func;			///< 関数オブジェクト
     newtRefVar	literals;		///< 関数オブジェクトのリテラルフレーム
     newtRefVar	argFrame;		///< 関数オブジェクトのフレーム
@@ -85,22 +85,22 @@ static nbc_env_t *	newt_bc_env;
 
 /// 関数命令テーブル
 static freq_func_t freq_func_tb[] =
-    {
-//		{"aref",			2,	kNBCAref,			0},
-//		{"setAref",			3,	kNBCSetAref,		0},
-        {"BAnd",			2,	kNBCBitAnd,			0},
-        {"BOr",				2,	kNBCBitOr,			0},
-        {"BNot",			1,	kNBCBitNot,			0},
-        {"Length",			1,	kNBCLength,			0},
-        {"Clone",			1,	kNBCClone,			0},
-        {"SetClass",		2,	kNBCSetClass,		0},
-        {"AddArraySlot",	2,	kNBCAddArraySlot,	0},
-        {"Stringer",		1,	kNBCStringer,		0},
-        {"ClassOf",			1,	kNBCClassOf,		0},
-
-        // end
-        {NULL,				0,	0,					0}
-    };
+{
+    //		{"aref",			2,	kNBCAref,			0},
+    //		{"setAref",			3,	kNBCSetAref,		0},
+    {"BAnd",			2,	kNBCBitAnd,			0},
+    {"BOr",				2,	kNBCBitOr,			0},
+    {"BNot",			1,	kNBCBitNot,			0},
+    {"Length",			1,	kNBCLength,			0},
+    {"Clone",			1,	kNBCClone,			0},
+    {"SetClass",		2,	kNBCSetClass,		0},
+    {"AddArraySlot",	2,	kNBCAddArraySlot,	0},
+    {"Stringer",		1,	kNBCStringer,		0},
+    {"ClassOf",			1,	kNBCClassOf,		0},
+    
+    // end
+    {NULL,				0,	0,					0}
+};
 
 
 #if 0
@@ -191,10 +191,10 @@ static void				NBCGenBC_sub(nps_syntax_node_t * stree, uint32_t n, bool ret);
 int16_t NBCAddLiteralEnv(nbc_env_t * env, newtRefArg r)
 {
     int16_t	b;
-
+    
     b = NewtArrayLength(env->literals);
     NcAddArraySlot(env->literals, r);
-
+    
     return b;
 }
 
@@ -213,20 +213,20 @@ void NBCGenCodeEnv(nbc_env_t * env, uint8_t a, int16_t b)
 {
     uint8_t *	bc;
     uint32_t	cx;
-
-	cx = ENV_CX(env);
-
-	if (! NewtStackExpand(&env->bytecode, cx + 3))
-		return;
-
-	bc = ENV_BC(env);
-
+    
+    cx = ENV_CX(env);
+    
+    if (! NewtStackExpand(&env->bytecode, cx + 3))
+        return;
+    
+    bc = ENV_BC(env);
+    
     if (a == kNBCFieldMask)
         b = 1;
-
+    
     if (a != kNBCFieldMask &&
         ((a & kNBCFieldMask) == a ||
-        (b != kNBCFieldMask && (b & kNBCFieldMask) == b)))
+         (b != kNBCFieldMask && (b & kNBCFieldMask) == b)))
     {
         bc[cx++] = a | b;
     }
@@ -236,8 +236,8 @@ void NBCGenCodeEnv(nbc_env_t * env, uint8_t a, int16_t b)
         bc[cx++] = b >> 8;
         bc[cx++] = b & 0xff;
     }
-
-	ENV_CX(env) = cx;
+    
+    ENV_CX(env) = cx;
 }
 
 
@@ -255,15 +255,15 @@ void NBCGenCodeEnvL(nbc_env_t * env, uint8_t a, newtRefArg r)
 {
     newtRefVar	obj;
     int16_t	b = 0;
-
+    
     obj = NewtPackLiteral(r);
-
+    
     // リテラルを検索
     b = NewtFindArrayIndex(env->literals, obj, 0);
-
+    
     if (b == -1) // リテラルに追加
         b = NBCAddLiteralEnv(env, obj);
-
+    
     NBCGenCodeEnv(env, a, b);
 }
 
@@ -281,12 +281,12 @@ int16_t NBCGenPushLiteralEnv(nbc_env_t * env, newtRefArg r)
 {
     newtRefVar	obj;
     int16_t	b;
-
+    
     obj = NewtPackLiteral(r);
     b = NBCAddLiteralEnv(env, obj);
-
+    
     NBCGenCodeEnv(env, kNBCPush, b);
-
+    
     return b;
 }
 
@@ -307,24 +307,24 @@ void NBCGenPUSH(newtRefArg r)
     switch (NewtGetRefType(r, false))
     {
         case kNewtInt30:
-            {
-                int32_t	n;
-
-                n = NewtRefToInteger(r);
-
-                if (-8192 <= n && n <= 8191)
-                    NBCGenCode(kNBCPushConstant, r);
-                else
-                    NBCGenCodeL(kNBCPush, r);
-            }
+        {
+            int32_t	n;
+            
+            n = NewtRefToInteger(r);
+            
+            if (-8192 <= n && n <= 8191)
+                NBCGenCode(kNBCPushConstant, r);
+            else
+                NBCGenCodeL(kNBCPush, r);
+        }
             break;
-
+            
         case kNewtNil:
         case kNewtTrue:
         case kNewtUnbind:
             NBCGenCode(kNBCPushConstant, r);
             break;
-
+            
         case kNewtCharacter:
         case kNewtSpecial:
         case kNewtMagicPointer:
@@ -333,7 +333,7 @@ void NBCGenPUSH(newtRefArg r)
             else
                 NBCGenCodeL(kNBCPush, r);
             break;
-
+            
         case kNewtPointer:
         default:
             NBCGenCodeL(kNBCPush, r);
@@ -357,9 +357,9 @@ void NBCGenGetVar(nps_syntax_node_t * stree, newtRefArg r)
     {
         // 定数の場合
         newtRefVar	c;
-
+        
         c = NcGetSlot(CONSTANT, r);
-
+        
         if (! NPSRefIsSyntaxNode(c) && NewtRefIsLiteral(c))
             NBCGenPUSH(c);
         else
@@ -368,10 +368,10 @@ void NBCGenGetVar(nps_syntax_node_t * stree, newtRefArg r)
     else
     {
         int16_t	b;
-
+        
         // ローカル変数を検索
         b = NewtFindSlotIndex(ARGFRAME, r);
-    
+        
         if (b != -1)
             NBCGenCode(kNBCGetVar, b);
         else
@@ -392,7 +392,7 @@ void NBCGenGetVar(nps_syntax_node_t * stree, newtRefArg r)
 void NBCGenCallFn(newtRefArg fn, int16_t numArgs)
 {
     int	i;
-
+    
     // freq-func の場合
     for (i = 0; freq_func_tb[i].name != NULL; i++)
     {
@@ -403,12 +403,12 @@ void NBCGenCallFn(newtRefArg fn, int16_t numArgs)
                 NBError(kNErrWrongNumberOfArgs);
                 return;
             }
-
+            
             NBCGenFreq(freq_func_tb[i].b);
             return;
         }
     }
-
+    
     // call function
     NBCGenPUSH(fn);
     NBCGenCode(kNBCCall, numArgs);
@@ -429,41 +429,41 @@ void NBCGenCallFn(newtRefArg fn, int16_t numArgs)
 int16_t NBCMakeFnArgFrame(newtRefArg argFrame, nps_syntax_node_t * stree, nps_node_t r, bool * indefiniteP)
 {
     int16_t	numArgs = 1;
-
+    
     if (r == kNewtRefUnbind)
         return 0;
-
-	if (*indefiniteP == true)
-	{
-		NBError(kNErrSyntaxError);
+    
+    if (*indefiniteP == true)
+    {
+        NBError(kNErrSyntaxError);
         return 0;
-	}
-
+    }
+    
     if (NPSRefIsSyntaxNode(r))
     {
         nps_syntax_node_t * node;
-
+        
         node = &stree[NPSRefToSyntaxNode(r)];
-
+        
         switch (node->code)
         {
             case kNPSCommaList:
                 numArgs = NBCMakeFnArgFrame(argFrame, stree, node->op1, indefiniteP)
-                            + NBCMakeFnArgFrame(argFrame, stree, node->op2, indefiniteP);
+                + NBCMakeFnArgFrame(argFrame, stree, node->op2, indefiniteP);
                 break;
-
+                
             case kNPSArg:
                 // type (node->op1) はとりあえず無視
                 NcSetSlot(argFrame, node->op2, kNewtRefUnbind);
                 break;
-
-			case kNPSIndefinite:
+                
+            case kNPSIndefinite:
                 // 不定長
-				NcSetSlot(argFrame, node->op1, kNewtRefUnbind);
-				*indefiniteP = true;
+                NcSetSlot(argFrame, node->op1, kNewtRefUnbind);
+                *indefiniteP = true;
                 numArgs = 0;
-				break;
-
+                break;
+                
             default:
                 NBError(kNErrSyntaxError);
                 break;
@@ -473,7 +473,7 @@ int16_t NBCMakeFnArgFrame(newtRefArg argFrame, nps_syntax_node_t * stree, nps_no
     {
         NcSetSlot(argFrame, r, kNewtRefUnbind);
     }
-
+    
     return numArgs;
 }
 
@@ -491,22 +491,22 @@ int16_t NBCMakeFnArgFrame(newtRefArg argFrame, nps_syntax_node_t * stree, nps_no
 int16_t NBCMakeFnArgs(newtRefArg fn, nps_syntax_node_t * stree, nps_node_t r)
 {
     int16_t	numArgs = 0;
-
+    
     if (r != kNewtRefUnbind)
     {
         newtRefVar	argFrame;
-		bool		indefinite = false;
-
+        bool		indefinite = false;
+        
         argFrame = NcGetSlot(fn, NSSYM0(argFrame));
         numArgs = NBCMakeFnArgFrame(argFrame, stree, r, &indefinite);
-
+        
         if (0 < numArgs)
             NcSetSlot(fn, NSSYM0(numArgs), NewtMakeInteger(numArgs));
- 
-		if (indefinite)
+        
+        if (indefinite)
             NcSetSlot(fn, NSSYM0(indefinite), kNewtRefTRUE);
-	}
-
+    }
+    
     return numArgs;
 }
 
@@ -523,10 +523,10 @@ int16_t NBCMakeFnArgs(newtRefArg fn, nps_syntax_node_t * stree, nps_node_t r)
 nbc_env_t * NBCMakeFnEnv(nps_syntax_node_t * stree, nps_node_t args)
 {
     newt_bc_env = NBCEnvNew(newt_bc_env);
-
-	if (newt_bc_env != NULL)
-		NBCMakeFnArgs(newt_bc_env->func, stree, args);
-
+    
+    if (newt_bc_env != NULL)
+        NBCMakeFnArgs(newt_bc_env->func, stree, args);
+    
     return newt_bc_env;
 }
 
@@ -542,10 +542,10 @@ nbc_env_t * NBCMakeFnEnv(nps_syntax_node_t * stree, nps_node_t args)
 uint32_t NBCGenBranch(uint8_t a)
 {
     uint32_t	cx;
-
+    
     cx = CX;
     NBCGenCode(a, 0xffff);	// 0xffff is dummy
-
+    
     return cx;
 }
 
@@ -569,14 +569,14 @@ uint32_t NBCGenBranch(uint8_t a)
 void NBCDefLocal(newtRefArg type, newtRefArg r, bool init)
 {
     NcSetSlot(ARGFRAME, r, kNewtRefUnbind);
-
+    
     if (init)
     {
         int16_t	b;
-    
+        
         // ローカル変数を検索
         b = NewtFindSlotIndex(ARGFRAME, r);
-
+        
         if (b != -1)
             NBCGenCode(kNBCSetVar, b);
         else
@@ -619,11 +619,11 @@ void NBCBackPatch(uint32_t cx, int16_t b)
 void NBCPushBreakStack(uint32_t cx)
 {
     if (BREAKSTACK == NULL)
-		NewtStackSetup(&newt_bc_env->breakstack, NEWT_POOL, sizeof(uint32_t), NEWT_NUM_BREAKSTACK);
-
-	if (! NewtStackExpand(&newt_bc_env->breakstack, BREAKSP + 1))
-		return;
-
+        NewtStackSetup(&newt_bc_env->breakstack, NEWT_POOL, sizeof(uint32_t), NEWT_NUM_BREAKSTACK);
+    
+    if (! NewtStackExpand(&newt_bc_env->breakstack, BREAKSP + 1))
+        return;
+    
     BREAKSTACK[BREAKSP] = cx;
     BREAKSP++;
 }
@@ -641,14 +641,14 @@ void NBCPushBreakStack(uint32_t cx)
 void NBCBreakBackPatchs(uint32_t loop_head, uint32_t cx)
 {
     uint32_t	branch;
-
+    
     for (; 0 < BREAKSP; BREAKSP--)
     {
         branch = BREAKSTACK[BREAKSP - 1];
-
+        
         if (branch < loop_head)
             break;
-
+        
         NBCBackPatch(branch, cx);	// ブランチをバックパッチ
     }
 }
@@ -670,11 +670,11 @@ void NBCBreakBackPatchs(uint32_t loop_head, uint32_t cx)
 void NBCPushOnexcpStack(uint32_t cx)
 {
     if (ONEXCPSTACK == NULL)
-		NewtStackSetup(&newt_bc_env->onexcpstack, NEWT_POOL, sizeof(uint32_t), NEWT_NUM_ONEXCPSTACK);
-
-	if (! NewtStackExpand(&newt_bc_env->onexcpstack, ONEXCPSP + 1))
-		return;
-
+        NewtStackSetup(&newt_bc_env->onexcpstack, NEWT_POOL, sizeof(uint32_t), NEWT_NUM_ONEXCPSTACK);
+    
+    if (! NewtStackExpand(&newt_bc_env->onexcpstack, ONEXCPSP + 1))
+        return;
+    
     ONEXCPSTACK[ONEXCPSP] = cx;
     ONEXCPSP++;
 }
@@ -692,14 +692,14 @@ void NBCPushOnexcpStack(uint32_t cx)
 void NBCOnexcpBackPatchs(uint32_t try_head, uint32_t cx)
 {
     uint32_t	branch;
-
+    
     for (; 0 < ONEXCPSP; ONEXCPSP--)
     {
         branch = ONEXCPSTACK[ONEXCPSP - 1];
-
+        
         if (branch < try_head)
             break;
-
+        
         NBCBackPatch(branch, cx);	// ブランチをバックパッチ
     }
 }
@@ -717,10 +717,10 @@ void NBCGenOnexcpPC(int32_t pc)
 {
     newtRefVar	r;
     int16_t	b;
-
+    
     r = NewtMakeInteger(pc);
     b = NBCGenPushLiteral(r);
-
+    
     NBCPushOnexcpStack(b);	// バックパッチのためにスタックにプッシュする
 }
 
@@ -752,10 +752,10 @@ void NBCGenOnexcpBranch(void)
 void NBCOnexcpBackPatchL(uint32_t sp, int32_t pc)
 {
     newtRefVar	r;
-
+    
     if (ONEXCPSTACK == NULL || ONEXCPSP <= sp)
         return;
-
+    
     r = NewtMakeInteger(pc);
     NewtSetArraySlot(LITERALS, ONEXCPSTACK[sp], r);
 }
@@ -775,49 +775,49 @@ void NBCOnexcpBackPatchL(uint32_t sp, int32_t pc)
 newtRef NBCMakeFn(nbc_env_t * env)
 {
     newtRefVar	fnv[] = {
-                            NS_CLASS,				NSSYM0(CodeBlock),
-                            NSSYM0(instructions),	kNewtRefNIL,
-                            NSSYM0(literals),		kNewtRefNIL,
-                            NSSYM0(argFrame),		kNewtRefNIL,
-                            NSSYM0(numArgs),		kNewtRefNIL
-                        };
-
+        NS_CLASS,				NSSYM0(CodeBlock),
+        NSSYM0(instructions),	kNewtRefNIL,
+        NSSYM0(literals),		kNewtRefNIL,
+        NSSYM0(argFrame),		kNewtRefNIL,
+        NSSYM0(numArgs),		kNewtRefNIL
+    };
+    
     newtRefVar	afv[] = {
-                            NSSYM0(_nextArgFrame),	kNewtRefNIL,
-                            NSSYM0(_parent),		kNewtRefNIL,
-                            NSSYM0(_implementor),	kNewtRefNIL
-                        };
-
+        NSSYM0(_nextArgFrame),	kNewtRefNIL,
+        NSSYM0(_parent),		kNewtRefNIL,
+        NSSYM0(_implementor),	kNewtRefNIL
+    };
+    
     newtRefVar	fn;
     int32_t	numArgs = 0;
-
+    
     // literals
     env->literals = NewtMakeArray(NSSYM0(literals), 0);
-
+    
     // argFrame
     env->argFrame = NewtMakeFrame2(sizeof(afv) / (sizeof(newtRefVar) * 2), afv);
-
+    
     // function
     fn = NewtMakeFrame2(sizeof(fnv) / (sizeof(newtRefVar) * 2), fnv);
-
-//    NcSetClass(fn, NSSYM0(CodeBlock));
+    
+    //    NcSetClass(fn, NSSYM0(CodeBlock));
     NcSetSlot(fn, NSSYM0(instructions), kNewtRefNIL);
     NcSetSlot(fn, NSSYM0(literals), env->literals);
     NcSetSlot(fn, NSSYM0(argFrame), env->argFrame);
     NcSetSlot(fn, NSSYM0(numArgs), NewtMakeInteger(numArgs));
-
+    
     env->func = fn;
-
+    
     // constant
-	if (env->parent)
-	{	// 親があれば定数フレームを共有する
-		env->constant = env->parent->constant;
-	}
-	else
-	{	// 親がなければ新規に定数フレームを作成
-		env->constant = NcMakeFrame();
-	}
-
+    if (env->parent)
+    {	// 親があれば定数フレームを共有する
+        env->constant = env->parent->constant;
+    }
+    else
+    {	// 親がなければ新規に定数フレームを作成
+        env->constant = NcMakeFrame();
+    }
+    
     return fn;
 }
 
@@ -831,7 +831,7 @@ newtRef NBCMakeFn(nbc_env_t * env)
 void NBCInitFreqFuncTable(void)
 {
     int	i;
-
+    
     for (i = 0; freq_func_tb[i].name != NULL; i++)
     {
         freq_func_tb[i].sym = NewtMakeSymbol(freq_func_tb[i].name);
@@ -850,17 +850,17 @@ void NBCInitFreqFuncTable(void)
 nbc_env_t * NBCEnvNew(nbc_env_t * parent)
 {
     nbc_env_t *	env;
-
+    
     env = (nbc_env_t *)NewtMemCalloc(NEWT_POOL, 1, sizeof(nbc_env_t));
-
-	if (env != NULL)
-	{
-		env->parent = parent;
-		NewtStackSetup(&env->bytecode, NEWT_POOL, sizeof(uint8_t), NEWT_NUM_BYTECODE);
-
-		NBCMakeFn(env);
-	}
-
+    
+    if (env != NULL)
+    {
+        env->parent = parent;
+        NewtStackSetup(&env->bytecode, NEWT_POOL, sizeof(uint8_t), NEWT_NUM_BYTECODE);
+        
+        NBCMakeFn(env);
+    }
+    
     return env;
 }
 
@@ -877,10 +877,10 @@ void NBCEnvFree(nbc_env_t * env)
 {
     if (env != NULL)
     {
-		NewtStackFree(&env->bytecode);
-		NewtStackFree(&env->breakstack);
-		NewtStackFree(&env->onexcpstack);
-
+        NewtStackFree(&env->bytecode);
+        NewtStackFree(&env->breakstack);
+        NewtStackFree(&env->onexcpstack);
+        
         NewtMemFree(env);
     }
 }
@@ -898,27 +898,27 @@ newtRef NBCFnDone(nbc_env_t ** envP)
 {
     nbc_env_t *	env = *envP;
     newtRefVar	fn = kNewtRefNIL;
-
+    
     if (env != NULL)
     {
         newtRefVar	instr;
         newtRefVar	literals;
-
+        
         NBCGenCodeEnv(env, kNBCReturn, 0);
-
+        
         fn = env->func;
         instr = NewtMakeBinary(kNewtRefNIL, ENV_BC(env), ENV_CX(env), true);
         NcSetSlot(fn, NSSYM0(instructions), instr);
-    
+        
         literals = NcGetSlot(fn, NSSYM0(literals));
-
+        
         if (NewtRefIsNotNIL(literals) && NcLength(literals) == 0)
             NcSetSlot(fn, NSSYM0(literals), kNewtRefNIL);
-
+        
         *envP = env->parent;
         NBCEnvFree(env);
     }
-
+    
     return fn;
 }
 
@@ -945,7 +945,7 @@ void NBCInit(void)
 void NBCCleanup(void)
 {
     nbc_env_t *	env;
-
+    
     while (newt_bc_env != NULL)
     {
         env = newt_bc_env;
@@ -975,7 +975,7 @@ void NBCGenBC_stmt(nps_syntax_node_t * stree, nps_node_t r, bool ret)
         NBCGenBC_sub(stree, NPSRefToSyntaxNode(r), ret);
         return;
     }
-
+    
     if (r != kNewtRefUnbind)
         NBCGenPUSH(r);
 }
@@ -995,16 +995,16 @@ void NBCGenConstant(nps_syntax_node_t * stree, nps_node_t r)
     if (NPSRefIsSyntaxNode(r))
     {
         nps_syntax_node_t * node;
-
+        
         node = &stree[NPSRefToSyntaxNode(r)];
-
+        
         switch (node->code)
         {
             case kNPSCommaList:
                 NBCGenConstant(stree, node->op1);
                 NBCGenConstant(stree, node->op2);
                 break;
-
+                
             case kNPSAssign:
                 // node->op2 がオブジェクトでない場合の処理を行うこと
                 NcSetSlot(CONSTANT, node->op1, node->op2);
@@ -1032,20 +1032,20 @@ void NBCGenGlobalVar(nps_syntax_node_t * stree, nps_node_t r)
     if (NPSRefIsSyntaxNode(r))
     {
         nps_syntax_node_t * node;
-
+        
         node = &stree[NPSRefToSyntaxNode(r)];
-
+        
         switch (node->code)
         {
             case kNPSCommaList:
                 NBCGenGlobalVar(stree, node->op1);
                 NBCGenGlobalVar(stree, node->op2);
                 break;
-
+                
             case kNPSAssign:
                 NBCGenPUSH(node->op1);
                 NBCGenBC_op(stree, node->op2);
-
+                
                 // defGlobalVar を呼出す
                 NBCGenCallFn(NSSYM0(defGlobalVar), 2);
                 break;
@@ -1055,7 +1055,7 @@ void NBCGenGlobalVar(nps_syntax_node_t * stree, nps_node_t r)
     {
         NBCGenPUSH(r);
         NBCGenPUSH(kNewtRefUnbind);
-
+        
         // defGlobalVar を呼出す
         NBCGenCallFn(NSSYM0(defGlobalVar), 2);
     }
@@ -1083,16 +1083,16 @@ void NBCGenLocalVar(nps_syntax_node_t * stree, nps_node_t type, nps_node_t r)
     if (NPSRefIsSyntaxNode(r))
     {
         nps_syntax_node_t * node;
-
+        
         node = &stree[NPSRefToSyntaxNode(r)];
-
+        
         switch (node->code)
         {
             case kNPSCommaList:
                 NBCGenLocalVar(stree, type, node->op1);
                 NBCGenLocalVar(stree, type, node->op2);
                 break;
-
+                
             case kNPSAssign:
                 NBCGenBC_op(stree, node->op2);
                 NBCDefLocal(type, node->op1, true);
@@ -1123,15 +1123,15 @@ bool NBCTypeValid(nps_node_t type)
 {
     if (type == kNewtRefUnbind)
         return true;
-
+    
     if (type == NS_INT)
         return true;
-
+    
     if (type == NSSYM0(array))
         return true;
-
+    
     NBError(kNErrSyntaxError);
-
+    
     return false;
 }
 
@@ -1148,29 +1148,29 @@ bool NBCTypeValid(nps_node_t type)
 int16_t NBCGenTryPre(nps_syntax_node_t * stree, nps_node_t r)
 {
     int16_t	numExcps = 0;
-
+    
     if (NPSRefIsSyntaxNode(r))
     {
         nps_syntax_node_t * node;
-
+        
         node = &stree[NPSRefToSyntaxNode(r)];
-
+        
         switch (node->code)
         {
             case kNPSOnexception:
                 NBCGenPUSH(node->op1);	// シンボル
                 NBCGenOnexcpPC(-1);	// PC（ダミー）
-
+                
                 numExcps = 1;
                 break;
-
+                
             case kNPSOnexceptionList:
                 numExcps = NBCGenTryPre(stree, node->op1)
-                            + NBCGenTryPre(stree, node->op2);
+                + NBCGenTryPre(stree, node->op2);
                 break;
         }
     }
-
+    
     return numExcps;
 }
 
@@ -1186,37 +1186,37 @@ int16_t NBCGenTryPre(nps_syntax_node_t * stree, nps_node_t r)
  */
 
 int16_t NBCGenTryPost(nps_syntax_node_t * stree, nps_node_t r,
-            uint32_t * onexcpspP)
+                      uint32_t * onexcpspP)
 {
     int16_t	numExcps = 0;
-
+    
     if (NPSRefIsSyntaxNode(r))
     {
         nps_syntax_node_t * node;
-
+        
         node = &stree[NPSRefToSyntaxNode(r)];
-
+        
         switch (node->code)
         {
             case kNPSOnexception:
                 // new-handler の引数をバックパッチ
                 NBCOnexcpBackPatchL(*onexcpspP, CX);
                 (*onexcpspP)++;
-
+                
                 // onexception のコード生成
                 NBCGenBC_stmt(stree, node->op2, true);
                 NBCGenOnexcpBranch();
-
+                
                 numExcps = 1;
                 break;
-
+                
             case kNPSOnexceptionList:
                 numExcps = NBCGenTryPost(stree, node->op1, onexcpspP)
-                            + NBCGenTryPost(stree, node->op2, onexcpspP);
+                + NBCGenTryPost(stree, node->op2, onexcpspP);
                 break;
         }
     }
-
+    
     return numExcps;
 }
 
@@ -1232,35 +1232,35 @@ int16_t NBCGenTryPost(nps_syntax_node_t * stree, nps_node_t r,
  */
 
 void NBCGenTry(nps_syntax_node_t * stree, nps_node_t expr,
-        nps_node_t onexception_list)
+               nps_node_t onexception_list)
 {
     uint32_t	onexcp_cx;
     uint32_t	branch_cx;
     uint32_t	onexcpsp;
     int16_t	numExcps = 0;
-
+    
     onexcpsp = ONEXCPSP;
     numExcps = NBCGenTryPre(stree, onexception_list);
     NBCGenCode(kNBCNewHandlers, numExcps);
-
+    
     // 実行文
     NBCGenBC_op(stree, expr);
     NBCGenCode(kNBCPopHandlers, 0);
-
+    
     branch_cx = CX;
     branch_cx = NBCGenBranch(kNBCBranch);
-
+    
     // onexception
     onexcp_cx = CX;
     NBCGenTryPost(stree, onexception_list, &onexcpsp);
-
+    
     // onexception の終了
     NBCOnexcpBackPatchs(onexcp_cx, CX);	// onexception の終了をバックパッチ
     NBCGenCode(kNBCPopHandlers, 0);
-
+    
     // ONEXCPSP を戻す
     ONEXCPSP = onexcpsp;
-
+    
     // バックパッチ
     NBCBackPatch(branch_cx, CX);	// branch をバックパッチ
 }
@@ -1278,15 +1278,15 @@ void NBCGenTry(nps_syntax_node_t * stree, nps_node_t expr,
  */
 
 void NBCGenIfThenElse(nps_syntax_node_t * stree, nps_node_t cond,
-        nps_node_t thenelse, bool ret)
+                      nps_node_t thenelse, bool ret)
 {
     nps_node_t	ifthen;
     nps_node_t	ifelse = kNewtRefUnbind;
     uint32_t	cond_cx;
-
+    
     NBCGenBC_op(stree, cond);
     cond_cx = NBCGenBranch(kNBCBranchIfFalse);
-
+    
     if (NewtRefIsArray(thenelse))
     {
         ifthen = NewtGetArraySlot(thenelse, 0);
@@ -1296,10 +1296,10 @@ void NBCGenIfThenElse(nps_syntax_node_t * stree, nps_node_t cond,
     {
         ifthen = thenelse;
     }
-
+    
     // THEN 文
     NBCGenBC_stmt(stree, ifthen, ret);
-
+    
     if (ifelse == kNewtRefUnbind)
     {
         NBCBackPatch(cond_cx, CX);				// 条件文をバックパッチ
@@ -1307,13 +1307,13 @@ void NBCGenIfThenElse(nps_syntax_node_t * stree, nps_node_t cond,
     else
     {
         uint32_t	then_done;
-
+        
         then_done = NBCGenBranch(kNBCBranch);	// THEN 文の終了
         NBCBackPatch(cond_cx, CX);				// 条件文をバックパッチ
-
+        
         // ELSE 文
         NBCGenBC_stmt(stree, ifelse, ret);
-
+        
         NBCBackPatch(then_done, CX);			// THEN 文終了のブランチをバックパッチ
     }
 }
@@ -1333,24 +1333,24 @@ void NBCGenAnd(nps_syntax_node_t * stree, nps_node_t op1, nps_node_t op2)
 {
     uint32_t	cx1;
     uint32_t	cx2;
-
-	// オペランド１
+    
+    // オペランド１
     NBCGenBC_op(stree, op1);
-
-	// NIL なら分岐
+    
+    // NIL なら分岐
     cx1 = NBCGenBranch(kNBCBranchIfFalse);
-
+    
     // オペランド２
     NBCGenBC_op(stree, op2);
-	// 式の最後へ分岐
+    // 式の最後へ分岐
     cx2 = NBCGenBranch(kNBCBranch);
-
-	// 戻り値をプッシュ
-	NBCBackPatch(cx1, CX);		// 分岐をバックパッチ
+    
+    // 戻り値をプッシュ
+    NBCBackPatch(cx1, CX);		// 分岐をバックパッチ
     NBCGenPUSH(kNewtRefNIL);	// 戻り値は NIL
-
-	// 式の最後
-	NBCBackPatch(cx2, CX);		// 分岐をバックパッチ
+    
+    // 式の最後
+    NBCBackPatch(cx2, CX);		// 分岐をバックパッチ
 }
 
 
@@ -1368,28 +1368,28 @@ void NBCGenOr(nps_syntax_node_t * stree, nps_node_t op1, nps_node_t op2)
 {
     uint32_t	cx1;
     uint32_t	cx2;
-
-	// オペランド１
+    
+    // オペランド１
     NBCGenBC_op(stree, op1);
-
-	// TRUE なら分岐
+    
+    // TRUE なら分岐
     cx1 = NBCGenBranch(kNBCBranchIfTrue);
-
+    
     // オペランド２
     NBCGenBC_op(stree, op2);
-	// 式の最後へ分岐
+    // 式の最後へ分岐
     cx2 = NBCGenBranch(kNBCBranch);
-
-	// 戻り値をプッシュ
-	NBCBackPatch(cx1, CX);		// 分岐をバックパッチ
-
-	if (NPSRefIsSyntaxNode(op1))
-		NBCGenPUSH(kNewtRefTRUE);
-	else
-		NBCGenPUSH(op1);
-
-	// 式の最後
-	NBCBackPatch(cx2, CX);		// 分岐をバックパッチ
+    
+    // 戻り値をプッシュ
+    NBCBackPatch(cx1, CX);		// 分岐をバックパッチ
+    
+    if (NPSRefIsSyntaxNode(op1))
+        NBCGenPUSH(kNewtRefTRUE);
+    else
+        NBCGenPUSH(op1);
+    
+    // 式の最後
+    NBCBackPatch(cx2, CX);		// 分岐をバックパッチ
 }
 
 
@@ -1405,15 +1405,15 @@ void NBCGenOr(nps_syntax_node_t * stree, nps_node_t op1, nps_node_t op2)
 void NBCGenLoop(nps_syntax_node_t * stree, nps_node_t expr)
 {
     uint32_t	loop_head;
-
+    
     // loop の先頭
     loop_head = CX;
-
+    
     // 実行文
     NBCGenBC_stmt(stree, expr, false);
-
+    
     NBCGenCode(kNBCBranch, loop_head);	// loop の先頭へ
-
+    
     // バックパッチ
     NBCBreakBackPatchs(loop_head, CX);	// break をバックパッチ
 }
@@ -1432,14 +1432,14 @@ void NBCGenLoop(nps_syntax_node_t * stree, nps_node_t expr)
 newtRef NBCMakeTempSymbol(newtRefArg index, newtRefArg val, char * s)
 {
     newtRefVar	str;
-
+    
     str = NSSTR("");
-
+    
     NcStrCat(str, index);
     NcStrCat(str, val);
     NewtStrCat(str, "|");
     NewtStrCat(str, s);
-
+    
     return NcMakeSymbol(str);
 }
 
@@ -1464,59 +1464,59 @@ void NBCGenFor(nps_syntax_node_t * stree, nps_node_t r, nps_node_t expr)
     newtRefVar	_incr;
     uint32_t	loop_head;
     uint32_t	branch_cx;
-
+    
     index = NewtGetArraySlot(r, 0);
     v = NewtGetArraySlot(r, 1);
     to = NewtGetArraySlot(r, 2);
     by = NewtGetArraySlot(r, 3);
- 
+    
     if (by == kNewtRefUnbind)
         by = NSINT(1);
-
+    
     // index を初期化
     NBCGenBC_op(stree, v);
     NBCDefLocal(NS_INT, index, true);
-
+    
     // index|limit を初期化
     _limit = NBCMakeTempSymbol(index, kNewtRefUnbind, "limit");
     NBCGenBC_op(stree, to);
     NBCDefLocal(NS_INT, _limit, true);
-
+    
     // index|limit を初期化
     _incr = NBCMakeTempSymbol(index, kNewtRefUnbind, "incr");
     NBCGenBC_op(stree, by);
     NBCDefLocal(NS_INT, _incr, true);
-
+    
     // 条件文へブランチ
     NBCGenGetVar(stree, _incr);
     NBCGenGetVar(stree, index);
-
+    
     branch_cx = NBCGenBranch(kNBCBranch);
-
+    
     // loop の先頭
     loop_head = CX;
-
+    
     // 実行文
     NBCGenBC_stmt(stree, expr, false);
-
+    
     // 変数に by を増分
     {
         int16_t	b;
-
+        
         b = NewtFindSlotIndex(ARGFRAME, index);
-
+        
         NBCGenGetVar(stree, _incr);
         NBCGenCode(kNBCIncrVar, b);
     }
-
+    
     // 条件文
     NBCBackPatch(branch_cx, CX);			// branch をバックパッチ
     NBCGenGetVar(stree, _limit);
     NBCGenCode(kNBCBranchIfLoopNotDone, loop_head);	// loop の先頭へ
-
+    
     // 戻り値
     NBCGenPUSH(kNewtRefNIL);
-
+    
     // バックパッチ
     NBCBreakBackPatchs(loop_head, CX);	// break をバックパッチ
 }
@@ -1545,42 +1545,42 @@ void NBCGenForeach(nps_syntax_node_t * stree, nps_node_t r, nps_node_t expr)
     uint32_t	loop_head;
     uint32_t	branch_cx;
     bool	collect;
-
+    
     index = NewtGetArraySlot(r, 0);
     val = NewtGetArraySlot(r, 1);
     obj = NewtGetArraySlot(r, 2);
     deeply = NewtGetArraySlot(r, 3);
     op = NewtGetArraySlot(r, 4);
-
+    
     collect = (op == NSSYM0(collect));
-
+    
     NBCDefLocal(kNewtRefUnbind, val, false);
     if (index != kNewtRefUnbind) NBCDefLocal(kNewtRefUnbind, index, false);
-
+    
     _iter = NBCMakeTempSymbol(index, val, "iter");
-
+    
     // new-iterator
     NBCGenBC_op(stree, obj);
     NBCGenPUSH(deeply);
     NBCGenFreq(kNBCNewIterator);
     NBCDefLocal(NSSYM0(array), _iter, true);
-
+    
     if (collect)
     {
         int32_t	lenIndex;
-
+        
         _index = NBCMakeTempSymbol(index, val, "index");
         _result = NBCMakeTempSymbol(index, val, "result");
-
+        
         NBCDefLocal(NSSYM0(array), _index, false);
         NBCDefLocal(NSSYM0(array), _result, false);
-
+        
         // 戻り値の array を作成
         if (NewtRefIsNIL(deeply))
             lenIndex = kIterMax;
         else
             lenIndex = kIterDeeply;
-
+        
         // length
         NBCGenGetVar(stree, _iter);
         NBCGenPUSH(NewtMakeInteger(lenIndex));
@@ -1589,24 +1589,24 @@ void NBCGenForeach(nps_syntax_node_t * stree, nps_node_t r, nps_node_t expr)
         NBCGenPUSH(kNewtRefUnbind);
         NBCGenCode(kNBCMakeArray, -1);
         NBCDefLocal(NSSYM0(array), _result, true);
-
+        
         // index の初期化
         NBCGenPUSH(NSINT(0));
         NBCDefLocal(NS_INT, _index, true);
     }
-
+    
     // 条件文へブランチ
     branch_cx = NBCGenBranch(kNBCBranch);
-
+    
     // loop の先頭
     loop_head = CX;
-
+    
     // val のセット
     NBCGenGetVar(stree, _iter);
     NBCGenPUSH(NewtMakeInteger(kIterValue));
     NBCGenFreq(kNBCAref);
     NBCDefLocal(kNewtRefUnbind, val, true);
-
+    
     // index のセット
     if (index != kNewtRefUnbind)
     {
@@ -1615,24 +1615,24 @@ void NBCGenForeach(nps_syntax_node_t * stree, nps_node_t r, nps_node_t expr)
         NBCGenFreq(kNBCAref);
         NBCDefLocal(kNewtRefUnbind, index, true);
     }
-
+    
     // 実行文
     if (collect)
     {
         int16_t	b;
-
+        
         NBCGenGetVar(stree, _result);
         NBCGenGetVar(stree, _index);
         NBCGenBC_stmt(stree, expr, true);
         NBCGenFreq(kNBCSetAref);
-
+        
         NBCGenCode(kNBCPop, 0);
-
+        
         //
         b = NewtFindSlotIndex(ARGFRAME, _index);
         NBCGenPUSH(NSINT(1));
         NBCGenCode(kNBCIncrVar, b);
-
+        
         NBCGenCode(kNBCPop, 0);
         NBCGenCode(kNBCPop, 0);
     }
@@ -1640,33 +1640,33 @@ void NBCGenForeach(nps_syntax_node_t * stree, nps_node_t r, nps_node_t expr)
     {
         NBCGenBC_stmt(stree, expr, false);
     }
-
+    
     // iter-next
     NBCGenGetVar(stree, _iter);
     NBCGenCode(kNBCIterNext, 0);
-
+    
     // 条件文
     NBCBackPatch(branch_cx, CX);		// branch をバックパッチ
     NBCGenGetVar(stree, _iter);
     NBCGenCode(kNBCIterDone, 0);		// iter-done
     NBCGenCode(kNBCBranchIfFalse, loop_head);	// loop の先頭へ
-
+    
     // 戻り値
     if (collect)
         NBCGenGetVar(stree, _result);
     else
         NBCGenPUSH(kNewtRefNIL);
-
+    
     // バックパッチ
     NBCBreakBackPatchs(loop_head, CX);	// break をバックパッチ
-
+    
     // iterator の後始末
     if (collect)
     {
         NBCGenPUSH(kNewtRefNIL);
         NBCDefLocal(kNewtRefUnbind, _result, true);
     }
-
+    
     NBCGenPUSH(kNewtRefNIL);
     NBCDefLocal(kNewtRefUnbind, _iter, true);
 }
@@ -1686,25 +1686,25 @@ void NBCGenWhile(nps_syntax_node_t * stree, nps_node_t cond, nps_node_t expr)
 {
     uint32_t	loop_head;
     uint32_t	cond_cx;
-
+    
     // loop の先頭
     loop_head = CX;
-
+    
     // 条件文
     NBCGenBC_op(stree, cond);
     cond_cx = NBCGenBranch(kNBCBranchIfFalse);
-
+    
     // 実行文
     NBCGenBC_stmt(stree, expr, false);
-
+    
     NBCGenCode(kNBCBranch, loop_head);	// loop の先頭へ
-
+    
     // バックパッチ
     NBCBackPatch(cond_cx, CX);		// 条件文をバックパッチ
-
+    
     // 戻り値
     NBCGenPUSH(kNewtRefNIL);
-
+    
     NBCBreakBackPatchs(loop_head, CX);	// break をバックパッチ
 }
 
@@ -1722,20 +1722,20 @@ void NBCGenWhile(nps_syntax_node_t * stree, nps_node_t cond, nps_node_t expr)
 void NBCGenRepeat(nps_syntax_node_t * stree, nps_node_t expr, nps_node_t cond)
 {
     uint32_t	loop_head;
-
+    
     // loop の先頭
     loop_head = CX;
-
+    
     // 実行文
     NBCGenBC_stmt(stree, expr, false);
-
+    
     // 条件文
     NBCGenBC_op(stree, cond);
     NBCGenCode(kNBCBranchIfFalse, loop_head);	// loop の先頭へ
-
+    
     // 戻り値
     NBCGenPUSH(kNewtRefNIL);
-
+    
     // バックパッチ
     NBCBreakBackPatchs(loop_head, CX);		// break をバックパッチ
 }
@@ -1753,13 +1753,13 @@ void NBCGenRepeat(nps_syntax_node_t * stree, nps_node_t expr, nps_node_t cond)
 void NBCGenBreak(nps_syntax_node_t * stree, nps_node_t expr)
 {
     uint32_t	cx;
-
+    
     // 戻り値
     if (expr == kNewtRefUnbind)
         NBCGenPUSH(kNewtRefNIL);
     else
         NBCGenBC_op(stree, expr);
-
+    
     // ブランチ
     cx = NBCGenBranch(kNBCBranch);	// loop の終わりへ
     NBCPushBreakStack(cx);		// バックパッチのためにスタックにプッシュする
@@ -1778,22 +1778,22 @@ void NBCGenBreak(nps_syntax_node_t * stree, nps_node_t expr)
  */
 
 void NBCGenStringer(nps_syntax_node_t * stree, nps_node_t op1, nps_node_t op2,
-        char * dlmt)
+                    char * dlmt)
 {
     int16_t numArgs = 2;
-
+    
     NBCGenBC_op(stree, op1);
-
+    
     if (dlmt != NULL)
     {
         NBCGenPUSH(NSSTRCONST(dlmt));
         numArgs++;
     }
-
+    
     NBCGenBC_op(stree, op2);
     NBCGenPUSH(kNewtRefUnbind);
     NBCGenCode(kNBCMakeArray, numArgs);
-
+    
     NBCGenFreq(kNBCStringer);
 }
 
@@ -1810,7 +1810,7 @@ void NBCGenStringer(nps_syntax_node_t * stree, nps_node_t op1, nps_node_t op2,
  */
 
 void NBCGenAssign(nps_syntax_node_t * stree,
-        nps_node_t lvalue, nps_node_t expr, bool ret)
+                  nps_node_t lvalue, nps_node_t expr, bool ret)
 {
     if (NewtRefIsSymbol(lvalue))
     {
@@ -1820,37 +1820,37 @@ void NBCGenAssign(nps_syntax_node_t * stree,
             NBError(kNErrAssignToConstant);
             return;
         }
-
+        
         NBCGenBC_op(stree, expr);
         NBCGenCodeL(kNBCFindAndSetVar, lvalue);
-
+        
         if (ret)
             NBCGenCodeL(kNBCFindVar, lvalue);
     }
 #ifdef __NAMED_MAGIC_POINTER__
-	else if (NewtRefIsNamedMP(lvalue))
-	{
-		newtRefVar	sym;
-
-		sym = NewtMPToSymbol(lvalue);
-		NBCGenFunc2(stree, NSSYM0(defMagicPointer), sym, expr);
-		NVCGenNoResult(ret);
-	}
+    else if (NewtRefIsNamedMP(lvalue))
+    {
+        newtRefVar	sym;
+        
+        sym = NewtMPToSymbol(lvalue);
+        NBCGenFunc2(stree, NSSYM0(defMagicPointer), sym, expr);
+        NVCGenNoResult(ret);
+    }
 #endif /* __NAMED_MAGIC_POINTER__ */
-	else if (NewtRefIsNumberedMP(lvalue))
-	{
-		int32_t	index;
-
-		index = NewtMPToIndex(lvalue);
-		NBCGenFunc2(stree, NSSYM0(defMagicPointer), NewtMakeInteger(index), expr);
-		NVCGenNoResult(ret);
-	}
+    else if (NewtRefIsNumberedMP(lvalue))
+    {
+        int32_t	index;
+        
+        index = NewtMPToIndex(lvalue);
+        NBCGenFunc2(stree, NSSYM0(defMagicPointer), NewtMakeInteger(index), expr);
+        NVCGenNoResult(ret);
+    }
     else if (NPSRefIsSyntaxNode(lvalue))
     {
         nps_syntax_node_t * node;
-
+        
         node = &stree[NPSRefToSyntaxNode(lvalue)];
-
+        
         switch (node->code)
         {
             case kNPSGetPath:
@@ -1860,7 +1860,7 @@ void NBCGenAssign(nps_syntax_node_t * stree,
                 NBCGenCode(kNBCSetPath, 1);
                 NVCGenNoResult(ret);
                 break;
-
+                
             case kNPSAref:
                 NBCGenBC_op(stree, node->op1);
                 NBCGenBC_op(stree, node->op2);
@@ -1868,7 +1868,7 @@ void NBCGenAssign(nps_syntax_node_t * stree,
                 NBCGenFreq(kNBCSetAref);
                 NVCGenNoResult(ret);
                 break;
-
+                
             default:
                 NBError(kNErrSyntaxError);
                 break;
@@ -1908,9 +1908,9 @@ void NBCGenExists(nps_syntax_node_t * stree, nps_node_t r)
     else if (NPSRefIsSyntaxNode(r))
     {
         nps_syntax_node_t * node;
-
+        
         node = &stree[NPSRefToSyntaxNode(r)];
-
+        
         switch (node->code)
         {
             case kNPSGetPath:
@@ -1918,7 +1918,7 @@ void NBCGenExists(nps_syntax_node_t * stree, nps_node_t r)
                 NBCGenBC_op(stree, node->op2);
                 NBCGenFreq(kNBCHasPath);
                 break;
-
+                
             default:
                 NBError(kNErrSyntaxError);
                 break;
@@ -1960,14 +1960,14 @@ void NBCGenReceiver(nps_syntax_node_t * stree, nps_node_t r)
  */
 
 void NBCGenMethodExists(nps_syntax_node_t * stree,
-        nps_node_t receiver, nps_node_t name)
+                        nps_node_t receiver, nps_node_t name)
 {
     // receiver の生成
     NBCGenReceiver(stree, receiver);
-
+    
     // name
     NBCGenBC_op(stree, name);
-
+    
     // hasVariable を呼出す
     NBCGenCallFn(NSSYM0(hasVariable), 2);
 }
@@ -1987,7 +1987,7 @@ void NBCGenFn(nps_syntax_node_t * stree, nps_node_t args, nps_node_t expr)
 {
     nbc_env_t * env;
     newtRefVar	fn;
-
+    
     env = NBCMakeFnEnv(stree, args);
     NBCGenBC_op(stree, expr);
     fn = NBCFnDone(&newt_bc_env);
@@ -2028,10 +2028,10 @@ void NBCGenGlobalFn(nps_syntax_node_t * stree, nps_node_t name, nps_node_t fn)
 void NBCGenCall(nps_syntax_node_t * stree, nps_node_t name, nps_node_t args)
 {
     int16_t numArgs;
-
+    
     NBCGenBC_op(stree, args);
     numArgs = NBCCountNumArgs(stree, args);
-
+    
     NBCGenCallFn(name, numArgs);
 }
 
@@ -2049,12 +2049,12 @@ void NBCGenCall(nps_syntax_node_t * stree, nps_node_t name, nps_node_t args)
 void NBCGenInvoke(nps_syntax_node_t * stree, nps_node_t fn, nps_node_t args)
 {
     int16_t numArgs;
-
+    
     NBCGenBC_op(stree, args);
     numArgs = NBCCountNumArgs(stree, args);
-
+    
     NBCGenBC_op(stree, fn);
-//    NBCGenCode(kNBCSetLexScope, 0);
+    //    NBCGenCode(kNBCSetLexScope, 0);
     NBCGenCode(kNBCInvoke, numArgs);
 }
 
@@ -2071,7 +2071,7 @@ void NBCGenInvoke(nps_syntax_node_t * stree, nps_node_t fn, nps_node_t args)
  */
 
 void NBCGenFunc2(nps_syntax_node_t * stree,
-        newtRefArg name, nps_node_t op1, nps_node_t op2)
+                 newtRefArg name, nps_node_t op1, nps_node_t op2)
 {
     NBCGenBC_op(stree, op1);
     NBCGenBC_op(stree, op2);
@@ -2092,25 +2092,25 @@ void NBCGenFunc2(nps_syntax_node_t * stree,
  */
 
 void NBCGenSend(nps_syntax_node_t * stree, uint32_t code,
-        nps_node_t receiver, nps_node_t r)
+                nps_node_t receiver, nps_node_t r)
 {
     nps_syntax_node_t * node;
     int16_t numArgs;
-
+    
     node = &stree[NPSRefToSyntaxNode(r)];
-
+    
     // 引数の生成
     NBCGenBC_op(stree, node->op2);
     numArgs = NBCCountNumArgs(stree, node->op2);
-
-	// There is a mistake in NewtonFormats. We push arguments in the Newton's
-	// natural order.
-
+    
+    // There is a mistake in NewtonFormats. We push arguments in the Newton's
+    // natural order.
+    
     // receiver の生成
     NBCGenReceiver(stree, receiver);
     // message の生成
     NBCGenPUSH(node->op1);
-
+    
     // メッセージ呼出しの生成
     NBCGenCode(code, numArgs);
 }
@@ -2128,13 +2128,13 @@ void NBCGenSend(nps_syntax_node_t * stree, uint32_t code,
  */
 
 void NBCGenResend(nps_syntax_node_t * stree, uint32_t code,
-        nps_node_t name, nps_node_t args)
+                  nps_node_t name, nps_node_t args)
 {
     int16_t numArgs;
-
+    
     NBCGenBC_op(stree, args);
     numArgs = NBCCountNumArgs(stree, args);
-
+    
     NBCGenPUSH(name);
     NBCGenCode(code, numArgs);
 }
@@ -2153,10 +2153,10 @@ void NBCGenResend(nps_syntax_node_t * stree, uint32_t code,
 void NBCGenMakeArray(nps_syntax_node_t * stree, nps_node_t klass, nps_node_t r)
 {
     int16_t n;
-
+    
     NBCGenBC_op(stree, r);
     n = NBCCountNumArgs(stree, r);
-
+    
     NBCGenPUSH(klass);
     NBCGenCode(kNBCMakeArray, n);
 }
@@ -2175,10 +2175,10 @@ void NBCGenMakeFrame(nps_syntax_node_t * stree, nps_node_t r)
 {
     newtRefVar	map;
     uint32_t	n;
-
+    
     map = NBCGenMakeFrameSlots(stree, r);
     n = NewtMapLength(map);
-
+    
     NBCGenPUSH(map);
     NBCGenCode(kNBCMakeFrame, n);
 }
@@ -2224,141 +2224,141 @@ void NBCGenSyntaxCode(nps_syntax_node_t * stree, nps_syntax_node_t * node, bool 
                 NBCGenBC_stmt(stree, node->op2, ret);
             }
             break;
-
+            
         case kNPSCommaList:
             NBCGenBC_op(stree, node->op1);
             NBCGenBC_op(stree, node->op2);
             break;
-
+            
         case kNPSConstant:
             NBCGenConstant(stree, node->op1);
             break;
-
+            
         case kNPSGlobal:
             NBCGenGlobalVar(stree, node->op1);
             NVCGenNoResult(ret);
             break;
-
+            
         case kNPSLocal:
             if (! NBCTypeValid(node->op1))
                 return;
-
+            
             NBCGenLocalVar(stree, node->op1, node->op2);
             break;
-
+            
         case kNPSFunc:
             NBCGenFn(stree, node->op1, node->op2);
             NVCGenNoResult(ret);
             break;
-
+            
         case kNPSGlobalFn:
             NBCGenGlobalFn(stree, node->op1, node->op2);
             NVCGenNoResult(ret);
             break;
-
+            
         case kNPSLvalue:
             if (NewtRefIsSymbol(node->op1))
                 NBCGenGetVar(stree, node->op1);
             else
                 NBCGenBC_op(stree, node->op1);
-
+            
             NVCGenNoResult(ret);
             break;
-
+            
         case kNPSAssign:
             NBCGenAssign(stree, node->op1, node->op2, ret);
             break;
-
+            
         case kNPSExists:
             NBCGenExists(stree, node->op1);
             NVCGenNoResult(ret);
             break;
-
+            
         case kNPSMethodExists:
             NBCGenMethodExists(stree, node->op1, node->op2);
             NVCGenNoResult(ret);
             break;
-
+            
         case kNPSTry:
             NBCGenTry(stree, node->op1, node->op2);
             NVCGenNoResult(ret);
             break;
-
+            
         case kNPSIf:
             NBCGenIfThenElse(stree, node->op1, node->op2, ret);
-//            NVCGenNoResult(ret);
+            //            NVCGenNoResult(ret);
             break;
-
+            
         case kNPSLoop:
             NBCGenLoop(stree, node->op1);
             NVCGenNoResult(ret);
             break;
-
+            
         case kNPSFor:
             NBCGenFor(stree, node->op1, node->op2);
             NVCGenNoResult(ret);
             break;
-
+            
         case kNPSForeach:
             NBCGenForeach(stree, node->op1, node->op2);
             NVCGenNoResult(ret);
             break;
-
+            
         case kNPSWhile:
             NBCGenWhile(stree, node->op1, node->op2);
             NVCGenNoResult(ret);
             break;
-
+            
         case kNPSRepeat:
             NBCGenRepeat(stree, node->op1, node->op2);
             NVCGenNoResult(ret);
             break;
-
+            
         case kNPSBreak:
             NBCGenBreak(stree, node->op1);
             break;
-
+            
         case kNPSAnd:
             NBCGenAnd(stree, node->op1, node->op2);
             NVCGenNoResult(ret);
             break;
-
+            
         case kNPSOr:
             NBCGenOr(stree, node->op1, node->op2);
             NVCGenNoResult(ret);
             break;
-
+            
         case kNPSMod:
             NBCGenFunc2(stree, NSSYM0(mod), node->op1, node->op2);
             NVCGenNoResult(ret);
             break;
-
-		case kNPSShiftLeft:
+            
+        case kNPSShiftLeft:
             NBCGenFunc2(stree, NSSYM0(shiftLeft), node->op1, node->op2);
             NVCGenNoResult(ret);
             break;
-
-		case kNPSShiftRight:
+            
+        case kNPSShiftRight:
             NBCGenFunc2(stree, NSSYM0(shiftRight), node->op1, node->op2);
             NVCGenNoResult(ret);
             break;
-
+            
         case kNPSConcat:
             NBCGenStringer(stree, node->op1, node->op2, NULL);
             NVCGenNoResult(ret);
             break;
-
+            
         case kNPSConcat2:
             NBCGenStringer(stree, node->op1, node->op2, " ");
             NVCGenNoResult(ret);
             break;
-
-		case kNPSObjectEqual:
+            
+        case kNPSObjectEqual:
             NBCGenFunc2(stree, NSSYM0(objectEqual), node->op1, node->op2);
             NVCGenNoResult(ret);
             break;
-
-		case kNPSMakeRegex:
+            
+        case kNPSMakeRegex:
             NBCGenFunc2(stree, NSSYM0(makeRegex), node->op1, node->op2);
             NVCGenNoResult(ret);
             break;
@@ -2378,25 +2378,25 @@ void NBCGenSyntaxCode(nps_syntax_node_t * stree, nps_syntax_node_t * node, bool 
 int16_t NBCCountNumArgs(nps_syntax_node_t * stree, nps_node_t r)
 {
     int16_t	numArgs = 1;
-
+    
     if (r == kNewtRefUnbind)
         return 0;
-
+    
     if (NPSRefIsSyntaxNode(r))
     {
         nps_syntax_node_t * node;
-
+        
         node = &stree[NPSRefToSyntaxNode(r)];
-
+        
         switch (node->code)
         {
             case kNPSCommaList:
                 numArgs = NBCCountNumArgs(stree, node->op1)
-                            + NBCCountNumArgs(stree, node->op2);
+                + NBCCountNumArgs(stree, node->op2);
                 break;
         }
     }
-
+    
     return numArgs;
 }
 
@@ -2413,52 +2413,52 @@ int16_t NBCCountNumArgs(nps_syntax_node_t * stree, nps_node_t r)
 newtRef NBCGenMakeFrameSlots_sub(nps_syntax_node_t * stree, nps_node_t r)
 {
     newtRefVar	obj = kNewtRefUnbind;
-
+    
     if (r == kNewtRefUnbind)
         return NewtMakeMap(kNewtRefNIL, 0, NULL);
-
+    
     if (NPSRefIsSyntaxNode(r))
     {
         nps_syntax_node_t * node;
-
+        
         node = &stree[NPSRefToSyntaxNode(r)];
-
+        
         switch (node->code)
         {
             case kNPSSlot:
                 obj = node->op1;
                 NBCGenBC_op(stree, node->op2);
                 break;
-
-            case kNPSCommaList:
-                {
-                    newtRefVar	obj1;
-                    newtRefVar	obj2;
-
-                    obj1 = NBCGenMakeFrameSlots_sub(stree, node->op1);
-                    obj2 = NBCGenMakeFrameSlots_sub(stree, node->op2);
-
-                    if (NewtRefIsArray(obj1))
-                    {
-                        obj = obj1;
-                    }
-                    else
-                    {
-                        newtRefVar	initMap[1];
                 
-                        initMap[0] = obj1;
-                        obj = NewtMakeMap(kNewtRefNIL, 1, initMap);
-                    }
-
-                    if (obj2 == NSSYM0(_proto))
-                        NewtSetMapFlags(obj, kNewtMapProto);
-
-                    NcAddArraySlot(obj, obj2);
+            case kNPSCommaList:
+            {
+                newtRefVar	obj1;
+                newtRefVar	obj2;
+                
+                obj1 = NBCGenMakeFrameSlots_sub(stree, node->op1);
+                obj2 = NBCGenMakeFrameSlots_sub(stree, node->op2);
+                
+                if (NewtRefIsArray(obj1))
+                {
+                    obj = obj1;
                 }
+                else
+                {
+                    newtRefVar	initMap[1];
+                    
+                    initMap[0] = obj1;
+                    obj = NewtMakeMap(kNewtRefNIL, 1, initMap);
+                }
+                
+                if (obj2 == NSSYM0(_proto))
+                    NewtSetMapFlags(obj, kNewtMapProto);
+                
+                NcAddArraySlot(obj, obj2);
+            }
                 break;
         }
     }
-
+    
     return obj;
 }
 
@@ -2475,21 +2475,21 @@ newtRef NBCGenMakeFrameSlots_sub(nps_syntax_node_t * stree, nps_node_t r)
 newtRef NBCGenMakeFrameSlots(nps_syntax_node_t * stree, nps_node_t r)
 {
     newtRefVar	obj;
-
+    
     obj = NBCGenMakeFrameSlots_sub(stree, r);
-
+    
     if (NewtRefIsArray(obj))
     {
         obj = NewtPackLiteral(obj);
     }
     else
     {
-		newtRefVar	initMap[1];
-
+        newtRefVar	initMap[1];
+        
         initMap[0] = obj;
         obj = NewtMakeMap(kNewtRefNIL, 1, initMap);
     }
-
+    
     return obj;
 }
 
@@ -2508,60 +2508,60 @@ void NBCGenBC_sub(nps_syntax_node_t * stree, uint32_t n, bool ret)
 {
     nps_syntax_node_t *	node;
     bool	handled = true;
-
+    
     node = stree + n;
-
+    
     if (kNPSConstituentList <= node->code)
     {
         NBCGenSyntaxCode(stree, node, ret);
         return;
     }
-
+    
     switch (node->code)
     {
         case kNPSCall:
             NBCGenCall(stree, node->op1, node->op2);
             break;
-
+            
         case kNPSInvoke:
             NBCGenInvoke(stree, node->op1, node->op2);
             break;
-
+            
         case kNPSSend:
             NBCGenSend(stree, kNBCSend, node->op1, node->op2);
-			break;
-
+            break;
+            
         case kNPSSendIfDefined:
             NBCGenSend(stree, kNBCSendIfDefined, node->op1, node->op2);
             break;
-
+            
         case kNPSResend:
             NBCGenResend(stree, kNBCResend, node->op1, node->op2);
             break;
-
+            
         case kNPSResendIfDefined:
             NBCGenResend(stree, kNBCResendIfDefined, node->op1, node->op2);
             break;
-
+            
         case kNPSMakeArray:
             NBCGenMakeArray(stree, node->op1, node->op2);
             break;
-
+            
         case kNPSMakeFrame:
             NBCGenMakeFrame(stree, node->op1);
             break;
-
+            
         case kNPSGetPath:
             NBCGenBC_op(stree, node->op1);
             NBCGenBC_op(stree, node->op2);
             NBCGenCode(node->code, 1);
             break;
-
+            
         default:
             handled = false;
             break;
     }
-
+    
     if (handled)
     {
         NVCGenNoResult(ret);
@@ -2570,7 +2570,7 @@ void NBCGenBC_sub(nps_syntax_node_t * stree, uint32_t n, bool ret)
     {
         NBCGenBC_op(stree, node->op1);
         NBCGenBC_op(stree, node->op2);
-    
+        
         if (node->code <= kNPSPopHandlers)
             NBCGenCode(0, node->code);
         else if (kNPSAdd <= node->code)
@@ -2594,14 +2594,14 @@ void NBCGenBC_sub(nps_syntax_node_t * stree, uint32_t n, bool ret)
 newtRef NBCGenBC(nps_syntax_node_t * stree, uint32_t size, bool ret)
 {
     newtRefVar	fn;
-
+    
     NBCGenBC_sub(stree, size - 1, ret);
     fn = NBCFnDone(&newt_bc_env);
-
+    
     if (NewtRefIsNotNIL(fn))
     {
-		fn = NewtPackLiteral(fn);
-
+        fn = NewtPackLiteral(fn);
+        
         if (NEWT_DUMPBC)
         {
             NewtFprintf(stderr, "*** byte code ***\n");
@@ -2609,7 +2609,7 @@ newtRef NBCGenBC(nps_syntax_node_t * stree, uint32_t size, bool ret)
             NewtFprintf(stderr, "\n");
         }
     }
-
+    
     return fn;
 }
 
@@ -2629,9 +2629,9 @@ newtRef NBCCompileFile(char * s, bool ret)
     uint32_t	numStree = 0;
     newtRefVar	fn = kNewtRefUnbind;
     newtErr	err;
-
+    
     err = NPSParseFile(s, &stree, &numStree);
-
+    
     if (stree != NULL)
     {
         NBCInit();
@@ -2639,7 +2639,7 @@ newtRef NBCCompileFile(char * s, bool ret)
         NBCCleanup();
         NPSCleanup();
     }
-
+    
     return fn;
 }
 
@@ -2659,9 +2659,9 @@ newtRef NBCCompileStr(char * s, bool ret)
     uint32_t	numStree;
     newtRefVar	fn = kNewtRefUnbind;
     newtErr	err;
-
+    
     err = NPSParseStr(s, &stree, &numStree);
-
+    
     if (stree != NULL)
     {
         NBCInit();
@@ -2672,9 +2672,9 @@ newtRef NBCCompileStr(char * s, bool ret)
     
     if (err)
     {
-    	return NewtThrow(err, kNewtRefNIL);
+        return NewtThrow(err, kNewtRefNIL);
     }
-
+    
     return fn;
 }
 
@@ -2692,27 +2692,27 @@ newtRef NBCCompileStr(char * s, bool ret)
 
 void NBError(int32_t err)
 {
-	char *  msg;
-
-	switch (err)
-	{
-		case kNErrWrongNumberOfArgs:
-			msg = "Wrong number of args";
-			break;
-
-		case kNErrAssignToConstant:
-			msg = "Assign to constant";
-			break;
-
-		case kNErrSyntaxError:
-			msg = "Syntax error";
-			break;
-
-		default:
-			msg = "Unknown error";
-			break;
-	}
-
+    char *  msg;
+    
+    switch (err)
+    {
+        case kNErrWrongNumberOfArgs:
+            msg = "Wrong number of args";
+            break;
+            
+        case kNErrAssignToConstant:
+            msg = "Assign to constant";
+            break;
+            
+        case kNErrSyntaxError:
+            msg = "Syntax error";
+            break;
+            
+        default:
+            msg = "Unknown error";
+            break;
+    }
+    
     NewtFprintf(stderr, "%s", msg);
 }
 

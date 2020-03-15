@@ -29,43 +29,43 @@
 
 char * NewtIconv(iconv_t cd, char * src, size_t srclen, size_t* dstlenp)
 {
-	char *	dst = NULL;
-	size_t	dstlen = 0;
-
-	if (cd != (iconv_t)-1)
-	{
-		size_t	bufflen;
-
-		bufflen = srclen * 3;
-		dst = malloc(bufflen);
-
-		if (dst)
-		{
-			const char *	inbuf_p = src;
-			char *	outbuf_p = dst;
-			size_t	inbytesleft = srclen;
-			size_t	outbytesleft = bufflen;
-			size_t	status;
-
-			iconv(cd, NULL, NULL, NULL, NULL);
-			status = iconv(cd, (char **) &inbuf_p, &inbytesleft, &outbuf_p, &outbytesleft);
-
-			if (status == (size_t)-1)
-			{	// 変換に失敗したのでバッファを解放する
-				free(dst);
-				dst = NULL;
-			}
-			else
-			{	// いらない部分のバッファを切り詰める
-				dstlen = bufflen - outbytesleft;
-				dst = realloc(dst, dstlen);
-			}
-		}
-	}
-
-	if (dstlenp) *dstlenp = dstlen;
-
-	return dst;
+    char *	dst = NULL;
+    size_t	dstlen = 0;
+    
+    if (cd != (iconv_t)-1)
+    {
+        size_t	bufflen;
+        
+        bufflen = srclen * 3;
+        dst = malloc(bufflen);
+        
+        if (dst)
+        {
+            const char *	inbuf_p = src;
+            char *	outbuf_p = dst;
+            size_t	inbytesleft = srclen;
+            size_t	outbytesleft = bufflen;
+            size_t	status;
+            
+            iconv(cd, NULL, NULL, NULL, NULL);
+            status = iconv(cd, (char **) &inbuf_p, &inbytesleft, &outbuf_p, &outbytesleft);
+            
+            if (status == (size_t)-1)
+            {	// 変換に失敗したのでバッファを解放する
+                free(dst);
+                dst = NULL;
+            }
+            else
+            {	// いらない部分のバッファを切り詰める
+                dstlen = bufflen - outbytesleft;
+                dst = realloc(dst, dstlen);
+            }
+        }
+    }
+    
+    if (dstlenp) *dstlenp = dstlen;
+    
+    return dst;
 }
 
 #if _MSC_VER
@@ -95,42 +95,42 @@ char * NewtIconv(iconv_t cd, char * src, size_t srclen, size_t* dstlenp)
  */
 iconv_t iconv_open(const char *tocode, const char *fromcode)
 {
-  iconv_t mode = 0;
-  // avoid a crash if the user does not privide encodings
-  if (!tocode || !fromcode)
-    return -1;
-
-  // determine the source text format
-  // if we can't identify the string, we assume the current codepage
-  if (strcmp(fromcode, "MACROMAN")==0)
-    mode |= 0x10;
-  else if (strcmp(fromcode, "UTF-16BE")==0)
-    mode |= 0x20;
-  else if (strcmp(fromcode, "UTF-16LE")==0)
-    mode |= 0x30;
-
-  // determine the destination text format of the text source
-  if (strcmp(tocode, "MACROMAN")==0)
-    mode |= 0x01;
-  else if (strcmp(tocode, "UTF-16BE")==0)
-    mode |= 0x02;
-  else if (strcmp(tocode, "UTF-16LE")==0)
-    mode |= 0x03;
-
-  return mode;
+    iconv_t mode = 0;
+    // avoid a crash if the user does not privide encodings
+    if (!tocode || !fromcode)
+        return -1;
+    
+    // determine the source text format
+    // if we can't identify the string, we assume the current codepage
+    if (strcmp(fromcode, "MACROMAN")==0)
+        mode |= 0x10;
+    else if (strcmp(fromcode, "UTF-16BE")==0)
+        mode |= 0x20;
+    else if (strcmp(fromcode, "UTF-16LE")==0)
+        mode |= 0x30;
+    
+    // determine the destination text format of the text source
+    if (strcmp(tocode, "MACROMAN")==0)
+        mode |= 0x01;
+    else if (strcmp(tocode, "UTF-16BE")==0)
+        mode |= 0x02;
+    else if (strcmp(tocode, "UTF-16LE")==0)
+        mode |= 0x03;
+    
+    return mode;
 }
 
 /*
  * Flip the endianness of a 16 bit per char string
  */
 static void ic_flip_endian(void *dst, const void *src, int n) {
-  unsigned char *d = (unsigned char *)dst;
-  unsigned char *s = (unsigned char *)src;
-  for ( ; n>0; n--) {
-    unsigned char c = *s++;
-    *d++ = *s++;
-    *d++ = c;
-  }
+    unsigned char *d = (unsigned char *)dst;
+    unsigned char *s = (unsigned char *)src;
+    for ( ; n>0; n--) {
+        unsigned char c = *s++;
+        *d++ = *s++;
+        *d++ = c;
+    }
 }
 
 /**
@@ -147,125 +147,125 @@ static void ic_flip_endian(void *dst, const void *src, int n) {
  */
 size_t iconv(iconv_t cd, const char **inbuf, size_t *inbytesleft, char **outbuf, size_t *outbytesleft)
 {
-  // reusable buffer for temporary conversion
-  static unsigned short *wbuf = 0L;
-  static int NWbuf = 0;
+    // reusable buffer for temporary conversion
+    static unsigned short *wbuf = 0L;
+    static int NWbuf = 0;
 # define MAKE_ROOM(n) if (NWbuf<(n)) { NWbuf=(n)+32; wbuf = realloc(wbuf, NWbuf); }
-
-  // addresses require by WIN32 calls
-  static char *dflt = ".";
-  BOOL dfltUsed;
-
-  // some variables
-  const char *src;
-  char *dst;
-  unsigned short *tmp;
-  int sn, dn, tn;
-  size_t ret = 0;
-
-  // handle the special cases first
-  if (inbuf==0L || *inbuf==0L) {
-    if (outbuf==0L || *outbuf==0L) {
-      // sepcial case: initialize converter
-      // (nothing to do here)
-      return 0;
-    } else {
-      // special case: write a format indicator
-      // (not implemented)
-      return 0;
+    
+    // addresses require by WIN32 calls
+    static char *dflt = ".";
+    BOOL dfltUsed;
+    
+    // some variables
+    const char *src;
+    char *dst;
+    unsigned short *tmp;
+    int sn, dn, tn;
+    size_t ret = 0;
+    
+    // handle the special cases first
+    if (inbuf==0L || *inbuf==0L) {
+        if (outbuf==0L || *outbuf==0L) {
+            // sepcial case: initialize converter
+            // (nothing to do here)
+            return 0;
+        } else {
+            // special case: write a format indicator
+            // (not implemented)
+            return 0;
+        }
     }
-  }
-
-  // catch faulty parameters
-  if (!inbytesleft || !outbytesleft || outbuf==0L || *outbuf==0L)
-    return -1;
-
-  src = *inbuf; dst = *outbuf; sn = *inbytesleft; dn = *outbytesleft;
-  if (sn==0) 
-    return 0;
-
-  // take care of all cases without any conversion
-  if ( (cd&0x3)==((cd>>4)&0x3) ) {
-    if (sn<=dn) {
-      dn = sn;
-    } else {
-      sn = dn;
-      ret = -1;
+    
+    // catch faulty parameters
+    if (!inbytesleft || !outbytesleft || outbuf==0L || *outbuf==0L)
+        return -1;
+    
+    src = *inbuf; dst = *outbuf; sn = *inbytesleft; dn = *outbytesleft;
+    if (sn==0) 
+        return 0;
+    
+    // take care of all cases without any conversion
+    if ( (cd&0x3)==((cd>>4)&0x3) ) {
+        if (sn<=dn) {
+            dn = sn;
+        } else {
+            sn = dn;
+            ret = -1;
+        }
+        memcpy(dst, src, sn);
+        goto fixup_return_values;
     }
-    memcpy(dst, src, sn);
-    goto fixup_return_values;
-  }
-
-  // now, the conversion on WIN32 is always a two-step process
-  // because WIN32 can only convert to and from UTF-16LE
-
-  // convert from old format to UTF-16LE
-  switch (cd & 0x30) {
-  case 0x00: // from local code page, WIN32 does that
-    MAKE_ROOM(sn*2);
-    tn = 2 * MultiByteToWideChar(CP_THREAD_ACP, MB_PRECOMPOSED, src, sn, wbuf, sn);
-    tmp = wbuf;
-    break;
-  case 0x10: // from Mac Roman, WIN32 does that
-    MAKE_ROOM(sn*2);
-    tn = 2 * MultiByteToWideChar(CP_MACCP, MB_PRECOMPOSED, src, sn, wbuf, sn);
-    tmp = wbuf;
-    break;
-  case 0x20: // from UTF-16BE, flip the byte order
-    MAKE_ROOM(sn);
-    ic_flip_endian(wbuf, src, sn/2);
-    tmp = wbuf; tn = sn;
-    break;
-  case 0x30: // from UTF-16LE, make the source buffer the temp buffer
-    tmp = (unsigned short*)src; tn = sn;
-    break;
-  }
-
-  // convert from UTF-16LE to new format
-  switch (cd & 0x03) {
-  case 0x00: // to local code page
-    dn = WideCharToMultiByte(CP_THREAD_ACP, 0, tmp, tn/2, dst, dn, dflt, &dfltUsed);
-    if (dn==0) 
-      ret = -1;
-    break;
-  case 0x01: // to Mac Roman
-    dn = WideCharToMultiByte(CP_MACCP, 0, tmp, tn/2, dst, dn, dflt, &dfltUsed);
-    if (dn==0) 
-      ret = -1;
-    break;
-  case 0x02: // to UTF-16BE
-    if (tn<=dn) {
-      dn = tn;
-    } else {
-      tn = dn;
-      ret = -1;
+    
+    // now, the conversion on WIN32 is always a two-step process
+    // because WIN32 can only convert to and from UTF-16LE
+    
+    // convert from old format to UTF-16LE
+    switch (cd & 0x30) {
+        case 0x00: // from local code page, WIN32 does that
+            MAKE_ROOM(sn*2);
+            tn = 2 * MultiByteToWideChar(CP_THREAD_ACP, MB_PRECOMPOSED, src, sn, wbuf, sn);
+            tmp = wbuf;
+            break;
+        case 0x10: // from Mac Roman, WIN32 does that
+            MAKE_ROOM(sn*2);
+            tn = 2 * MultiByteToWideChar(CP_MACCP, MB_PRECOMPOSED, src, sn, wbuf, sn);
+            tmp = wbuf;
+            break;
+        case 0x20: // from UTF-16BE, flip the byte order
+            MAKE_ROOM(sn);
+            ic_flip_endian(wbuf, src, sn/2);
+            tmp = wbuf; tn = sn;
+            break;
+        case 0x30: // from UTF-16LE, make the source buffer the temp buffer
+            tmp = (unsigned short*)src; tn = sn;
+            break;
     }
-    ic_flip_endian(dst, tmp, tn/2);
-    break;
-  case 0x03: // to UTF-16LE
-    if (tn<=dn) {
-      dn = tn;
-    } else {
-      tn = dn;
-      ret = -1;
+    
+    // convert from UTF-16LE to new format
+    switch (cd & 0x03) {
+        case 0x00: // to local code page
+            dn = WideCharToMultiByte(CP_THREAD_ACP, 0, tmp, tn/2, dst, dn, dflt, &dfltUsed);
+            if (dn==0) 
+                ret = -1;
+            break;
+        case 0x01: // to Mac Roman
+            dn = WideCharToMultiByte(CP_MACCP, 0, tmp, tn/2, dst, dn, dflt, &dfltUsed);
+            if (dn==0) 
+                ret = -1;
+            break;
+        case 0x02: // to UTF-16BE
+            if (tn<=dn) {
+                dn = tn;
+            } else {
+                tn = dn;
+                ret = -1;
+            }
+            ic_flip_endian(dst, tmp, tn/2);
+            break;
+        case 0x03: // to UTF-16LE
+            if (tn<=dn) {
+                dn = tn;
+            } else {
+                tn = dn;
+                ret = -1;
+            }
+            memcpy(dst, tmp, tn);
+            break;
     }
-    memcpy(dst, tmp, tn);
-    break;
-  }
-
+    
 fixup_return_values:
-  *inbuf  += sn; *inbytesleft  -= sn;
-  *outbuf += dn; *outbytesleft -= dn;
-  if (ret==-1) 
-    errno = 7;
-  return ret;
-
+    *inbuf  += sn; *inbytesleft  -= sn;
+    *outbuf += dn; *outbytesleft -= dn;
+    if (ret==-1) 
+        errno = 7;
+    return ret;
+    
 #undef MAKE_ROOM
 }
 
 int iconv_close(iconv_t type)
 {
-  return 0;
+    return 0;
 }
 
 #endif

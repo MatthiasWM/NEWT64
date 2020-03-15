@@ -71,18 +71,18 @@ static void			NIOInfo(newtStream_t * f, newtRefArg r);
 
 int32_t NewtGetPrintLength(void)
 {
-	newtRefVar	n;
-	int32_t		printLength = -1;
-
-	n = NcGetGlobalVar(NSSYM0(printLength));
-
-	if (NewtRefIsInteger(n))
-		printLength = NewtRefToInteger(n);
-
-	if (printLength < 0)
-		printLength = 0x7fffffff;
-
-	return printLength;
+    newtRefVar	n;
+    int32_t		printLength = -1;
+    
+    n = NcGetGlobalVar(NSSYM0(printLength));
+    
+    if (NewtRefIsInteger(n))
+        printLength = NewtRefToInteger(n);
+    
+    if (printLength < 0)
+        printLength = 0x7fffffff;
+    
+    return printLength;
 }
 
 
@@ -96,13 +96,13 @@ int32_t NewtGetPrintDepth(void)
 {
     newtRefVar	n;
     int32_t		depth = 3;
-
+    
     n = NcGetGlobalVar(NSSYM0(printDepth));
-
+    
     if (NewtRefIsInteger(n))
         depth = NewtRefToInteger(n);
-
-	return depth;
+    
+    return depth;
 }
 
 
@@ -116,13 +116,13 @@ int32_t NewtGetPrintIndent(void)
 {
     newtRefVar	n;
     int32_t		indent = 1;
-
+    
     n = NcGetGlobalVar(NSSYM0(printIndent));
-
+    
     if (NewtRefIsInteger(n))
         indent = NewtRefToInteger(n);
-
-	return indent;
+    
+    return indent;
 }
 
 
@@ -136,13 +136,13 @@ int32_t NewtGetPrintBinaries(void)
 {
     newtRefVar	n;
     int32_t		pb = 0;
-
+    
     n = NcGetGlobalVar(NSSYM0(printBinaries));
-
+    
     if (NewtRefIsInteger(n))
         pb = NewtRefToInteger(n);
-
-	return pb;
+    
+    return pb;
 }
 
 
@@ -161,30 +161,30 @@ int32_t NewtGetPrintBinaries(void)
 
 bool NewtSymbolIsPrint(char * str, int len)
 {
-	int c;
-	int i;
-
-	if (len == 0)
-		return false;
-
-	c = str[0];
-
-	if ('0' <= c && c <= '9')
-		return false;
-
-	for (i = 0; i < len && str[i]; i++)
-	{
-		c = str[i];
-
-		if (c == '_') continue;
-		if ('a' <= c && c <= 'z') continue;
-		if ('A' <= c && c <= 'Z') continue;
-		if ('0' <= c && c <= '9') continue;
-
-		return false;
-	}
-
-	return true;
+    int c;
+    int i;
+    
+    if (len == 0)
+        return false;
+    
+    c = str[0];
+    
+    if ('0' <= c && c <= '9')
+        return false;
+    
+    for (i = 0; i < len && str[i]; i++)
+    {
+        c = str[i];
+        
+        if (c == '_') continue;
+        if ('a' <= c && c <= 'z') continue;
+        if ('A' <= c && c <= 'Z') continue;
+        if ('0' <= c && c <= '9') continue;
+        
+        return false;
+    }
+    
+    return true;
 }
 
 
@@ -200,18 +200,18 @@ bool NewtSymbolIsPrint(char * str, int len)
 
 bool NewtStrIsPrint(char * str, int len)
 {
-	int		i;
-
-	for (i = 0; i < len && str[i]; i++)
-	{
-		if (str[i] == '"')
-			return false;
-
-		if (! isprint(str[i]))
-			return false;
-	}
-
-	return true;
+    int		i;
+    
+    for (i = 0; i < len && str[i]; i++)
+    {
+        if (str[i] == '"')
+            return false;
+        
+        if (! isprint(str[i]))
+            return false;
+    }
+    
+    return true;
 }
 
 
@@ -226,13 +226,13 @@ bool NewtStrIsPrint(char * str, int len)
 
 char * NewtCharAndBarToEscape(int c)
 {	
-	if (c=='|') {
-		return "\\|";
-	} else if (c=='\\') { 
-		return "\\\\";
-	} else {
-		return NewtCharToEscape(c);
-	}
+    if (c=='|') {
+        return "\\|";
+    } else if (c=='\\') { 
+        return "\\\\";
+    } else {
+        return NewtCharToEscape(c);
+    }
 }
 
 
@@ -246,28 +246,28 @@ char * NewtCharAndBarToEscape(int c)
 
 char * NewtCharToEscape(int c)
 {
-	char *	s = NULL;
-
-	switch (c)
-	{
-		case '\n':
-			s = "\\n";
-			break;
-
-		case '\r':
-			s = "\\r";
-			break;
-
-		case '\t':
-			s = "\\t";
-			break;
-
-		case '"':
-			s = "\\\"";
-			break;
-	}
-
-	return s;
+    char *	s = NULL;
+    
+    switch (c)
+    {
+        case '\n':
+            s = "\\n";
+            break;
+            
+        case '\r':
+            s = "\\r";
+            break;
+            
+        case '\t':
+            s = "\\t";
+            break;
+            
+        case '"':
+            s = "\\\"";
+            break;
+    }
+    
+    return s;
 }
 
 
@@ -278,19 +278,19 @@ char * NewtCharToEscape(int c)
  */
 void NIOPrintIndent(newtStream_t * f, int32_t depth)
 {
-	int32_t i, n = newt_env._indentDepth - depth;
-	NIOFputc('\n', f);
-	if (NEWT_INDENT>0) {
-		n *= NEWT_INDENT;
-		for (i=0; i<n; i++) {
-			NIOFputc('\t', f);
-		}
-	} else {
-		n *= -NEWT_INDENT;
-		for (i=0; i<n; i++) {
-			NIOFputc(' ', f);
-		}
-	}
+    int32_t i, n = newt_env._indentDepth - depth;
+    NIOFputc('\n', f);
+    if (NEWT_INDENT>0) {
+        n *= NEWT_INDENT;
+        for (i=0; i<n; i++) {
+            NIOFputc('\t', f);
+        }
+    } else {
+        n *= -NEWT_INDENT;
+        for (i=0; i<n; i++) {
+            NIOFputc(' ', f);
+        }
+    }
 }
 
 
@@ -310,51 +310,51 @@ void NIOPrintIndent(newtStream_t * f, int32_t depth)
 
 void NIOPrintEscapeStr(newtStream_t * f, char * str, int len, char bar)
 {
-	bool	unicode = false;
-	char *	s;
-	int		c;
-	int		i;
-
-	for (i = 0; i < len; i++)
-	{
-		c = str[i];
-
-		if (bar)
-			s = NewtCharAndBarToEscape(c);
-		else
-			s = NewtCharToEscape(c);
-
-		if (s != NULL)
-		{
-			if (unicode)
-			{
-				NIOFputs("\\u", f);
-				unicode = false;
-			}
-
-			NIOFputs(s, f);
-		}
-		else if (isprint(c))
-		{
-			if (unicode)
-			{
-				NIOFputs("\\u", f);
-				unicode = false;
-			}
-
-			NIOFputc(c, f);
-		}
-		else
-		{
-			if (! unicode)
-			{
-				NIOFputs("\\u", f);
-				unicode = true;
-			}
-
-			NIOFprintf(f, "%02x%02x", c, str[++i]);
-		}
-	}
+    bool	unicode = false;
+    char *	s;
+    int		c;
+    int		i;
+    
+    for (i = 0; i < len; i++)
+    {
+        c = str[i];
+        
+        if (bar)
+            s = NewtCharAndBarToEscape(c);
+        else
+            s = NewtCharToEscape(c);
+        
+        if (s != NULL)
+        {
+            if (unicode)
+            {
+                NIOFputs("\\u", f);
+                unicode = false;
+            }
+            
+            NIOFputs(s, f);
+        }
+        else if (isprint(c))
+        {
+            if (unicode)
+            {
+                NIOFputs("\\u", f);
+                unicode = false;
+            }
+            
+            NIOFputc(c, f);
+        }
+        else
+        {
+            if (! unicode)
+            {
+                NIOFputs("\\u", f);
+                unicode = true;
+            }
+            
+            NIOFprintf(f, "%02x%02x", c, str[++i]);
+        }
+    }
 }
 
 
@@ -392,7 +392,7 @@ void NIOPrintRef(newtStream_t * f, newtRefArg r)
 void NIOPrintSpecial(newtStream_t * f, newtRefArg r)
 {
     int	n;
-
+    
     n = NewtRefToSpecial(r);
     NIOFprintf(f, "<Special, %04x>", n);
 }
@@ -412,7 +412,7 @@ void NIOPrintSpecial(newtStream_t * f, newtRefArg r)
 void NIOPrintInteger(newtStream_t * f, newtRefArg r)
 {
     int	n;
-
+    
     n = NewtRefToInteger(r);
     NIOFprintf(f, "%d", n);
 }
@@ -432,7 +432,7 @@ void NIOPrintInteger(newtStream_t * f, newtRefArg r)
 void NIOPrintReal(newtStream_t * f, newtRefArg r)
 {
     double	n;
-
+    
     n = NewtRefToReal(r);
     NIOFprintf(f, "%f", n);
 }
@@ -451,23 +451,23 @@ void NIOPrintReal(newtStream_t * f, newtRefArg r)
 
 void NIOPrintObjCharacter(newtStream_t * f, newtRefArg r)
 {
-	char *	s;
+    char *	s;
     int		c;
-
+    
     c = NewtRefToCharacter(r);
-
-	NIOFputc('$', f);
-
-	s = NewtCharToEscape(c);
-
-	if (s != NULL)
-		NIOFputs(s, f);
-	else if (0xff00 & c)
-		NIOFprintf(f, "\\u%04x", c);
-	else if (isprint(c))
-		NIOFputc(c, f);
-	else
-		NIOFprintf(f, "\\%02x", c);
+    
+    NIOFputc('$', f);
+    
+    s = NewtCharToEscape(c);
+    
+    if (s != NULL)
+        NIOFputs(s, f);
+    else if (0xff00 & c)
+        NIOFprintf(f, "\\u%04x", c);
+    else if (isprint(c))
+        NIOFputc(c, f);
+    else
+        NIOFprintf(f, "\\%02x", c);
 }
 
 
@@ -486,12 +486,12 @@ void NIOPrintObjCharacter(newtStream_t * f, newtRefArg r)
 
 void NIOPrintObjNamedMP(newtStream_t * f, newtRefArg r)
 {
-	newtRefVar	sym;
-
-	sym = NewtMPToSymbol(r);
-
-	NIOFputc('@', f);
-	NIOPrintObjSymbol(f, sym);
+    newtRefVar	sym;
+    
+    sym = NewtMPToSymbol(r);
+    
+    NIOFputc('@', f);
+    NIOPrintObjSymbol(f, sym);
 }
 
 #endif /* __NAMED_MAGIC_POINTER__ */
@@ -510,12 +510,12 @@ void NIOPrintObjNamedMP(newtStream_t * f, newtRefArg r)
 
 void NIOPrintObjMagicPointer(newtStream_t * f, newtRefArg r)
 {
-	int32_t	table;
-	int32_t	index;
-
-	table = NewtMPToTable(r);
-	index = NewtMPToIndex(r);
-
+    int32_t	table;
+    int32_t	index;
+    
+    table = NewtMPToTable(r);
+    index = NewtMPToIndex(r);
+    
     NIOFprintf(f, "@%d", index);
 }
 
@@ -536,7 +536,7 @@ void NIOPrintObjBinary(newtStream_t * f, newtRefArg r)
     newtRefVar	klass;
     int	ptr;
     int	len;
-
+    
     ptr = r;
     len = NewtBinaryLength(r);
     klass = NcClassOf(r);
@@ -580,21 +580,21 @@ void NIOPrintObjBinary(newtStream_t * f, newtRefArg r)
 void NIOPrintObjSymbol(newtStream_t * f, newtRefArg r)
 {
     newtSymDataRef	sym;
-	int		len;
-
+    int		len;
+    
     sym = NewtRefToSymbol(r);
-	len = NewtSymbolLength(r);
-
-	if (NewtSymbolIsPrint(sym->name, len))
-	{
-		NIOFputs(sym->name, f);
-	}
-	else
-	{
-		NIOFputc('|', f);
-		NIOPrintEscapeStr(f, sym->name, len, 1);
-		NIOFputc('|', f);
-	}
+    len = NewtSymbolLength(r);
+    
+    if (NewtSymbolIsPrint(sym->name, len))
+    {
+        NIOFputs(sym->name, f);
+    }
+    else
+    {
+        NIOFputc('|', f);
+        NIOPrintEscapeStr(f, sym->name, len, 1);
+        NIOFputc('|', f);
+    }
 }
 
 
@@ -612,24 +612,24 @@ void NIOPrintObjSymbol(newtStream_t * f, newtRefArg r)
 void NIOPrintObjString(newtStream_t * f, newtRefArg r)
 {
     char *	s;
-	int		len;
-
+    int		len;
+    
     s = NewtRefToString(r);
-	len = NewtStringLength(r);
-
-	if (NewtStrIsPrint(s, len))
-	{
-//		NIOFprintf(f, "\"%s\"", s);
-		NIOFputs("\"", f);
-		NIOFputs(s, f);
-		NIOFputs("\"", f);
-	}
-	else
-	{
-		NIOFputc('"', f);
-		NIOPrintEscapeStr(f, s, len, 0);
-		NIOFputc('"', f);
-	}
+    len = NewtStringLength(r);
+    
+    if (NewtStrIsPrint(s, len))
+    {
+        //		NIOFprintf(f, "\"%s\"", s);
+        NIOFputs("\"", f);
+        NIOFputs(s, f);
+        NIOFputs("\"", f);
+    }
+    else
+    {
+        NIOFputc('"', f);
+        NIOPrintEscapeStr(f, s, len, 0);
+        NIOFputc('"', f);
+    }
 }
 
 
@@ -653,63 +653,63 @@ void NIOPrintObjArray(newtStream_t * f, newtRefArg r, int32_t depth, bool litera
     newtRefVar	klass;
     uint32_t	len;
     uint32_t	i;
-
+    
     obj = NewtRefToPointer(r);
     len = NewtObjSlotsLength(obj);
     slots = NewtObjToSlots(obj);
-
+    
     if (literal && NcClassOf(r) == NSSYM0(pathExpr))
     {
         for (i = 0; i < len; i++)
         {
             if (0 < i)
                 NIOFputs(".", f);
-    
+            
             NIOPrintObj2(f, slots[i], 0, literal);
         }
     }
     else
     {
         NIOFputs("[", f);
-    
+        
         klass = NcClassOf(r);
-    
+        
         if (NewtRefIsNotNIL(klass) && ! NewtRefEqual(klass, NSSYM0(array)))
         {
-			if (NEWT_INDENT) NIOPrintIndent(f, depth-1);
+            if (NEWT_INDENT) NIOPrintIndent(f, depth-1);
             NIOPrintObj2(f, klass, 0, true);
             NIOFputs(": ", f);
         }
-    
+        
         if (depth < 0)
         {
             NIOPrintRef(f, r);
         }
         else
         {
-			int32_t	printLength;
-
+            int32_t	printLength;
+            
             depth--;
-			printLength = NewtGetPrintLength();
-
+            printLength = NewtGetPrintLength();
+            
             for (i = 0; i < len; i++)
             {
                 if (0 < i)
                     NIOFputs(", ", f);
-        
-				if (printLength <= i)
-				{
-					NIOFputs("...", f);
-					break;
-				}
-
-				if (NEWT_INDENT) NIOPrintIndent(f, depth);
+                
+                if (printLength <= i)
+                {
+                    NIOFputs("...", f);
+                    break;
+                }
+                
+                if (NEWT_INDENT) NIOPrintIndent(f, depth);
                 NIOPrintObj2(f, slots[i], depth, literal);
             }
-			depth++;
+            depth++;
         }
-
-		if (NEWT_INDENT) NIOPrintIndent(f, depth);
+        
+        if (NEWT_INDENT) NIOPrintIndent(f, depth);
         NIOFputs("]", f);
     }
 }
@@ -728,17 +728,17 @@ void NIOPrintObjArray(newtStream_t * f, newtRefArg r, int32_t depth, bool litera
 
 void NIOPrintFnFrame(newtStream_t * f, newtRefArg r)
 {
-	newtRefVar	indefinite;
+    newtRefVar	indefinite;
     int32_t		numArgs;
-	char *		indefiniteStr = "";
-
+    char *		indefiniteStr = "";
+    
     numArgs = NewtRefToInteger(NcGetSlot(r, NSSYM0(numArgs)));
-	indefinite = NcGetSlot(r, NSSYM0(indefinite));
-
-	if (NewtRefIsNotNIL(indefinite))
-		indefiniteStr = "...";
-
-	NIOFprintf(f, "<function, %d arg(s)%s #%08x>", numArgs, indefiniteStr, r);
+    indefinite = NcGetSlot(r, NSSYM0(indefinite));
+    
+    if (NewtRefIsNotNIL(indefinite))
+        indefiniteStr = "...";
+    
+    NIOFprintf(f, "<function, %d arg(s)%s #%08x>", numArgs, indefiniteStr, r);
 }
 
 
@@ -755,19 +755,19 @@ void NIOPrintFnFrame(newtStream_t * f, newtRefArg r)
 
 void NIOPrintRegexFrame(newtStream_t * f, newtRefArg r)
 {
-	newtRefVar	pattern;
-	newtRefVar	option;
-
-	pattern = NcGetSlot(r, NSSYM0(pattern));
-	option = NcGetSlot(r, NSSYM0(option));
-
-//    NIOFprintf(f, "/%s/", NewtRefToString(pattern));
+    newtRefVar	pattern;
+    newtRefVar	option;
+    
+    pattern = NcGetSlot(r, NSSYM0(pattern));
+    option = NcGetSlot(r, NSSYM0(option));
+    
+    //    NIOFprintf(f, "/%s/", NewtRefToString(pattern));
     NIOFputs("/", f);
     NIOFputs(NewtRefToString(pattern), f);
     NIOFputs("/", f);
-
-	if (NewtRefIsString(option))
-		NIOFputs(NewtRefToString(option), f);
+    
+    if (NewtRefIsString(option))
+        NIOFputs(NewtRefToString(option), f);
 }
 
 
@@ -792,7 +792,7 @@ void NIOPrintObjFrame(newtStream_t * f, newtRefArg r, int32_t depth, bool litera
     uint32_t	index;
     uint32_t	len;
     uint32_t	i;
-
+    
     if (!newt_env._printBinaries)
     {
         if (NewtRefIsFunction(r) && ! NEWT_DUMPBC)
@@ -800,56 +800,56 @@ void NIOPrintObjFrame(newtStream_t * f, newtRefArg r, int32_t depth, bool litera
             NIOPrintFnFrame(f, r);
             return;
         }
-
+        
         if (NewtRefIsRegex(r) && ! NEWT_DUMPBC)
         {
             NIOPrintRegexFrame(f, r);
             return;
         }
     }
-
+    
     obj = NewtRefToPointer(r);
     len = NewtObjSlotsLength(obj);
     slots = NewtObjToSlots(obj);
-
+    
     NIOFputs("{", f);
-
+    
     if (depth < 0)
     {
         NIOPrintRef(f, r);
     }
     else
     {
-		int32_t	printLength;
-
+        int32_t	printLength;
+        
         depth--;
-		printLength = NewtGetPrintLength();
-
+        printLength = NewtGetPrintLength();
+        
         for (i = 0; i < len; i++)
         {
             if (0 < i) {
                 NIOFputs(", ", f);
-			}
-
-			if (printLength <= i)
-			{
-				NIOFputs("...", f);
-				if (NEWT_INDENT) NIOPrintIndent(f, depth);
-				break;
-			}
-			if (NEWT_INDENT) NIOPrintIndent(f, depth);
-
+            }
+            
+            if (printLength <= i)
+            {
+                NIOFputs("...", f);
+                if (NEWT_INDENT) NIOPrintIndent(f, depth);
+                break;
+            }
+            if (NEWT_INDENT) NIOPrintIndent(f, depth);
+            
             slot = NewtGetMapIndex(obj->as.map, i, &index);
-			if (slot == kNewtRefUnbind) break;
-
+            if (slot == kNewtRefUnbind) break;
+            
             NIOPrintObjSymbol(f, slot);
             NIOFputs(": ", f);
             NIOPrintObj2(f, slots[i], depth, literal);
-
+            
         }
-		if (NEWT_INDENT) NIOPrintIndent(f, depth+1);
+        if (NEWT_INDENT) NIOPrintIndent(f, depth+1);
     }
-
+    
     NIOFputs("}", f);
 }
 
@@ -870,7 +870,7 @@ void NIOPrintLiteral(newtStream_t * f, newtRefArg r, bool * literalP)
 {
     if (! *literalP && NewtRefIsLiteral(r))
     {
-		NIOFputc('\'', f);
+        NIOFputc('\'', f);
         *literalP = true;
     }
 }
@@ -896,80 +896,80 @@ void NIOPrintObj2(newtStream_t * f, newtRefArg r, int32_t depth, bool literal)
         case kNewtNil:
             NIOFputs("NIL", f);
             break;
-
+            
         case kNewtTrue:
             NIOFputs("TRUE", f);
             break;
-
+            
         case kNewtUnbind:
             NIOFputs("#UNBIND", f);
             break;
-
+            
         case kNewtSpecial:
             NIOPrintSpecial(f, r);
             break;
-
+            
         case kNewtInt30:
         case kNewtInt32:
             NIOPrintInteger(f, r);
             break;
-
+            
         case kNewtReal:
             NIOPrintReal(f, r);
             break;
-
+            
         case kNewtCharacter:
             NIOPrintObjCharacter(f, r);
             break;
-
+            
         case kNewtMagicPointer:
-			if (0 <= depth)
-			{
-				newtRefVar	r2;
-
-				r2 = NcResolveMagicPointer(r);
-
-				if (! NewtRefIsMagicPointer(r2))
-				{
-					NIOPrintObj2(f, r2, depth, literal);
-					break;
-				}
-			}
-
+            if (0 <= depth)
+            {
+                newtRefVar	r2;
+                
+                r2 = NcResolveMagicPointer(r);
+                
+                if (! NewtRefIsMagicPointer(r2))
+                {
+                    NIOPrintObj2(f, r2, depth, literal);
+                    break;
+                }
+            }
+            
 #ifdef __NAMED_MAGIC_POINTER__
-			if (NewtRefIsNamedMP(r))
-			{	// Named Magic Ponter
-				NIOPrintObjNamedMP(f, r);
-				break;
-			}
+            if (NewtRefIsNamedMP(r))
+            {	// Named Magic Ponter
+                NIOPrintObjNamedMP(f, r);
+                break;
+            }
 #endif /* __NAMED_MAGIC_POINTER__ */
-
-			NIOPrintObjMagicPointer(f, r);
+            
+            NIOPrintObjMagicPointer(f, r);
             break;
-
+            
         case kNewtBinary:
             NIOPrintObjBinary(f, r);
             break;
-
+            
         case kNewtArray:
             NIOPrintLiteral(f, r, &literal);
             NIOPrintObjArray(f, r, depth, literal);
             break;
-
+            
         case kNewtFrame:
             NIOPrintLiteral(f, r, &literal);
             NIOPrintObjFrame(f, r, depth, literal);
             break;
-
+            
         case kNewtSymbol:
             NIOPrintLiteral(f, r, &literal);
             NIOPrintObjSymbol(f, r);
             break;
-
+            
         case kNewtString:
             NIOPrintObjString(f, r);
             break;
-
+            
         default:
             NIOFputs("###UNKNOWN###", f);
             break;
@@ -990,12 +990,12 @@ void NIOPrintObj2(newtStream_t * f, newtRefArg r, int32_t depth, bool literal)
 
 void NIOPrintObj(newtStream_t * f, newtRefArg r)
 {
-	int32_t depth = NewtGetPrintDepth();
-	newt_env._indentDepth = depth;
-	int32_t indent = NewtGetPrintIndent();
-	newt_env._indent = indent;
-	int32_t pb = NewtGetPrintBinaries();
-	newt_env._printBinaries = pb;
+    int32_t depth = NewtGetPrintDepth();
+    newt_env._indentDepth = depth;
+    int32_t indent = NewtGetPrintIndent();
+    newt_env._indent = indent;
+    int32_t pb = NewtGetPrintBinaries();
+    newt_env._printBinaries = pb;
     NIOPrintObj2(f, r, depth, false);
 }
 
@@ -1011,9 +1011,9 @@ void NIOPrintObj(newtStream_t * f, newtRefArg r)
 
 void NewtPrintObj(FILE * f, newtRefArg r)
 {
-	newtStream_t	stream;
-
-	NIOSetFile(&stream, f);
+    newtStream_t	stream;
+    
+    NIOSetFile(&stream, f);
     NIOPrintObj(&stream, r);
 }
 
@@ -1029,10 +1029,10 @@ void NewtPrintObj(FILE * f, newtRefArg r)
 
 void NewtPrintObject(FILE * f, newtRefArg r)
 {
-	newtStream_t	stream;
-
-	NIOSetFile(&stream, f);
-
+    newtStream_t	stream;
+    
+    NIOSetFile(&stream, f);
+    
     NIOPrintObj(&stream, r);
     NIOFputs("\n", &stream);
 }
@@ -1051,7 +1051,7 @@ void NewtPrintObject(FILE * f, newtRefArg r)
 
 void NIOPrintCharacter(newtStream_t * f, newtRefArg r)
 {
-	NIOFputc(NewtRefToCharacter(r), f);
+    NIOFputc(NewtRefToCharacter(r), f);
 }
 
 
@@ -1069,9 +1069,9 @@ void NIOPrintCharacter(newtStream_t * f, newtRefArg r)
 void NIOPrintSymbol(newtStream_t * f, newtRefArg r)
 {
     newtSymDataRef	sym;
-
-	sym = NewtRefToSymbol(r);
-	NIOFputs(sym->name, f);
+    
+    sym = NewtRefToSymbol(r);
+    NIOFputs(sym->name, f);
 }
 
 
@@ -1088,7 +1088,7 @@ void NIOPrintSymbol(newtStream_t * f, newtRefArg r)
 
 void NIOPrintString(newtStream_t * f, newtRefArg r)
 {
-	NIOFputs(NewtRefToString(r), f);
+    NIOFputs(NewtRefToString(r), f);
 }
 
 
@@ -1105,17 +1105,17 @@ void NIOPrintString(newtStream_t * f, newtRefArg r)
 
 void NIOPrintArray(newtStream_t * f, newtRefArg r)
 {
-	newtRef *	slots;
-	uint32_t	len;
-	uint32_t	i;
-
-	slots = NewtRefToSlots(r);
-	len = NewtLength(r);
-
-	for (i = 0; i < len; i++)
-	{
-		NIOPrint(f, slots[i]);
-	}
+    newtRef *	slots;
+    uint32_t	len;
+    uint32_t	i;
+    
+    slots = NewtRefToSlots(r);
+    len = NewtLength(r);
+    
+    for (i = 0; i < len; i++)
+    {
+        NIOPrint(f, slots[i]);
+    }
 }
 
 
@@ -1138,53 +1138,53 @@ void NIOPrint(newtStream_t * f, newtRefArg r)
         case kNewtTrue:
         case kNewtUnbind:
             break;
-
+            
         case kNewtSpecial:
             NIOPrintSpecial(f, r);
             break;
-
+            
         case kNewtInt30:
         case kNewtInt32:
             NIOPrintInteger(f, r);
             break;
-
+            
         case kNewtReal:
             NIOPrintReal(f, r);
             break;
-
+            
         case kNewtCharacter:
-			NIOPrintCharacter(f, r);
+            NIOPrintCharacter(f, r);
             break;
-
+            
         case kNewtMagicPointer:
-			{
-				newtRefVar	r2;
-
-				r2 = NcResolveMagicPointer(r);
-
-				if (! NewtRefIsMagicPointer(r2))
-				{
-					NIOPrint(f, r2);
-				}
-			}
+        {
+            newtRefVar	r2;
+            
+            r2 = NcResolveMagicPointer(r);
+            
+            if (! NewtRefIsMagicPointer(r2))
+            {
+                NIOPrint(f, r2);
+            }
+        }
             break;
-
+            
         case kNewtArray:
-			NIOPrintArray(f, r);
-			break;
-
+            NIOPrintArray(f, r);
+            break;
+            
         case kNewtBinary:
         case kNewtFrame:
             break;
-
+            
         case kNewtSymbol:
-			NIOPrintSymbol(f, r);
+            NIOPrintSymbol(f, r);
             break;
-
+            
         case kNewtString:
-			NIOPrintString(f, r);
+            NIOPrintString(f, r);
             break;
-
+            
         default:
             break;
     }
@@ -1202,10 +1202,10 @@ void NIOPrint(newtStream_t * f, newtRefArg r)
 
 void NewtPrint(FILE * f, newtRefArg r)
 {
-	newtStream_t	stream;
-
-	NIOSetFile(&stream, f);
-	NIOPrint(&stream, r);
+    newtStream_t	stream;
+    
+    NIOSetFile(&stream, f);
+    NIOPrint(&stream, r);
 }
 
 
@@ -1222,30 +1222,30 @@ void NewtPrint(FILE * f, newtRefArg r)
 void NIOInfo(newtStream_t * f, newtRefArg r)
 {
     newtRefVar	fn = kNewtRefUnbind;
-
+    
     if (NewtRefIsSymbol(r))
         fn = NcGetGlobalFn(r);
     else
         fn = (newtRef)r;
-
+    
     if (NewtRefIsFunction(fn))
     {
         newtRefVar	docString;
-
+        
         docString = NcGetSlot(fn, NSSYM0(docString));
-
+        
         if (NewtRefIsNotNIL(docString))
         {
             if (NewtRefIsString(docString))
-			{
-//                NIOFprintf(f, "%s\n", NewtRefToString(docString));
+            {
+                //                NIOFprintf(f, "%s\n", NewtRefToString(docString));
                 NIOFputs(NewtRefToString(docString), f);
                 NIOFputs("\n", f);
             }
-			else
+            else
             {
-			    NIOPrintObj(f, docString);
-			}
+                NIOPrintObj(f, docString);
+            }
         }
     }
 }
@@ -1261,10 +1261,10 @@ void NIOInfo(newtStream_t * f, newtRefArg r)
 
 void NewtInfo(newtRefArg r)
 {
-	newtStream_t	stream;
-
-	NIOSetFile(&stream, stdout);
-	NIOInfo(&stream, r);
+    newtStream_t	stream;
+    
+    NIOSetFile(&stream, stdout);
+    NIOInfo(&stream, r);
 }
 
 
@@ -1276,19 +1276,19 @@ void NewtInfo(newtRefArg r)
 
 void NewtInfoGlobalFns(void)
 {
-	newtStream_t	stream;
+    newtStream_t	stream;
     newtRef *	slots;
     newtRefVar	fns;
     uint32_t	len;
     uint32_t	i;
-
-	NIOSetFile(&stream, stdout);
-
+    
+    NIOSetFile(&stream, stdout);
+    
     fns = NcGetGlobalFns();
     len = NewtLength(fns);
-
+    
     slots = NewtRefToSlots(fns);
-
+    
     for (i = 0; i < len; i++)
     {
         NIOInfo(&stream, slots[i]);

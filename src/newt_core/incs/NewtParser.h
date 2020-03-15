@@ -23,12 +23,12 @@
 /* マクロ */
 
 /*
-#define kNPSSyntaxNodeMask			0x80000003											///< オブジェクト参照のマスク（構文木ノード用）
-
-#define NPSRefIsSyntaxNode(r)		(((r) & kNPSSyntaxNodeMask) == kNPSSyntaxNodeMask)	///< オブジェクト参照が構文木ノードか？
-#define NPSRefToSyntaxNode(r)		(((uint32_t)(r) & 0x7fffffff) >> 2)					///< オブジェクト参照を構文木ノードに変換
-#define NPSMakeSyntaxNode(v)		(((v) << 2) | kNPSSyntaxNodeMask)					///< 構文木ノードのオブジェクト参照を作成
-*/
+ #define kNPSSyntaxNodeMask			0x80000003											///< オブジェクト参照のマスク（構文木ノード用）
+ 
+ #define NPSRefIsSyntaxNode(r)		(((r) & kNPSSyntaxNodeMask) == kNPSSyntaxNodeMask)	///< オブジェクト参照が構文木ノードか？
+ #define NPSRefToSyntaxNode(r)		(((uint32_t)(r) & 0x7fffffff) >> 2)					///< オブジェクト参照を構文木ノードに変換
+ #define NPSMakeSyntaxNode(v)		(((v) << 2) | kNPSSyntaxNodeMask)					///< 構文木ノードのオブジェクト参照を作成
+ */
 
 #define kNPSSyntaxNodeMask			0x0000000e										///< オブジェクト参照のマスク（構文木ノード用）
 
@@ -41,16 +41,16 @@
 
 /// オペレータコード
 enum {
-	kNPS_NOT				= 256,  ///< not
-	kNPS_DIV,						///< div
-	kNPS_MOD,						///< mod
-	kNPS_SHIFT_LEFT,				///< <<
-	kNPS_SHIFT_RIGHT,				///< >>
-	kNPS_NOT_EQUAL,					///< <>
-	kNPS_GREATER_EQUAL,				///< >=
-	kNPS_LESS_EQUAL,				///< <=
-	kNPS_OBJECT_EQUAL,				///< ==
-	kNPS_CONCAT2,					///< &&
+    kNPS_NOT				= 256,  ///< not
+    kNPS_DIV,						///< div
+    kNPS_MOD,						///< mod
+    kNPS_SHIFT_LEFT,				///< <<
+    kNPS_SHIFT_RIGHT,				///< >>
+    kNPS_NOT_EQUAL,					///< <>
+    kNPS_GREATER_EQUAL,				///< >=
+    kNPS_LESS_EQUAL,				///< <=
+    kNPS_OBJECT_EQUAL,				///< ==
+    kNPS_CONCAT2,					///< &&
 };
 
 /// パーサ用疑似命令
@@ -63,7 +63,7 @@ enum {
     kNPSIterNext			= 005,	///< 005 iter-next
     kNPSIterDone			= 006,	///< 006 iter-done
     kNPSPopHandlers			= 007,	///< 007 000 001 pop-handlers
-
+    
     kNPSPush				= 0030,	///< 03x push
     kNPSPushConstant		= 0040,	///< 04x (B signed) push-constant
     kNPSCall				= 0050,	///< 05x call
@@ -87,7 +87,7 @@ enum {
     kNPSBranchIfLoopNotDone	= 0270,	///< 27x branch-if-loop-not-done
     kNPSFreqFunc			= 0300,	///< 30x freq-func
     kNPSNewHandlers			= 0310,	///< 31x new-handlers
-
+    
     // 30x freq-func
     kNPSAdd					= 03000,///<  0 add					|+|
     kNPSSubtract,					///<  1 subtract			|-|
@@ -114,7 +114,7 @@ enum {
     kNPSStringer,					///< 22 stringer			Stringer
     kNPSHasPath,					///< 23 has-path			none
     kNPSClassOf,					///< 24 class-of			ClassOf
-
+    
     // 40x syntax
     kNPSConstituentList		= 04000,
     kNPSCommaList,
@@ -124,7 +124,7 @@ enum {
     kNPSGlobalFn,
     kNPSFunc,
     kNPSArg,
-	kNPSIndefinite,
+    kNPSIndefinite,
     kNPSMessage,
     kNPSLvalue,
     kNPSAssign,
@@ -145,16 +145,16 @@ enum {
     kNPSConcat2,							///< &&
     kNPSAnd,								///< and
     kNPSOr,									///< or
-
+    
     // function
     kNPSMod,								///< mod
-	kNPSShiftLeft,							///< <<
-	kNPSShiftRight,							///< >>
-
-	// 独自拡張
-	kNPSObjectEqual,						///< ==
-	kNPSMakeRegex,							///< 正規表現オブジェクトの生成
-
+    kNPSShiftLeft,							///< <<
+    kNPSShiftRight,							///< >>
+    
+    // 独自拡張
+    kNPSObjectEqual,						///< ==
+    kNPSMakeRegex,							///< 正規表現オブジェクトの生成
+    
     // Unknown
     KNPSUnknownCode		= 0xffffffff		///< 不明な命令
 };
@@ -184,16 +184,16 @@ typedef struct {
 
 /// パーサ環境
 typedef struct {
-	bool			first_time;			///< 字句解析の初回判別用フラグ
-
-	uint16_t		numwarns;			///< 発生したワーニング数
-	uint16_t		numerrs;			///< 発生したエラー数
-
-	const char *	fname;				///< 入力中のファイル名
-	uint32_t		lineno;				///< 字句解析の行番号
-	uint32_t		tokenpos;			///< トークンの位置
-	uint16_t		yyleng;				///< トークンの長さ
-	char			linebuf[NEWT_LEX_LINEBUFFSIZE];  ///< 行バッファ
+    bool			first_time;			///< 字句解析の初回判別用フラグ
+    
+    uint16_t		numwarns;			///< 発生したワーニング数
+    uint16_t		numerrs;			///< 発生したエラー数
+    
+    const char *	fname;				///< 入力中のファイル名
+    uint32_t		lineno;				///< 字句解析の行番号
+    uint32_t		tokenpos;			///< トークンの位置
+    uint16_t		yyleng;				///< トークンの長さ
+    char			linebuf[NEWT_LEX_LINEBUFFSIZE];  ///< 行バッファ
 } nps_env_t;
 
 
@@ -216,10 +216,10 @@ int			nps_yycleanup(void);
 newtErr		NPSParse(const char * path, nps_syntax_node_t ** streeP, uint32_t * sizeP, bool is_file);
 
 newtErr		NPSParseFile(const char * path,
-                    nps_syntax_node_t ** streeP, uint32_t * sizeP);
+                         nps_syntax_node_t ** streeP, uint32_t * sizeP);
 
 newtErr		NPSParseStr(const char * s,
-                    nps_syntax_node_t ** streeP, uint32_t * sizeP);
+                        nps_syntax_node_t ** streeP, uint32_t * sizeP);
 
 void		NPSCleanup(void);
 void		NPSDumpSyntaxTree(FILE * f, nps_syntax_node_t * stree, uint32_t size);
@@ -234,14 +234,14 @@ nps_node_t	NPSGenOP1(uint32_t op, nps_node_t op1);
 nps_node_t	NPSGenOP2(uint32_t op, nps_node_t op1, nps_node_t op2);
 
 nps_node_t	NPSGenSend(nps_node_t receiver,
-                    uint32_t op, nps_node_t msg, nps_node_t args);
+                       uint32_t op, nps_node_t msg, nps_node_t args);
 nps_node_t	NPSGenResend(uint32_t op, nps_node_t msg, nps_node_t args);
 
 nps_node_t	NPSGenIfThenElse(nps_node_t cond, nps_node_t ifthen, nps_node_t ifelse);
 nps_node_t	NPSGenForLoop(nps_node_t index, nps_node_t v,
-                    nps_node_t to, nps_node_t by, nps_node_t expr);
+                          nps_node_t to, nps_node_t by, nps_node_t expr);
 nps_node_t	NPSGenForeach(nps_node_t index, nps_node_t val, nps_node_t obj,
-                    nps_node_t deeply, nps_node_t op, nps_node_t expr);
+                          nps_node_t deeply, nps_node_t op, nps_node_t expr);
 nps_node_t	NPSGenGlobalFn(nps_node_t name, nps_node_t args, nps_node_t expr);
 
 newtRef		NPSMakePathExpr(newtRefArg sym1, newtRefArg sym2);

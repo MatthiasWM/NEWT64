@@ -20,15 +20,15 @@
 
 // 未定義の場合はデフォルト値を設定する
 #ifndef	__PLATFORM__
-	#define __PLATFORM__			NULL
+#define __PLATFORM__			NULL
 #endif
 
 #ifndef	__DYLIBSUFFIX__
-	#define __DYLIBSUFFIX__		".so"
+#define __DYLIBSUFFIX__		".so"
 #endif
 
 #ifndef NEWT_EXPORT
-	#define NEWT_EXPORT
+#define NEWT_EXPORT
 #endif
 
 

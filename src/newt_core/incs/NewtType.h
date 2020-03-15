@@ -165,6 +165,7 @@ typedef newtSymData *	newtSymDataRef;
 /// エラーコード
 typedef int32_t		newtErr;
 
+typedef uint32_t        newtUniChar;
 
 #endif /* NEWTTYPE_H */
 

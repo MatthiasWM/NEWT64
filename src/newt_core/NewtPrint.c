@@ -379,7 +379,7 @@ void NIOPrintRef(newtStream_t * f, newtRefArg r)
 
 
 /*------------------------------------------------------------------------*/
-/** 出力ファイルに特殊オブジェクトをプリントする
+/** Print special objects to output file
  *
  * @param f			[in] 出力ファイル
  * @param r			[in] オブジェクト
@@ -391,10 +391,10 @@ void NIOPrintRef(newtStream_t * f, newtRefArg r)
 
 void NIOPrintSpecial(newtStream_t * f, newtRefArg r)
 {
-    int	n;
+    uint64_t n;
     
     n = NewtRefToSpecial(r);
-    NIOFprintf(f, "<Special, %04x>", n);
+    NIOFprintf(f, "<Special, %08x>", n);
 }
 
 

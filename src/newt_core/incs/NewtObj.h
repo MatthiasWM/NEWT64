@@ -27,6 +27,9 @@
 extern "C" {
 #endif
 
+extern newtRef NewtMakeSymbol(const char *s); // used before declaration
+
+
 static inline bool
     NewtRefIsInt62(newtRefArg r)    { return ((r & 3) == 0); } ///< 30bit整数オブジェクトか？
 static inline int64_t
@@ -41,26 +44,41 @@ static inline void*
 static inline newtRef
     NewtMakePointer(void *v)        { return (newtRef)((uintptr_t)v + 1); } ///< ポインタオブジェクトを作成
 
-#define	NewtRefIsCharacter(r)		((r & 0xF) == 6)					///< 文字オブジェクトか？
-#define	NewtRefToCharacter(r)		(int)(((uint32_t)r >> 4) & 0xFFFF)	///< オブジェクト参照を文字に変換
-#define	NewtMakeCharacter(v)		(newtRef)(((uint32_t)(v) << 4) | 6)	///< 文字オブジェクトを作成
+static inline bool
+    NewtRefIsCharacter(newtRefArg r) { return ((r & 0xF) == 6); } ///< 文字オブジェクトか？
+static inline newtUniChar
+    NewtRefToCharacter(newtRefArg r) { return (newtUniChar)((r >> 4) & 0xFFFFFFFF); } ///< オブジェクト参照を文字に変換
+static inline newtRef
+    NewtMakeCharacter(newtUniChar v) { return (newtRef)((((uint64_t)(v)) << 4) | 6); } ///< 文字オブジェクトを作成
 
-#define	NewtRefIsSpecial(r)			((r & 0xF) == 2)					///< 特殊オブジェクトか？
-#define	NewtRefToSpecial(r)			(int32_t)((uint32_t)r >> 2)			///< オブジェクト参照を特殊値に変換
+static inline bool
+    NewtRefIsSpecial(newtRefArg r)  { return ((r & 0xF) == 2); } ///< 特殊オブジェクトか？
+static inline uint64_t
+    NewtRefToSpecial(newtRefArg r)  { return (r >> 2); } ///< オブジェクト参照を特殊値に変換
 
-#define NewtRefIsMagicPointer(r)	((r & 3) == 3)										///< マジックポインタか？（数値および名前付）
+
+static inline bool
+    NewtRefIsMagicPointer(newtRefArg r) { return ((r & 3) == 3); } ///< マジックポインタか？（数値および名前付）
 
 #ifdef __NAMED_MAGIC_POINTER__
-#	define NewtRefIsNamedMP(r)		((r & 0x80000003) == 0x80000003)					///< 名前付マジックポインタか？
-#	define NewtMakeNamedMP(r)		NewtSymbolToMP(NewtMakeSymbol(r))					///< 名前付マジックポインタを作成
-#	define NewtMPToSymbol(r)		((newtRef)((((uint32_t)r << 1) & 0xFFFFFFF8) | 1))	///< 名前付マジックポインタをシンボルに変換
-#	define NewtSymbolToMP(r)		((newtRef)(((uint32_t)r >> 1) | 0x80000003))		///< シンボルを名前付マジックポインタに変換
+static inline bool
+    NewtRefIsNamedMP(newtRefArg r)  { return ((r & 0x8000000000000003) == 0x8000000000000003); } ///< 名前付マジックポインタか？
+static inline newtRef
+    NewtMPToSymbol(newtRefArg r)    { return (((r << 1) & 0xFFFFFFFFFFFFFFF8) | 1); } ///< 名前付マジックポインタをシンボルに変換
+static inline newtRef
+    NewtSymbolToMP(newtRefArg r)    { return ((r >> 1) | 0x8000000000000003); } ///< シンボルを名前付マジックポインタに変換
+static inline newtRef
+    NewtMakeNamedMP(const char *r)  { return NewtSymbolToMP(NewtMakeSymbol(r)); } ///< 名前付マジックポインタを作成
 #endif /* __NAMED_MAGIC_POINTER__ */
 
-#define NewtRefIsNumberedMP(r)		((r & 0x80000003) == 3)								///< 数値マジックポインタか？
-#define NewtMakeMagicPointer(t, i)	((newtRef)((t << 14) | ((i & 0x03ff) << 2) | 3))	///< マジックポインタを作成
-#define	NewtMPToTable(r)			((int32_t)((uint32_t)r >> 14))						///< マジックポインタのテーブル番号を取得
-#define	NewtMPToIndex(r)			((int32_t)(((uint32_t)r >> 2) & 0x03ff))			///< マジックポインタのインデックスを取得
+static inline bool
+    NewtRefIsNumberedMP(newtRefArg r) { return ((r & 0x8000000000000003) == 3); } ///< 数値マジックポインタか？
+static inline newtRef
+    NewtMakeMagicPointer(uint32_t t, uint32_t i) { return (newtRef)((t << 14) | ((i & 0x03ff) << 2) | 3); } ///< マジックポインタを作成
+static inline uint32_t
+    NewtMPToTable(newtRefArg r)     { return (uint32_t)(r >> 14);} ///< マジックポインタのテーブル番号を取得
+static inline uint32_t
+    NewtMPToIndex(newtRefArg r)     { return (uint32_t)((r >> 2) & 0x03ff); } ///< マジックポインタのインデックスを取得
 
 #define	NewtRefIsNotNIL(v)			(! NewtRefIsNIL(v))								///< NIL 以外か？
 #define	NewtMakeBoolean(v)			((newtRef)((v)?(kNewtRefTRUE):(kNewtRefNIL)))	///< ブール値オブジェクトを作成

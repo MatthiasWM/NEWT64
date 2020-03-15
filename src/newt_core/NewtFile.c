@@ -797,7 +797,6 @@ newtRef NsLoadBinary(newtRefArg rcvr, newtRefArg r)
  *
  * @return		error code
  */
-
 newtRef NsSaveBinary(newtRefArg rcvr, newtRefArg r1, newtRefArg r2)
 {
     if (NewtRefIsBinary(r1)) {

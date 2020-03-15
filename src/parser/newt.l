@@ -39,7 +39,8 @@ static void			lex_newline(void);
 static char *		lex_truncstr(char *s);
 static char *		lex_escapestr(char *s);
 static char			lex_escapechar(char c);
-static int			lex_htoi(char *s, int len);
+static int          lex_htoi(char *s, int len);
+static uint64_t     lex_htoll(char *s, int len);
 static uint32_t		lex_getop(char *s);
 static int			lex_op(char *s, int op);
 static int			lex_reserveword(int tokn, char *s);
@@ -48,7 +49,7 @@ static int			lex_makesymbol(char *s, bool trunc);
 static int			lex_makestring(char *s, bool trunc);
 static int			lex_makeregex(char *s, bool trunc);
 static int			lex_makechar(int c);
-static int			lex_makeinteger(int n);
+static int			lex_makeinteger(int64_t n);
 static int			lex_makereal(double n);
 
 static int			lex_makemagicpointer(int n);
@@ -187,8 +188,8 @@ __LINE__						{ return lex_makeinteger(nps_env.lineno); }
 "@"{SYMBOL}						{ return lex_makenamedmp(yytext + 1, false); }
 "@""|"{SYMBOL-SEQUENCE}"|"		{ return lex_makenamedmp(yytext + 1, true); }
 
-{DIGIT}+						{ return lex_makeinteger(atoi(yytext)); }
-"0x"{HEX-DIGIT}+				{ return lex_makeinteger(lex_htoi(yytext + 2, -1)); }
+{DIGIT}+						{ return lex_makeinteger(atoll(yytext)); }
+"0x"{HEX-DIGIT}+				{ return lex_makeinteger(lex_htoll(yytext + 2, -1)); }
 
 {REAL}							{ return lex_makereal(atof(yytext)); }
 
@@ -427,7 +428,6 @@ char lex_escapechar(char c)
  *
  * @return			整数
  */
-
 int lex_htoi(char *s, int len)
 {
     int	n = 0;
@@ -445,6 +445,35 @@ int lex_htoi(char *s, int len)
             n += *s - 'a' + 10;
         else
             n += *s - '0';
+
+        s++;
+        len--;
+    }
+
+    return n;
+}
+
+
+/*------------------------------------------------------------------------*/
+/** 64 bit version of reading a hexadecimal number
+ */
+uint64_t lex_htoll(char *s, int len)
+{
+    uint64_t n = 0;
+
+    if (len < 0)
+    len = (int)strlen(s) + 1 + len;
+
+    while (0 < len)
+    {
+        n *= 16;
+
+        if ('A' <= *s && *s <= 'F')
+        n += *s - 'A' + 10;
+        else if ('a' <= *s && *s <= 'f')
+        n += *s - 'a' + 10;
+        else
+        n += *s - '0';
 
         s++;
         len--;
@@ -630,7 +659,7 @@ int lex_makechar(int c)
  * @return			トークンID
  */
 
-int lex_makeinteger(int n)
+int lex_makeinteger(int64_t n)
 {
     yylval.obj = NewtMakeInteger(n);
     lex_debug(kINTEGER);

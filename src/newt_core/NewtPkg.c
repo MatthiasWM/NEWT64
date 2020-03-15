@@ -128,7 +128,8 @@ static newtRef	PkgWriteBinary(pkg_stream_t *pkg, newtRefArg obj);
 static newtRef	PkgWriteObject(pkg_stream_t *pkg, newtRefArg obj);
 static void		PkgWritePart(pkg_stream_t *pkg, newtRefArg part);
 
-static uint32_t	PkgReadU32(uint8_t *d) ;
+static uint32_t    PkgReadU32(uint8_t *d) ;
+static uint64_t    PkgReadU64(uint8_t *d) ;
 static newtRef	PkgPartGetInstance(pkg_stream_t *pkg, uint32_t p_obj);
 static void		PkgPartSetInstance(pkg_stream_t *pkg, uint32_t p_obj, newtRefArg r);
 static newtRef	PkgReadRef(pkg_stream_t *pkg, uint32_t p_obj);
@@ -237,7 +238,7 @@ uint32_t PkgGetSlotInt(newtRefArg frame, newtRefArg name, uint32_t def)
         return def;
     slot = NewtGetArraySlot(frame, ix);
     if (NewtRefIsInteger(slot)) {
-        return NewtRefToInteger(slot);
+        return (uint32_t)NewtRefToInteger(slot);
     } else {
         return def;
     }
@@ -472,11 +473,7 @@ newtRef PkgWriteBinary(pkg_stream_t *pkg, newtRefArg obj)
     PkgWriteU32(pkg, dst+8, klass_ref);
     
     // copy the binary data over
-    if (klass==NSSYM0(int32)) {
-        uint32_t *s = (uint32_t*)data;
-        uint32_t  v = htonl(*s);
-        PkgWriteData(pkg, dst+12, &v, sizeof(v));
-    } else if (klass==NSSYM0(real)) {
+    if (klass==NSSYM0(real)) {
         // this code fails miserably if 'double' is not an 8-byte IEEE value!
         double *s = (double*)data;
         double  v = htond(*s);
@@ -706,14 +703,28 @@ newtRef NewtWritePkg(newtRefArg package)
 
 /*------------------------------------------------------------------------*/
 /** Endian-neutral conversion of four bytes into one uint32
- * 
- * @param d		[in] pointer to byte array
  *
- * @retval	uint32 assembled from four bytes
+ * @param d        [in] pointer to byte array
+ *
+ * @retval    uint32 assembled from four bytes
  */
-uint32_t PkgReadU32(uint8_t *d) 
+uint32_t PkgReadU32(uint8_t *d)
 {
     return ((d[0]<<24)|(d[1]<<16)|(d[2]<<8)|(d[3]));
+}
+
+/*------------------------------------------------------------------------*/
+/** Endian-neutral conversion of eight bytes into one uint64
+ *
+ * @param d        [in] pointer to byte array
+ *
+ * @retval    uint64 assembled from eight bytes
+ */
+uint64_t PkgReadU64(uint8_t *d)
+{
+    uint64_t a = PkgReadU32(d);
+    uint64_t b = PkgReadU32(d+4);
+    return (a<<32)|b;
 }
 
 /*------------------------------------------------------------------------*/
@@ -789,7 +800,6 @@ newtRef PkgReadBinaryObject(pkg_stream_t *pkg, uint32_t p_obj)
 {
     uint32_t size = PkgReadU32(pkg->data + p_obj) >> 8;
     newtRef klass, result = kNewtRefNIL;
-    newtRef ins = NSSYM0(instructions);
     
     klass = PkgReadRef(pkg, p_obj+8);
     
@@ -807,9 +817,9 @@ newtRef PkgReadBinaryObject(pkg_stream_t *pkg, uint32_t p_obj)
 #		endif /* HAVE_LIBICONV */
         if (result==kNewtRefNIL)
             result = NewtMakeString2(src, sze, true);
-    } else if (klass==NSSYM0(int32)) {
-        uint32_t v = PkgReadU32(pkg->data + p_obj + 12);
-        result = NewtMakeInt32(v);
+    } else if (klass==NSSYM0(int64)) {
+        uint64_t v = PkgReadU64(pkg->data + p_obj + 12);
+        result = NewtMakeInt64(v);
     } else if (klass==NSSYM0(real)) {
         double *v = (double*)(pkg->data + p_obj + 12);
         result = NewtMakeReal(ntohd(*v));
@@ -954,7 +964,7 @@ newtRef PkgReadNOSPart(pkg_stream_t *pkg)
     // verify that we have a correct lead-in 
     if (PkgReadU32(pkg->part)!=0x00001041 || PkgReadU32(pkg->part+8)!=0x00000002) {
 #		ifdef DEBUG_PKG
-        printf("*** PkgReader: PkgReadPart - unsupported NOS Part intro at %d\n",
+        printf("*** PkgReader: PkgReadPart - unsupported NOS Part intro at %ld\n",
                pkg->part-pkg->data);
 #		endif
         return kNewtRefNIL;
@@ -1000,8 +1010,8 @@ newtRef PkgReadPart(pkg_stream_t *pkg, int32_t index)
     
     frame = NewtMakeFrame2(sizeof(ptv) / (sizeof(newtRefVar) * 2), ptv);
     
-    NcSetSlot(frame, NSSYM(flags), NewtMakeInt32(flags));
-    NcSetSlot(frame, NSSYM(type), NewtMakeInt32(ntohl(pkg->part_header->type)));
+    NcSetSlot(frame, NSSYM(flags), NewtMakeInteger(flags));
+    NcSetSlot(frame, NSSYM(type), NewtMakeInteger(ntohl(pkg->part_header->type)));
     
     switch (flags&0x03) {
         case kNOSPart:
@@ -1086,12 +1096,12 @@ newtRef PkgReadHeader(pkg_stream_t *pkg)
     newtRefVar	frame = NewtMakeFrame2(sizeof(fnv) / (sizeof(newtRefVar) * 2), fnv);
     newtRefVar	parts;
     
-    NcSetSlot(frame, NSSYM(type), NewtMakeInt32(ntohl(pkg->header->type)));
+    NcSetSlot(frame, NSSYM(type), NewtMakeInteger(ntohl(pkg->header->type)));
     NcSetSlot(frame, NSSYM(pkg_version), NewtMakeInteger(pkg->pkg_version));
-    NcSetSlot(frame, NSSYM(version), NewtMakeInt32(ntohl(pkg->header->version)));
+    NcSetSlot(frame, NSSYM(version), NewtMakeInteger(ntohl(pkg->header->version)));
     NcSetSlot(frame, NSSYM(copyright), PkgReadVardataString(pkg, &pkg->header->copyright));
     NcSetSlot(frame, NSSYM(name), PkgReadVardataString(pkg, &pkg->header->name));
-    NcSetSlot(frame, NSSYM(flags), NewtMakeInt32(ntohl(pkg->header->flags)));
+    NcSetSlot(frame, NSSYM(flags), NewtMakeInteger(ntohl(pkg->header->flags)));
     
     parts = NewtMakeArray(kNewtRefNIL, pkg->num_parts);
     
@@ -1145,7 +1155,7 @@ newtRef NewtReadPkg(uint8_t * data, size_t size)
     if (size<sizeof(pkg_header_t))
         return kNewtRefNIL;
     
-    if (!PkgIsPackage(data))
+    if (!PkgIsPackage((char*)data))
         return kNewtRefNIL;
     
     memset(&pkg, 0, sizeof(pkg));

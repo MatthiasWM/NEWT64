@@ -317,7 +317,7 @@ newtRef NewtFgets(FILE * stream)
     
     while ((str = fgets(buff, sizeof(buff), stream)) != NULL)
     {
-        len = strlen(str);
+        len = (int)strlen(str);
         
         if (result == kNewtRefNIL)
         {	// 文字列オブジェクト作成

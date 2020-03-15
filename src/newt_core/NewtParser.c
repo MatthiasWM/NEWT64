@@ -96,7 +96,7 @@ int nps_yyinput_str(char * buff, int max_size)
 {
     int	n;
     
-    n = nps_inputdata.limit - nps_inputdata.currp;
+    n = (int)(nps_inputdata.limit - nps_inputdata.currp);
     if (max_size < n) n = max_size;
     
     if (0 < n)
@@ -124,7 +124,7 @@ int nps_yyinput(FILE * yyin, char * buff, int max_size)
     if (nps_inputdata.data != NULL)
         return nps_yyinput_str(buff, max_size);
     else
-        return fread(buff, 1, max_size, yyin);
+        return (int)fread(buff, 1, max_size, yyin);
 }
 
 
@@ -1022,7 +1022,7 @@ void NPSErrorStr(char c, char * s)
 #ifdef NEWT0_IGNORE_TABS
     NewtFprintf(stderr, "%*s\n", nps_env.tokenpos - nps_env.yyleng + 1, "^");
 #else
-    int i = 0, n = nps_env.tokenpos - nps_env.yyleng, m = strlen(nps_env.linebuf);
+    int i = 0, n = nps_env.tokenpos - nps_env.yyleng, m = (int)strlen(nps_env.linebuf);
     for ( ; i<n; ++i ) {
         if (i<m && nps_env.linebuf[i]=='\t') 
             NewtFprintf(stderr, "\t");

@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 
 #include "config.h"
 
@@ -34,7 +35,7 @@ static uint32_t		NewtObjStringLength(newtObjRef obj);
 static newtObjRef   NewtObjStringSetLength(newtObjRef obj, uint32_t n);
 static void			NewtMakeInitSlots(newtRefArg r, uint32_t st, uint32_t n, uint32_t step, const newtRefVar v[]);
 static newtObjRef   NewtObjSlotsSetLength(newtObjRef obj, uint32_t n, newtRefArg v);
-static int			NewtInt32Compare(newtRefArg r1, newtRefArg r2);
+static int			NewtInt64Compare(newtRefArg r1, newtRefArg r2);
 static int			NewtRealCompare(newtRefArg r1, newtRefArg r2);
 static int			NewtStringCompare(newtRefArg r1, newtRefArg r2);
 static int			NewtBinaryCompare(newtRefArg r1, newtRefArg r2);
@@ -98,7 +99,7 @@ newtRef NewtMakeSymbol0(const char *s)
     newtObjRef	obj;
     uint32_t	size;
     
-    size = sizeof(uint32_t) + strlen(s) + 1;
+    size = (uint32_t)(sizeof(uint32_t) + strlen(s) + 1);
     obj = NewtObjAlloc(kNewtSymbolClass, size, 0, true);
     
     if (obj != NULL)
@@ -275,7 +276,7 @@ uint16_t NewtGetRefType(newtRefArg r, bool detail)
     switch (r & 3)
     {
         case 0:	// Integer
-            type = kNewtInt30;
+            type = kNewtInt62;
             break;
             
         case 1:	// Pointer
@@ -346,8 +347,8 @@ uint16_t NewtGetObjectType(newtObjRef obj, bool detail)
                     type = kNewtSymbol;
                 else if (NewtRefEqual(obj->as.klass, NSSYM0(string)))
                     type = kNewtString;
-                else if (NewtRefEqual(obj->as.klass, NSSYM0(int32)))
-                    type = kNewtInt32;
+                else if (NewtRefEqual(obj->as.klass, NSSYM0(int64)))
+                    type = kNewtInt64;
                 else if (NewtRefEqual(obj->as.klass, NSSYM0(real)))
                     type = kNewtReal;
                 else if (NewtIsSubclass(obj->as.klass, NSSYM0(string)))
@@ -825,7 +826,7 @@ bool NewtRefIsString(newtRefArg r)
 
 bool NewtRefIsInteger(newtRefArg r)
 {
-    return (NewtRefIsInt62(r) || NewtRefIsInt32(r));
+    return (NewtRefIsInt62(r) || NewtRefIsInt64(r));
 }
 
 
@@ -861,9 +862,9 @@ int64_t NewtRefToInteger(newtRefArg r)
  * @retval			false   32bit整数でない
  */
 
-bool NewtRefIsInt32(newtRefArg r)
+bool NewtRefIsInt64(newtRefArg r)
 {
-    return (kNewtInt32 == NewtGetRefType(r, true));
+    return (kNewtInt64 == NewtGetRefType(r, true));
 }
 
 
@@ -1225,7 +1226,7 @@ newtRef NewtMakeBinary(newtRefArg klass, uint8_t * data, uint32_t size, bool lit
 
 newtRef NewtMakeBinaryFromHex(newtRefArg klass, const char *hex, bool literal)
 {
-    uint32_t size = strlen(hex)/2;
+    uint32_t size = (uint32_t)strlen(hex)/2;
     newtRef obj = NewtMakeBinary(klass, 0, size, literal);
     if (obj) {
         uint32_t i;
@@ -1308,7 +1309,7 @@ uint32_t NewtObjSymbolLength(newtObjRef obj)
     newtSymDataRef	sym;
     
     sym = NewtObjToSymbol(obj);
-    return strlen(sym->name);
+    return (uint32_t)strlen(sym->name);
 }
 
 
@@ -1323,7 +1324,7 @@ uint32_t NewtObjSymbolLength(newtObjRef obj)
 
 newtRef NewtMakeString(const char *s, bool literal)
 {
-    return NewtMakeBinary(NSSYM0(string), (uint8_t *)s, strlen(s) + 1, literal); 
+    return NewtMakeBinary(NSSYM0(string), (uint8_t *)s, (uint32_t)strlen(s) + 1, literal);
 }
 
 
@@ -1377,7 +1378,7 @@ uint32_t NewtObjStringLength(newtObjRef obj)
     char *	s;
     
     s = NewtObjToString(obj);
-    return strlen(s);
+    return (uint32_t)strlen(s);
 }
 
 
@@ -1433,7 +1434,7 @@ newtRef NewtMakeInteger(int64_t v)
     else
     {
         // 64bit version
-        return NewtMakeInt32(v);
+        return NewtMakeInt64(v);
     }
 }
 
@@ -1446,9 +1447,9 @@ newtRef NewtMakeInteger(int64_t v)
  * @return			32bit整数オブジェクト
  */
 
-newtRef NewtMakeInt32(int32_t v)
+newtRef NewtMakeInt64(int64_t v)
 {
-    return NewtMakeBinary(NSSYM0(int32), (uint8_t *)&v, sizeof(v), true); 
+    return NewtMakeBinary(NSSYM0(int64), (uint8_t *)&v, sizeof(v), true); 
 }
 
 
@@ -1534,7 +1535,7 @@ newtRef NewtMakeArray2(newtRefArg klass, uint32_t n, const newtRefVar v[])
 newtRef NewtMakeMap(newtRefArg superMap, uint32_t n, newtRefVar v[])
 {
     newtRefVar	r;
-    int32_t	flags = 0;
+    int64_t	flags = 0;
     
     r = NewtMakeSlotsObj(NewtMakeInteger(flags), n + 1, 0);
     NewtSetArraySlot(r, 0, superMap);
@@ -1582,7 +1583,7 @@ newtRef NewtMakeMap(newtRefArg superMap, uint32_t n, newtRefVar v[])
 
 void NewtSetMapFlags(newtRefArg map, int32_t bit)
 {
-    int32_t	flags;
+    int64_t	flags;
     
     flags = NewtRefToInteger(NcClassOf(map));
     flags |= bit;
@@ -1601,7 +1602,7 @@ void NewtSetMapFlags(newtRefArg map, int32_t bit)
 
 void NewtClearMapFlags(newtRefArg map, int32_t bit)
 {
-    int32_t	flags;
+    int64_t	flags;
     
     flags = NewtRefToInteger(NcClassOf(map));
     flags &= ~ bit;
@@ -2315,10 +2316,10 @@ const char * NewtErrorMessage(int32_t err) {
  * @retval			1		r1 > r2
  */
 
-int NewtInt32Compare(newtRefArg r1, newtRefArg r2)
+int NewtInt64Compare(newtRefArg r1, newtRefArg r2)
 {
-    int32_t	i1;
-    int32_t	i2;
+    int64_t	i1;
+    int64_t	i2;
     
     i1 = NewtRefToInteger(r1);
     i2 = NewtRefToInteger(r2);
@@ -2481,15 +2482,15 @@ uint16_t NewtArgsType(newtRefArg r1, newtRefArg r2)
     if (type1 == type2)
         return type1;
     
-    if (type1 == kNewtInt30)
-        type1 = kNewtInt32;
+    if (type1 == kNewtInt62)
+        type1 = kNewtInt64;
     
-    if (type2 == kNewtInt30)
-        type2 = kNewtInt32;
+    if (type2 == kNewtInt62)
+        type2 = kNewtInt64;
     
-    if (type1 == kNewtInt32 && type2 == kNewtReal)
+    if (type1 == kNewtInt64 && type2 == kNewtReal)
         type1 = kNewtReal;
-    else if (type1 == kNewtReal && type2 == kNewtInt32)
+    else if (type1 == kNewtReal && type2 == kNewtInt64)
         type2 = kNewtReal;
     
     if (type1 == type2)
@@ -2516,10 +2517,10 @@ int16_t NewtObjectCompare(newtRefArg r1, newtRefArg r2)
     
     switch (NewtArgsType(r1, r2))
     {
-        case kNewtInt30:
-            if ((int32_t)r1 < (int32_t)r2)
+        case kNewtInt62:
+            if ((int64_t)r1 < (int64_t)r2)
                 r = -1;
-            else if ((int32_t)r1 > (int32_t)r2)
+            else if ((int64_t)r1 > (int64_t)r2)
                 r = 1;
             else
                 r = 0;
@@ -2534,8 +2535,8 @@ int16_t NewtObjectCompare(newtRefArg r1, newtRefArg r2)
                 r = 0;
             break;
             
-        case kNewtInt32:
-            r = NewtInt32Compare(r1, r2);
+        case kNewtInt64:
+            r = NewtInt64Compare(r1, r2);
             break;
             
         case kNewtReal:
@@ -2580,8 +2581,8 @@ bool NewtRefEqual(newtRefArg r1, newtRefArg r2)
     
     switch (NewtArgsType(r1, r2))
     {
-        case kNewtInt32:
-            r = NewtInt32Compare(r1, r2);
+        case kNewtInt64:
+            r = NewtInt64Compare(r1, r2);
             break;
             
         case kNewtReal:
@@ -2838,7 +2839,7 @@ uint32_t NewtDeeplyFrameLength(newtRefArg r)
 
 bool NewtObjHasProto(newtObjRef obj)
 {
-    int32_t	flags;
+    int64_t	flags;
     
     if (NewtRefIsNIL(obj->as.map))
         return false;
@@ -2897,7 +2898,7 @@ bool NewtMapIsSorted(newtRefArg r)
     klass = NcClassOf(r);
     if (! NewtRefIsInteger(klass)) return false;
     
-    flags = NewtRefToInteger(klass);
+    flags = (uint32_t)NewtRefToInteger(klass);
     
     return ((flags & kNewtMapSorted) != 0);
 }
@@ -3059,7 +3060,7 @@ void NewtDeeplyCopyMap(newtRef * dst, int32_t * pos, newtRefArg src)
 newtRef NewtDeeplyCloneMap(newtRefArg map, int32_t len)
 {
     newtRefVar	newMap;
-    int32_t	flags;
+    int64_t	flags;
     int32_t	i = 1;
     
     flags = NewtRefToInteger(NcClassOf(map));
@@ -3139,7 +3140,7 @@ void NewtObjRemoveSlot(newtObjRef obj, newtRefArg slot)
         }
         
         int32_t	i;
-        i = NewtRefToInteger(slot);
+        i = (int32_t)NewtRefToInteger(slot);
         NewtObjRemoveArraySlot(obj, i);
     }
 }
@@ -3384,20 +3385,23 @@ bool NewtHasSlot(newtRefArg frame, newtRefArg slot)
 
 
 /*------------------------------------------------------------------------*/
-/** スロットオブジェクトのアクセスパスから値を取得する
+/** Get value from slot object access path
  *
- * @param r			[in] オブジェクト
- * @param p			[in] アクセスパス
+ * @param r			[in] Object
+ * @param p			[in] Access pass
  *
  * @return			値オブジェクト
  */
 
 newtRef NewtSlotsGetPath(newtRefArg r, newtRefArg p)
 {
-    if (NewtRefIsArray(r))
+    if (NewtRefIsArray(r)) {
+        assert(0);
+        // FIXME: huh? The second argument is an integer. Casting this seems wrong.
         return NewtGetArraySlot(r, p);
-    else
+    } else {
         return NcFullLookup(r, p);
+    }
 }
 
 
@@ -3518,7 +3522,7 @@ newtRef NewtSetBinarySlot(newtRefArg r, uint32_t p, newtRefArg v)
     if (p < len)
     {
         uint8_t *	data;
-        int32_t	n;
+        int64_t	n;
         
         if (! NewtRefIsInteger(v))
             return NewtThrow(kNErrNotAnInteger, v);
@@ -4223,11 +4227,11 @@ bool NewtStrHasSubclass(char * sub, uint32_t sublen, char * supr, uint32_t suprl
         w = strchr(sub, ';');
         if (w == NULL) break;
         
-        if (NewtStrIsSubclass(sub, w - sub, supr, suprlen))
+        if (NewtStrIsSubclass(sub, (uint32_t)(w - sub), supr, suprlen))
             return true;
         
         sub = w + 1;
-        sublen = last - sub;
+        sublen = (uint32_t)(last - sub);
     } while (true);
     
     return NewtStrIsSubclass(sub, sublen, supr, suprlen);
@@ -4347,7 +4351,7 @@ newtRef NewtStrCat2(newtRefArg r, char * s, size_t slen)
         uint32_t	dstlen;
         
         tgtlen = NewtObjStringLength(obj);
-        dstlen = tgtlen + slen;
+        dstlen = (uint32_t)(tgtlen + slen);
         
         if (NewtObjSize(obj) <= dstlen)
             obj = NewtObjStringSetLength(obj, dstlen);

@@ -36,7 +36,7 @@
 /// オブジェクトタイプ（内部でのみ使用）
 enum {
     kNewtUnknownType		= 0,	///< 不明なタイプ
-    kNewtInt30,						///< 30bit整数（即値）
+    kNewtInt62,						///< 30bit整数（即値）
     kNewtPointer,					///< ポインタ参照
     kNewtCharacter,					///< 文字（即値）
     kNewtSpecial,					///< 特殊参照（即値）
@@ -51,7 +51,7 @@ enum {
     kNewtFrame,						///< フレーム
     
     //　バイナリオブジェクト
-    kNewtInt32,						///< 32bit整数
+    kNewtInt64,						///< 32bit整数
     kNewtReal,						///< 浮動小数点
     kNewtSymbol,					///< シンボル
     kNewtString						///< 文字列

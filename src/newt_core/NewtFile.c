@@ -155,7 +155,7 @@ char * NewtGetHomeDir(const char * s, char ** subdir)
     
     if (sepp != NULL)
     {
-        len = sepp - (s + 1);
+        len = (uint32_t)(sepp - (s + 1));
         login = malloc(len + 1);
         strncpy(login, s + 1, len);
         pswd = getpwnam(s + 1);
@@ -211,8 +211,8 @@ char * NewtJoinPath(char * s1, char * s2, char sep)
     uint32_t	len1;
     uint32_t	len2;
     
-    len1 = strlen(s1);
-    len2 = strlen(s2);
+    len1 = (uint32_t)strlen(s1);
+    len2 = (uint32_t)strlen(s2);
     
     len = len1 + len2 + 2;
     
@@ -683,7 +683,7 @@ newtRef NsDirName(newtRefArg rcvr, newtRefArg r)
             base--;
         
         if (s < base)
-            return NewtMakeString2(s, base - s, false);
+            return NewtMakeString2(s, (uint32_t)(base - s), false);
     }
     
     return NSSTR(".");
@@ -780,9 +780,9 @@ newtRef NsLoadBinary(newtRefArg rcvr, newtRefArg r)
         size_t size = ftell(f);
         fseek(f, 0, SEEK_SET);
         uint8_t *data = (uint8_t*)malloc(size);
-        int err = fread(data, size, 1, f);
+        /*int err = (int)*/ fread(data, size, 1, f);
         fclose(f);
-        return NewtMakeBinary(NSSYM(data), data, size, false); 
+        return NewtMakeBinary(NSSYM(data), data, (uint32_t)size, false);
     } else {
         return NewtThrow(kNErrNotAString, r);
     }

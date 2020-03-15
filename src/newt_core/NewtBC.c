@@ -306,9 +306,9 @@ void NBCGenPUSH(newtRefArg r)
 {
     switch (NewtGetRefType(r, false))
     {
-        case kNewtInt30:
+        case kNewtInt62:
         {
-            int32_t	n;
+            int64_t	n;
             
             n = NewtRefToInteger(r);
             

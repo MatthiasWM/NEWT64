@@ -145,7 +145,7 @@ void NewtInitSYM(void)
     INITSYM(array);
     INITSYM(frame);
     INITSYM2(NS_INT, "int");
-    INITSYM(int32);
+    INITSYM(int64);
     INITSYM(pathExpr);
     INITSYM(bits);
     INITSYM(cbits);
@@ -831,7 +831,7 @@ newtRef NsDefMagicPointer(newtRefArg rcvr, newtRefArg r, newtRefArg v)
     }
     else if (NewtRefIsInteger(r))
     {
-        index = NewtRefToInteger(r);
+        index = (int32_t)NewtRefToInteger(r);
     }
     else
     {

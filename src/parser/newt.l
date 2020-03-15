@@ -433,7 +433,7 @@ int lex_htoi(char *s, int len)
     int	n = 0;
 
     if (len < 0)
-        len = strlen(s) + 1 + len;
+        len = (int)strlen(s) + 1 + len;
 
     while (0 < len)
     {
@@ -467,7 +467,7 @@ uint32_t lex_getop(char *s)
     uint32_t	op;
     int	len;
 
-	len = strlen(s);
+	len = (int)strlen(s);
 
     if (len == 1)
     {

@@ -189,7 +189,7 @@ bool NewtBeginsWith(const char * str, const char * sub)
 
 bool NewtEndsWith(const char * str, const char * sub)
 {
-    int32_t	st;
+    size_t	st;
     
     st = strlen(str) - strlen(sub);
     
@@ -219,7 +219,7 @@ newtRef NsChr(newtRefArg rcvr, newtRefArg r)
     if (! NewtRefIsInteger(r))
         return NewtThrow(kNErrNotAnInteger, r);
     
-    return NewtMakeCharacter(NewtRefToInteger(r));
+    return NewtMakeCharacter((newtUniChar)NewtRefToInteger(r));
 }
 
 
@@ -364,7 +364,7 @@ newtRef NsStrPos(newtRefArg rcvr, newtRefArg haystack, newtRefArg needle, newtRe
         return NewtThrow(kNErrNotAnInteger, start);
     }
     
-    int offset = NewtRefToInteger(start);
+    size_t offset = NewtRefToInteger(start);
     if (offset < 0) {
         offset = -1; //strlen(s) + offset;
     }
@@ -392,7 +392,7 @@ newtRef NsStrPos(newtRefArg rcvr, newtRefArg haystack, newtRefArg needle, newtRe
         return kNewtRefNIL;
     }
     
-    return NewtMakeInt32(match - s);
+    return NewtMakeInteger(match - s);
 }
 
 newtRef NsStrReplace(newtRefArg rcvr, newtRefArg string, newtRefArg substr, newtRefArg replacement, newtRefArg count) {
@@ -434,15 +434,15 @@ newtRef NsStrReplace(newtRefArg rcvr, newtRefArg string, newtRefArg substr, newt
     
     if (NewtRefIsInteger(count)) {
         if (occurences > NewtRefToInteger(count)) {
-            occurences = NewtRefToInteger(count);
+            occurences = (int)NewtRefToInteger(count);
         }
     }
     
     if (occurences == 0) {
-        return NewtMakeInt32(0);
+        return NewtMakeInteger(0);
     }
     
-    int mallocLen = strlen(orig) + (len_with - len_rep) * occurences + 1;
+    int mallocLen = (int)strlen(orig) + (len_with - len_rep) * occurences + 1;
     char *result = tmp = calloc(mallocLen, sizeof(char *));
     
     if (!tmp) {
@@ -452,7 +452,7 @@ newtRef NsStrReplace(newtRefArg rcvr, newtRefArg string, newtRefArg substr, newt
     int remaining = occurences;
     while (remaining--) {
         ins = strstr(orig, rep);
-        len_front = ins - orig;
+        len_front = (int)(ins - orig);
         strncpy(tmp, orig, len_front);
         tmp+=len_front;
         strncpy(tmp, with, len_with);
@@ -462,11 +462,11 @@ newtRef NsStrReplace(newtRefArg rcvr, newtRefArg string, newtRefArg substr, newt
     strcpy(tmp, orig);
     
     orig = NewtRefToString(string);
-    NewtSetLength(string, strlen(result));
+    NewtSetLength(string, (int)strlen(result));
     strcpy(NewtRefToData(string), result);
     free(result);
     
-    return NewtMakeInt32(occurences);
+    return NewtMakeInteger(occurences);
 }
 
 /*------------------------------------------------------------------------*/
@@ -524,7 +524,7 @@ newtRef NsSubStr(newtRefArg rcvr, newtRefArg r, newtRefArg start, newtRefArg cou
     theString = NewtRefToString(r);
     theLen = strlen(theString);
     
-    theStart = NewtRefToInteger(start);
+    theStart = (int)NewtRefToInteger(start);
     if (theStart > theLen) {
         return NewtMakeString("", true);
     }
@@ -535,13 +535,13 @@ newtRef NsSubStr(newtRefArg rcvr, newtRefArg r, newtRefArg start, newtRefArg cou
         {
             return NewtThrow(kNErrNotAnInteger, count);
         }
-        theEnd = theStart + NewtRefToInteger(count);
+        theEnd = theStart + (int)NewtRefToInteger(count);
         if (theEnd > theLen)
         {
-            theEnd = theLen;
+            theEnd = (int)theLen;
         }
     } else {
-        theEnd = theLen;
+        theEnd = (int)theLen;
     }
     
     /* new length */

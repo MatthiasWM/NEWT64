@@ -445,7 +445,7 @@ newtErr NVMGetExceptionErrCode(newtRefArg r, bool dump)
     err = NcGetSlot(r, NSSYM0(error));
 
     if (NewtRefIsNotNIL(err))
-        return NewtRefToInteger(err);
+        return (newtErr)NewtRefToInteger(err);
 
     return kNErrBadExceptionName;
 }
@@ -889,7 +889,7 @@ bool excp_push(newtRefArg sym, newtRefArg pc)
     excp->callsp = CALLSP;
     excp->excppc = PC;
     excp->sym = sym;
-    excp->pc = NewtRefToInteger(pc);
+    excp->pc = (uint32_t)NewtRefToInteger(pc);
 
     EXCPSP++;
 
@@ -1036,8 +1036,8 @@ void iter_next(newtRefArg iter)
 
     obj = NewtGetArraySlot(iter, kIterObj);
     deeply = NewtGetArraySlot(iter, kIterDeeply);
-    pos = NewtRefToInteger(NewtGetArraySlot(iter, kIterPos));
-    len = NewtRefToInteger(NewtGetArraySlot(iter, kIterMax));
+    pos = (int32_t)NewtRefToInteger(NewtGetArraySlot(iter, kIterPos));
+    len = (int32_t)NewtRefToInteger(NewtGetArraySlot(iter, kIterMax));
     map = NewtGetArraySlot(iter, kIterMap);
 
     if (NewtRefIsNIL(deeply) || NewtRefIsNIL(map))
@@ -1112,8 +1112,8 @@ void iter_next(newtRefArg iter)
 
 bool iter_done(newtRefArg iter)
 {
-    int32_t	pos;
-    int32_t	len;
+    int64_t	pos;
+    int64_t	len;
 
     pos = NewtRefToInteger(NewtGetArraySlot(iter, kIterPos));
     len = NewtRefToInteger(NewtGetArraySlot(iter, kIterMax));
@@ -1164,7 +1164,7 @@ void NVMBindArgs(uint16_t numArgs)
     int16_t		i;
     newtRefVar	v;
 
-    minArgs = NewtRefToInteger(NcGetSlot(FUNC, NSSYM0(numArgs)));
+    minArgs = (int32_t)NewtRefToInteger(NcGetSlot(FUNC, NSSYM0(numArgs)));
     indefinite = NcGetSlot(FUNC, NSSYM0(indefinite));
 
     if (NewtRefIsNotNIL(indefinite))
@@ -1223,7 +1223,7 @@ bool NVMFuncCheckNumArgs(newtRefArg fn, int16_t numArgs)
     newtRefVar	indefinite;
     int32_t		minArgs;
 
-    minArgs = NewtRefToInteger(NcGetSlot(fn, NSSYM0(numArgs)));
+    minArgs = (int32_t)NewtRefToInteger(NcGetSlot(fn, NSSYM0(numArgs)));
     indefinite = NcGetSlot(fn, NSSYM0(indefinite));
 
     if (NewtRefIsNIL(indefinite))
@@ -1279,7 +1279,7 @@ void NVMCallNativeFn(newtRefArg fn, int16_t numArgs)
     if (funcPtr == NULL)
         return;
 
-    minArgs = NewtRefToInteger(NcGetSlot(fn, NSSYM0(numArgs)));
+    minArgs = (int32_t)NewtRefToInteger(NcGetSlot(fn, NSSYM0(numArgs)));
     indefinite = NcGetSlot(fn, NSSYM0(indefinite));
 
     if (NewtRefIsNIL(indefinite))
@@ -1503,7 +1503,7 @@ void NVMCallNativeFunc(newtRefArg fn, newtRefArg rcvr, int16_t numArgs)
     if (funcPtr == NULL)
         return;
 
-    minArgs = NewtRefToInteger(NcGetSlot(fn, NSSYM0(numArgs)));
+    minArgs = (int32_t)NewtRefToInteger(NcGetSlot(fn, NSSYM0(numArgs)));
     indefinite = NcGetSlot(fn, NSSYM0(indefinite));
 
     if (NewtRefIsNIL(indefinite))
@@ -2611,7 +2611,7 @@ void is_push_constant(int16_t b)
 
     if (NewtRefIsInteger(r))
     {
-        int32_t	n;
+        int64_t	n; // FIXME: n is not ever used
 
         n = NewtRefToInteger(r);
 
@@ -2921,7 +2921,7 @@ void is_make_array(int16_t b)
         x = stk_pop();
 
         if (NewtRefIsInteger(x))
-            a = NewtMakeArray(kNewtRefUnbind, NewtRefToInteger(x));
+            a = NewtMakeArray(kNewtRefUnbind, (uint32_t)NewtRefToInteger(x));
     }
     else
     {
@@ -3069,7 +3069,7 @@ void is_incr_var(int16_t b)
 
     addend = stk_top();
     n = NewtGetFrameSlot(LOCALS, b);
-    v = NewtRefToInteger(n) + NewtRefToInteger(addend);
+    v = (int32_t)(NewtRefToInteger(n) + NewtRefToInteger(addend));
     n = NewtMakeInteger(v);
 
     NewtSetFrameSlot(LOCALS, b, n);
@@ -3116,9 +3116,9 @@ void is_branch_if_loop_not_done(int16_t b)
         return;
     }
 
-    incr = NewtRefToInteger(r_incr);
-    index = NewtRefToInteger(r_index);
-    limit = NewtRefToInteger(r_limit);
+    incr = (int32_t)NewtRefToInteger(r_incr);
+    index = (int32_t)NewtRefToInteger(r_index);
+    limit = (int32_t)NewtRefToInteger(r_limit);
 
     if (incr == 0)
     {

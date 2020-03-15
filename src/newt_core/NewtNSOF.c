@@ -102,7 +102,7 @@ bool NewtRefIsByte(newtRefArg r)
 {
     if (NewtRefIsInteger(r))
     {
-        int32_t		n;
+        int64_t		n;
         
         n = NewtRefToInteger(r);
         
@@ -320,7 +320,7 @@ newtErr NSOFWritePrecedent(nsof_stream_t * nsof, int32_t pos)
 newtErr NSOFWriteImmediate(nsof_stream_t * nsof, newtRefArg r)
 {
     NSOFWriteByte(nsof, kNSOFImmediate);
-    NSOFWriteXlong(nsof, r);
+    NSOFWriteXlong(nsof, (int32_t)r);
     
     return nsof->lastErr;
 }
@@ -395,7 +395,7 @@ newtErr NSOFWriteBinary(nsof_stream_t * nsof, newtRefArg r, uint16_t objtype)
         
         s = NewtRefToString(r);
         buff = NewtIconv(nsof->cd.to.utf16be, (char *)s, size, &bufflen);
-        if (buff) size = bufflen;
+        if (buff) size = (uint32_t)bufflen;
     }
 #endif /* HAVE_LIBICONV */
     
@@ -415,17 +415,17 @@ newtErr NSOFWriteBinary(nsof_stream_t * nsof, newtRefArg r, uint16_t objtype)
         
         switch (objtype)
         {
-            case kNewtInt32:
+            case kNewtInt64:
                 if (NSOFIsNOS(nsof->verno))
                 {
                     nsof->lastErr = kNErrNSOFWrite;
                 }
                 else
                 {
-                    int32_t	n;
+                    int64_t	n;
                     
                     n = NewtRefToInteger(r);
-                    n = htonl(n);
+                    n = htonl(n); //FIXME: n is 64 bits
                     memcpy(data, (uint8_t *)&n, sizeof(n));
                 }
                 break;
@@ -485,7 +485,7 @@ newtErr NSOFWriteSymbol(nsof_stream_t * nsof, newtRefArg r)
         if (buff)
         {
             name = buff;
-            size = bufflen;
+            size = (uint32_t)bufflen;
         }
     }
 #endif /* HAVE_LIBICONV */
@@ -753,7 +753,7 @@ newtRef NsMakeNSOF(newtRefArg rcvr, newtRefArg r, newtRefArg ver)
     
     memset(&nsof, 0, sizeof(nsof));
     
-    nsof.verno = NewtRefToInteger(ver);
+    nsof.verno = (uint32_t)NewtRefToInteger(ver);
     nsof.precedents = NewtMakeArray(kNewtRefUnbind, 0);
     nsof.offset = 1;
     
@@ -839,7 +839,7 @@ newtRef NSOFReadBinary(nsof_stream_t * nsof, int type)
     
     data = nsof->data + nsof->offset;
     
-    if (klass == NSSYM0(int32))
+    if (klass == NSSYM0(int64)) // TODO: check this code for 32/64 bit compatibility
     {
         if (NSOFIsNOS(nsof->verno))
         {
@@ -1184,7 +1184,7 @@ newtRef NewtReadNSOF(uint8_t * data, size_t size)
     memset(&nsof, 0, sizeof(nsof));
     
     nsof.data = data;
-    nsof.len = size;
+    nsof.len = (uint32_t)size;
     nsof.precedents = NewtMakeArray(kNewtRefUnbind, 0);
     nsof.verno = NSOFReadByte(&nsof);
     

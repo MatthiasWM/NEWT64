@@ -137,7 +137,7 @@ typedef struct {
     newtRefVar	array;				///< array
     newtRefVar	frame;				///< frame
     newtRefVar	__int;				///< int
-    newtRefVar	int32;				///< int32
+    newtRefVar  int64;                ///< int64
     newtRefVar	pathExpr;			///< pathExpr
     newtRefVar	bits;			///< bits
     newtRefVar	cbits;			///< cbits

@@ -25,7 +25,7 @@
 
 #include <time.h>
 
-#undef DEBUG_PKG_DIS
+#define DEBUG_PKG_DIS
 #define DEBUG_PKG
 #ifdef DEBUG_PKG
 #	include "NewtPrint.h"
@@ -646,8 +646,8 @@ newtRef NewtWritePkg(newtRefArg package)
         PgkWriteVarData(&pkg, 20, package, NSSYM(copyright));
         // name
         PgkWriteVarData(&pkg, 24, package, NSSYM(name));
-        // date
-        PkgWriteU32(&pkg, 32, time(0L)+2082844800);
+        // date: we will eventually run out of time
+        PkgWriteU32(&pkg, 32, (uint32_t)(time(0L)+2082844800));
         // reserved2
         PkgWriteU32(&pkg, 36, 0); 
         // reserved3
@@ -804,15 +804,15 @@ newtRef PkgReadBinaryObject(pkg_stream_t *pkg, uint32_t p_obj)
     klass = PkgReadRef(pkg, p_obj+8);
     
     if (klass==kNewtSymbolClass) {
-        result = NewtMakeSymbol(pkg->data + p_obj + 16);
+        result = NewtMakeSymbol((char*)pkg->data + p_obj + 16);
     } else if (klass==NSSYM0(string)) {
-        char *src = pkg->data + p_obj + 12;
+        char *src = (char*)pkg->data + p_obj + 12;
         int sze = size-12;
 #		ifdef HAVE_LIBICONV
         size_t buflen;
         char *buf = NewtIconv(pkg->from_utf16, src, sze, &buflen);
         if (buf) {
-            result = NewtMakeString2(buf, buflen-1, true); // NewtMakeString2 appends another null
+            result = NewtMakeString2(buf, (uint32_t)buflen-1, true); // NewtMakeString2 appends another null
         }
 #		endif /* HAVE_LIBICONV */
         if (result==kNewtRefNIL)
@@ -961,7 +961,11 @@ newtRef PkgReadNOSPart(pkg_stream_t *pkg)
     uint32_t	p_obj;
     newtRefVar	result;
     
-    // verify that we have a correct lead-in 
+    // verify that we have a correct lead-in
+    // 0x00001041 = 16 byte array
+    // 0x00000000 (0=align to 8 bytes, 1=align to 4 bytes)
+    // 0x00000002 = class is NIL
+    // 0x.......1 = pointer into pkg->data
     if (PkgReadU32(pkg->part)!=0x00001041 || PkgReadU32(pkg->part+8)!=0x00000002) {
 #		ifdef DEBUG_PKG
         printf("*** PkgReader: PkgReadPart - unsupported NOS Part intro at %ld\n",
@@ -974,8 +978,8 @@ newtRef PkgReadNOSPart(pkg_stream_t *pkg)
     pkg->instances = NewtMakeArray(kNewtRefUnbind, ntohl(pkg->part_header->size)/4);
     
     // now recursively load all objects
-    p_obj = PkgReadU32(pkg->part+12);
-    result = PkgReadObject(pkg, p_obj&~3);
+    p_obj = PkgReadU32(pkg->part+12); // get the offset of the first object into pkg->data
+    result = PkgReadObject(pkg, p_obj&~3); // remove the 0x01 tag from the offset
     
     // release our helper array
     NewtSetLength(pkg->instances, 0);
@@ -1061,13 +1065,13 @@ newtRef PkgReadVardataString(pkg_stream_t *pkg, pkg_info_ref_t *info_ref)
     if (info_ref->size==0) {
         return kNewtRefNIL;
     } else {
-        char *src = pkg->var_data + ntohs(info_ref->offset);
+        char *src = (char*)(pkg->var_data + ntohs(info_ref->offset));
         int size = ntohs(info_ref->size);
 #		ifdef HAVE_LIBICONV
         size_t buflen;
         char *buf = NewtIconv(pkg->from_utf16, src, size, &buflen);
         if (buf) {
-            return NewtMakeString2(buf, buflen-1, true);
+            return NewtMakeString2(buf, (uint32_t)(buflen-1), true);
         }
 #		endif /* HAVE_LIBICONV */
         return NewtMakeString2(src, size, true);
@@ -1112,7 +1116,8 @@ newtRef PkgReadHeader(pkg_stream_t *pkg)
         NcSetSlot(frame, NSSYM(parts), parts);
         for (i = 0; i < n; i++)
         {
-            NewtSetArraySlot(parts, i, PkgReadPart(pkg, i));
+            newtRef part = PkgReadPart(pkg, i);
+            NewtSetArraySlot(parts, i, part);
             if (pkg->lastErr != kNErrNone) break;
         }
     }
@@ -1159,9 +1164,9 @@ newtRef NewtReadPkg(uint8_t * data, size_t size)
         return kNewtRefNIL;
     
     memset(&pkg, 0, sizeof(pkg));
-    pkg.pkg_version = data[7]-'0';
+    pkg.pkg_version = data[7]-'0'; // "package0" or "package1"
     pkg.data = data;
-    pkg.size = size;
+    pkg.size = (uint32_t)size; // file format does not allow bigger files
     pkg.header = (pkg_header_t*)data;
     pkg.num_parts = ntohl(pkg.header->numParts);
     if (ntohl(pkg.header->flags) & kRelocationFlag) {

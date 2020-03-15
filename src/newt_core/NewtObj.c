@@ -1427,7 +1427,7 @@ newtRef NewtStringSetLength(newtRefArg r, uint32_t n)
 
 newtRef NewtMakeInteger(int64_t v)
 {
-    if (0xE000000000000000 <= v && v <= 0x1FFFFFFFFFFFFFFF)
+    if (-0x2000000000000000 <= v && v <= 0x1FFFFFFFFFFFFFFF)
     {   // 62bit 以内の場合
         return NewtMakeInt62(v);
     }

@@ -3396,8 +3396,6 @@ bool NewtHasSlot(newtRefArg frame, newtRefArg slot)
 newtRef NewtSlotsGetPath(newtRefArg r, newtRefArg p)
 {
     if (NewtRefIsArray(r)) {
-        assert(0);
-        // FIXME: huh? The second argument is an integer. Casting this seems wrong.
         return NewtGetArraySlot(r, p);
     } else {
         return NcFullLookup(r, p);

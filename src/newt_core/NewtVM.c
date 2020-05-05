@@ -2612,6 +2612,8 @@ void is_push_constant(int16_t b)
     if (NewtRefIsInteger(r))
     {
         int64_t	n; // FIXME: n is not ever used
+        // TODO: b is signed, so n needs to be converted using sign extension
+        // TODO: we must verify that this is working as intended
 
         n = NewtRefToInteger(r);
 

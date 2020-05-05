@@ -425,7 +425,7 @@ newtErr NSOFWriteBinary(nsof_stream_t * nsof, newtRefArg r, uint16_t objtype)
                     int64_t	n;
                     
                     n = NewtRefToInteger(r);
-                    n = htonl(n); //FIXME: n is 64 bits
+                    n = htonll(n);
                     memcpy(data, (uint8_t *)&n, sizeof(n));
                 }
                 break;
@@ -1179,7 +1179,7 @@ newtRef NSOFReadNSOF(nsof_stream_t * nsof)
 newtRef NewtReadNSOF(uint8_t * data, size_t size)
 {
     nsof_stream_t	nsof;
-    newtRefVar		reault;
+    newtRefVar		result;
     
     memset(&nsof, 0, sizeof(nsof));
     
@@ -1204,14 +1204,14 @@ newtRef NewtReadNSOF(uint8_t * data, size_t size)
     }
 #endif /* HAVE_LIBICONV */
     
-    reault = NSOFReadNSOF(&nsof);
+    result = NSOFReadNSOF(&nsof);
     
 #ifdef HAVE_LIBICONV
     if (nsof.cd.from.utf16be != (iconv_t)-1) iconv_close(nsof.cd.from.utf16be);
     if (nsof.cd.from.macroman != (iconv_t)-1) iconv_close(nsof.cd.from.macroman);
 #endif /* HAVE_LIBICONV */
     
-    return reault;
+    return result;
 }
 
 

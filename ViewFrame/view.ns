@@ -4,6 +4,11 @@ printLength := 9999;
 printBinaries := 1;
 printUnique := 1;
 
+
+p( { class: $\s0003 } );
+exit();
+
+
 pkg := ReadPkg(LoadBinary("/Users/matt/Desktop/Newton/NewtonDev/NewtonDev.1/Sample Code/System Services/PeriodicElements-1/PeriodicElements.pkg"));
 p(pkg);
 bin := MakePkg(pkg);

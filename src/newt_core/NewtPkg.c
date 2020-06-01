@@ -653,7 +653,7 @@ newtRef NewtWritePkg(newtRefArg package)
         PgkWriteVarData(&pkg, 20, package, NSSYM(copyright));
         // name
         PgkWriteVarData(&pkg, 24, package, NSSYM(name));
-        // date: we will eventually run out of time
+        // date: this will overflow on Mon Feb 6th, 07:28:15 2040
         PkgWriteU32(&pkg, 32, (uint32_t)(time(0L)+2082844800));
         // reserved2
         PkgWriteU32(&pkg, 36, 0); 

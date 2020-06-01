@@ -208,9 +208,11 @@ static inline newtRef
 NewtMakeCharacter(newtUniChar v)    { return (newtRef)((((uint64_t)(v)) << 4) | 6); } ///< 文字オブジェクトを作成
 
 static inline bool
-NewtRefIsSpecial(newtRefArg r)      { return ((r & 0xF) == 2); } ///< 特殊オブジェクトか？
+NewtRefIsSpecial(newtRefArg r)      { return ((r & 0xF) == 2); } ///< Is it a special object?
 static inline uint64_t
-NewtRefToSpecial(newtRefArg r)      { return (r >> 2); } ///< オブジェクト参照を特殊値に変換
+NewtRefToSpecial(newtRefArg r)      { return (r >> 4); } ///< Convert object reference to special value
+static inline newtRef
+NewtMakeSpecial(uint64_t v)         { return (newtRef)((v << 4) | 2); } ///< Create a special value
 
 
 static inline bool

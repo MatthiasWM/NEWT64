@@ -48,7 +48,8 @@ static int			lex_reserveword(int tokn, char *s);
 static int			lex_makesymbol(char *s, bool trunc);
 static int			lex_makestring(char *s, bool trunc);
 static int			lex_makeregex(char *s, bool trunc);
-static int			lex_makechar(int c);
+static int          lex_makechar(int c);
+static int          lex_makespecial(int c);
 static int			lex_makeinteger(int64_t n);
 static int			lex_makereal(double n);
 
@@ -180,8 +181,9 @@ __LINE__						{ return lex_makeinteger(nps_env.lineno); }
 								}
 
 "$\\"{ESCAPE-CHAR}				{ return lex_makechar(lex_escapechar(yytext[2])); }
-"$\\"{HEX-DIGIT}{2}				{ return lex_makechar(lex_htoi(yytext + 2, -1)); }
-"$\\u"{HEX-DIGIT}{4}			{ return lex_makechar(lex_htoi(yytext + 3, -1)); }
+"$\\"({HEX-DIGIT}{2})			{ return lex_makechar(lex_htoi(yytext + 2, -1)); }
+"$\\u"({HEX-DIGIT}{4})          { return lex_makechar(lex_htoi(yytext + 3, -1)); }
+"$\\s"({HEX-DIGIT}{4})          { return lex_makespecial(lex_htoi(yytext + 3, -1)); }
 "$"{NON-ESCAPE-CHARACTER}		{ return lex_makechar(yytext[1]); }
 
 "@"{DIGIT}+						{ return lex_makemagicpointer(atoi(yytext + 1)); }
@@ -648,6 +650,24 @@ int lex_makechar(int c)
     lex_debug(kCHARACTER);
 
 	return lex_update_tokenpos(kCHARACTER);
+}
+
+
+/*------------------------------------------------------------------------*/
+/** Make a special code (this is similar to a character, and it is needed
+ * as a function signature for newer .pkg files)
+ *
+ * @param c            [in] special value
+ *
+ * @return            Special Ref
+ */
+
+int lex_makespecial(int c)
+{
+    yylval.obj = NewtMakeSpecial(c);
+    lex_debug(kSPECIAL);
+
+    return lex_update_tokenpos(kSPECIAL);
 }
 
 

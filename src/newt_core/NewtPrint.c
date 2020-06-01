@@ -414,7 +414,8 @@ void NIOPrintSpecial(newtStream_t * f, newtRefArg r)
     uint64_t n;
     
     n = NewtRefToSpecial(r);
-    NIOFprintf(f, "<Special, %08x>", n);
+//    NIOFprintf(f, "<Special, %08x>", n);
+    NIOFprintf(f, "$\\s%04x", (uint16_t)n);
 }
 
 

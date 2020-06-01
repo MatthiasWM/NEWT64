@@ -91,7 +91,7 @@
     /* オブジェクト */
 
 %token		<obj>	kSYMBOL		kSTRING		kREGEX
-%token		<obj>	kINTEGER	kREAL		kCHARACTER	kMAGICPOINTER
+%token		<obj>	kINTEGER	kREAL		kCHARACTER	kSPECIAL kMAGICPOINTER
 %token		<obj>	kTRUE		kNIL		kUNBIND
 
 // 優先順位
@@ -276,6 +276,7 @@ simple_literal
 		: kINTEGER
 		| kREAL
 		| kCHARACTER
+        | kSPECIAL
 		| kMAGICPOINTER
 		| kTRUE			{ $$ = kNewtRefTRUE; }
 		| kNIL			{ $$ = kNewtRefNIL; }

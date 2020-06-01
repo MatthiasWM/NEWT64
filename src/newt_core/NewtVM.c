@@ -3711,6 +3711,7 @@ void NVMInitGlobalVars(void)
     NcDefGlobalVar(NSSYM0(printIndent), NSINT(1));
     NcDefGlobalVar(NSSYM0(printLength), NSINT(10));
     NcDefGlobalVar(NSSYM0(printBinaries), NSINT(0));
+    NcDefGlobalVar(NSSYM0(printUnique), NSINT(0));
 
     NcDefGlobalVar(NSSYM0(_STDOUT_), kNewtRefNIL);
     NcDefGlobalVar(NSSYM0(_STDERR_), kNewtRefNIL);

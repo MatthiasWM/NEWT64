@@ -52,7 +52,7 @@
 
 /* lex */
 /// 字句解析の行バッファサイズ
-#define	NEWT_LEX_LINEBUFFSIZE	500
+#define	NEWT_LEX_LINEBUFFSIZE	2048
 
 /* text encoding */
 /// デフォルトエンコーディング

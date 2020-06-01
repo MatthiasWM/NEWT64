@@ -25,7 +25,8 @@
 static int32_t		NewtGetPrintLength(void);
 static int32_t		NewtGetPrintDepth(void);
 static int32_t		NewtGetPrintIndent(void);
-static int32_t		NewtGetPrintBinaries(void);
+static int32_t      NewtGetPrintBinaries(void);
+static int32_t      NewtGetPrintUnique(void);
 
 static bool			NewtSymbolIsPrint(char * str, int len);
 static bool			NewtStrIsPrint(char * str, int len);
@@ -127,22 +128,41 @@ int32_t NewtGetPrintIndent(void)
 
 
 /*------------------------------------------------------------------------*/
-/** If set, brint binary objects as well.
+/** If set, print binary objects as well.
  *
- * @return			0 or 1
+ * @return            0 or 1
  */
 
 int32_t NewtGetPrintBinaries(void)
 {
-    newtRefVar	n;
-    int32_t		pb = 0;
-    
+    newtRefVar    n;
+    int32_t        pb = 0;
+
     n = NcGetGlobalVar(NSSYM0(printBinaries));
-    
+
     if (NewtRefIsInteger(n))
         pb = (int32_t)NewtRefToInteger(n);
-    
+
     return pb;
+}
+
+
+/*------------------------------------------------------------------------*/
+/** If set, print objects only once, even if they are referenced multiple times.
+ *
+ * @return            0 or 1
+ */
+int32_t NewtGetPrintUnique(void)
+{
+    newtRefVar    n;
+    int32_t        pu = 0;
+
+    n = NcGetGlobalVar(NSSYM0(printUnique));
+
+    if (NewtRefIsInteger(n))
+        pu = (int32_t)NewtRefToInteger(n);
+
+    return pu;
 }
 
 
@@ -352,7 +372,7 @@ void NIOPrintEscapeStr(newtStream_t * f, char * str, int len, char bar)
                 unicode = true;
             }
             
-            NIOFprintf(f, "%02x%02x", c, str[++i]);
+            NIOFprintf(f, "%02x%02x", (uint8_t)c, (uint8_t)str[++i]);
         }
     }
 }
@@ -632,18 +652,17 @@ void NIOPrintObjString(newtStream_t * f, newtRefArg r)
 
 
 /*------------------------------------------------------------------------*/
-/** 出力ファイルに配列オブジェクトをプリントする
+/** Print the array object to the output file
  *
- * @param f			[in] 出力ファイル
- * @param r			[in] オブジェクト
- * @param depth		[in] 深さ
- * @param literal	[in] リテラルフラグ
+ * @param f[in] Output file
+ * @param r[in] object
+ * @param depth[in] depth
+ * @param literal[in] Literal flag
  *
- * @return			なし
+ * without @return
  *
- * @note			newtStream_t を使用
+ * @note newtStream_t
  */
-
 void NIOPrintObjArray(newtStream_t * f, newtRefArg r, int32_t depth, bool literal)
 {
     newtObjRef	obj;
@@ -656,6 +675,22 @@ void NIOPrintObjArray(newtStream_t * f, newtRefArg r, int32_t depth, bool litera
     len = NewtObjSlotsLength(obj);
     slots = NewtObjToSlots(obj);
     
+    if (newt_env._printUnique) {
+        newtObjRef v = NewtRefToPointer(r);
+        if (v->header.flags & kNewtObjPrintRefMulti) {
+            if (v->header.flags & kNewtObjPrinted) {
+                //if (NEWT_INDENT) NIOPrintIndent(f, depth);
+                NIOPrintRef(f, r);
+                return;
+            } else {
+                v->header.flags |= kNewtObjPrinted;
+                //if (NEWT_INDENT) NIOPrintIndent(f, depth);
+                NIOPrintRef(f, r);
+                NIOFputs(" := ", f);
+            }
+        }
+    }
+
     if (literal && NcClassOf(r) == NSSYM0(pathExpr))
     {
         for (i = 0; i < len; i++)
@@ -790,7 +825,7 @@ void NIOPrintObjFrame(newtStream_t * f, newtRefArg r, int32_t depth, bool litera
     uint32_t	index;
     uint32_t	len;
     uint32_t	i;
-    
+
     if (!newt_env._printBinaries)
     {
         if (NewtRefIsFunction(r) && ! NEWT_DUMPBC)
@@ -974,6 +1009,81 @@ void NIOPrintObj2(newtStream_t * f, newtRefArg r, int32_t depth, bool literal)
     }
 }
 
+/**
+ * Recursively clear all printing related flags in all referenced objects.
+ *
+ * This function assumes that there is no cyclic dependency in the object tree.
+ */
+void NIOPrintClearFlags(newtRefArg r)
+{
+    newtObjRef v = NULL;
+    uint32_t type = NewtGetRefType(r, true);
+    switch (type)
+    {
+        case kNewtInt64:    // binary
+        case kNewtReal:     // binary
+        case kNewtString:   // binary
+        case kNewtBinary:
+            v = NewtRefToPointer(r);
+            v->header.flags &= ~kNewtObjPrintFlags;
+            NIOPrintClearFlags( NewtObjBinaryClass(v) );
+            break;
+        case kNewtFrame:
+        case kNewtArray:
+            v = NewtRefToPointer(r);
+            v->header.flags &= ~kNewtObjPrintFlags;
+            // no need to follow class or map
+            newtRef *slot = NewtObjToSlots(v);
+            int n = NewtObjSlotsLength(v);
+            for (uint32_t i=0; i<n; i++)
+                NIOPrintClearFlags( slot[i] );
+            break;
+    }
+}
+
+/**
+ * Recursively update all printing related flags in all referenced objects.
+ *
+ * Find all objects that are referenced more than once, so we can print them seperately.
+ * Find and mark all objects that are a view, so we can print those seperately as well.
+ *
+ * This function assumes that there is no cyclic dependency in the object tree.
+ */
+void NIOPrintUpdateFlags(newtRefArg r)
+{
+    newtObjRef v = NULL;
+    uint32_t type = NewtGetRefType(r, true);
+    switch (type)
+    {
+        case kNewtInt64:    // binary
+        case kNewtReal:     // binary
+        case kNewtString:   // binary
+        case kNewtBinary:
+            v = NewtRefToPointer(r);
+            if (v->header.flags & kNewtObjPrintRefOnce) {
+                v->header.flags |= kNewtObjPrintRefMulti;
+            } else {
+                v->header.flags |= kNewtObjPrintRefOnce;
+                NIOPrintUpdateFlags( NewtObjBinaryClass(v) );
+            }
+            break;
+        case kNewtFrame:
+        case kNewtArray:
+            v = NewtRefToPointer(r);
+            if (v->header.flags & kNewtObjPrintRefOnce) {
+                v->header.flags |= kNewtObjPrintRefMulti;
+            } else {
+                v->header.flags |= kNewtObjPrintRefOnce;
+                NIOPrintUpdateFlags( NewtObjBinaryClass(v) );
+            }
+            newtRef *slot = NewtObjToSlots(v);
+            int n = NewtObjSlotsLength(v);
+            for (uint32_t i=0; i<n; i++)
+                NIOPrintUpdateFlags( slot[i] );
+            break;
+    }
+}
+
 
 /*------------------------------------------------------------------------*/
 /** 出力ファイルにオブジェクトをプリント
@@ -994,6 +1104,10 @@ void NIOPrintObj(newtStream_t * f, newtRefArg r)
     newt_env._indent = indent;
     int32_t pb = NewtGetPrintBinaries();
     newt_env._printBinaries = pb;
+    int32_t pu = NewtGetPrintUnique();
+    newt_env._printUnique = pu;
+    if (newt_env._printUnique) NIOPrintClearFlags(r);
+    if (newt_env._printUnique) NIOPrintUpdateFlags(r);
     NIOPrintObj2(f, r, depth, false);
 }
 
@@ -1118,7 +1232,7 @@ void NIOPrintArray(newtStream_t * f, newtRefArg r)
 
 
 /*------------------------------------------------------------------------*/
-/** 出力ファイルにオブジェクトをプリント
+/** Print object to output file
  *
  * @param f			[in] 出力ファイル
  * @param r			[in] オブジェクト

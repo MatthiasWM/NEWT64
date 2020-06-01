@@ -99,6 +99,7 @@ typedef struct {
     int32_t		_indent;		///< number of tabs for indenting a printout
     int32_t		_indentDepth;	///< base for calculating the indent depth
     int32_t		_printBinaries;	///< print binary objects so that they can be regenerated from the printout
+    int32_t     _printUnique;   ///< print an object only once, even if it is referenced multiple times
 } newt_env_t;
 
 
@@ -203,7 +204,8 @@ typedef struct {
     newtRefVar	printDepth;			///< printDepth
     newtRefVar	printIndent;			///< printIndent
     newtRefVar	printLength;		///< printLength
-    newtRefVar	printBinaries;		///< printBinaries
+    newtRefVar  printBinaries;        ///< printBinaries
+    newtRefVar  printUnique;        ///< printUnique
 
     // for regex
     newtRefVar	protoREGEX;			///< @protoREGEX

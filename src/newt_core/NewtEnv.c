@@ -204,7 +204,8 @@ void NewtInitSYM(void)
     INITSYM(printIndent);
     INITSYM(printLength);
     INITSYM(printBinaries);
-    
+    INITSYM(printUnique);
+
     // for regex
     INITSYM(protoREGEX);
     INITSYM(regex);

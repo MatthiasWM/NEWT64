@@ -98,6 +98,7 @@ typedef struct {
     uint8_t *	part;			///< r  start of current part data
     uint32_t	part_offset;	///< r  offset of current part to the beginning of data
     uint32_t	part_header_offset;	///< r  offset of current part header
+    uint32_t    part_align;     ///< align objects inside current part to 4 or 8 bytes
     newtRefVar	instances;		///< rw array holding the previously generated instance of any ref per part
     newtRefVar	precedents;		///< w  array referencing the instances array
     newtErr		lastErr;		///< r  a way to return error from deep below
@@ -216,7 +217,10 @@ void PkgPartSetPrecedent(pkg_stream_t *pkg, newtRefArg ref, newtRefArg val)
  */
 uint32_t PkgAlign(pkg_stream_t *pkg, uint32_t offset)
 {
-    return (offset+7)&(~7);
+    if (pkg->part_align==4)
+        return (offset+3)&(~3);
+    else
+        return (offset+7)&(~7);
 }
 
 /*------------------------------------------------------------------------*/
@@ -344,7 +348,7 @@ void PgkWriteVarData(pkg_stream_t *pkg, uint32_t offset, newtRefVar frame, newtR
 
 /*------------------------------------------------------------------------*/
 /** Append a frame object to the end of the Package
- * 
+ *
  * @param pkg		[inout] the package
  * @param frame		[in] the frame that we will write
  *
@@ -509,7 +513,11 @@ newtRef PkgWriteObject(pkg_stream_t *pkg, newtRefArg obj)
     if (prec!=kNewtRefUnbind) {
         return prec;
     }
-    
+
+    // make this ref available for later incarnations of the same object
+    uint32_t precOffset = PkgAlign(pkg, pkg->size);
+    PkgPartSetPrecedent(pkg, obj, NewtMakePointer((void*)(uintptr_t)precOffset));
+
     if (NewtRefIsFrame(obj)) {
         dst = PkgWriteFrame(pkg, obj);
     } else if (NewtRefIsArray(obj)) {
@@ -524,16 +532,13 @@ newtRef PkgWriteObject(pkg_stream_t *pkg, newtRefArg obj)
 #		endif
         return kNewtRefNIL; // do not create a precedent
     }
-    
-    // make this ref available for later incarnations of the same object
-    PkgPartSetPrecedent(pkg, obj, dst);
-    
+
     return dst;
 }
 
 /*------------------------------------------------------------------------*/
 /** Create a part in package format based on this object.
- * 
+ *
  * This function makes heavy use of the "pkg" structure, updating all
  * members to allow writing multiple consecutive parts by repeatedly
  * caling this function. Multiple part packages are untested.
@@ -558,10 +563,12 @@ void PkgWritePart(pkg_stream_t *pkg, newtRefArg part)
     
     pkg->instances = NewtMakeArray(kNewtRefUnbind, 0);
     pkg->precedents = NewtMakeArray(kNewtRefUnbind, 0);
-    
+
+    pkg->part_align = PkgGetSlotInt(part, NSSYM(align), 0);
+    if (pkg->part_align!=4 && pkg->part_align!=8) pkg->part_align = 8;
     PkgMakeRoom(pkg, dst, 16);
     PkgWriteU32(pkg, dst,    0x00001041);
-    PkgWriteU32(pkg, dst+4,  0x00000000);
+    PkgWriteU32(pkg, dst+4,  (pkg->part_align==4) ? 1 : 0);
     PkgWriteU32(pkg, dst+8,  0x00000002);
     PkgWriteU32(pkg, dst+12, (uint32_t)PkgWriteObject(pkg, data));
     
@@ -663,11 +670,7 @@ newtRef NewtWritePkg(newtRefArg package)
         
         // the original file has this (c) message embedded
         {	
-#ifdef _MSC_VER
-            char msg[] = "Newtonª ToolKit Package © 1992-1997, Apple Computer, Inc.";
-#else
-            char msg[] = "Newtonï½ª ToolKit Package ï½© 1992-1997, Apple Computer, Inc.";
-#endif
+            char msg[] = "Newton\xaa"" ToolKit Package \xa9"" 1992-1997, Apple Computer, Inc.";
             PkgWriteData(&pkg, pkg.header_size + pkg.var_data_size, msg, sizeof(msg));
             pkg.var_data_size += sizeof(msg);
         }
@@ -1006,7 +1009,8 @@ newtRef PkgReadPart(pkg_stream_t *pkg, int32_t index)
         NSSYM(info),			kNewtRefNIL,
         NSSYM(flags),			kNewtRefNIL,
         NSSYM(type),			kNewtRefNIL,
-        NSSYM(data),			kNewtRefNIL
+        NSSYM(align),           kNewtRefNIL,
+        NSSYM(data),            kNewtRefNIL
     };
     
     pkg->part_header = pkg->part_headers + index;
@@ -1022,6 +1026,8 @@ newtRef PkgReadPart(pkg_stream_t *pkg, int32_t index)
     switch (flags&0x03) {
         case kNOSPart:
             NcSetSlot(frame, NSSYM(info), PkgReadVardataBinary(pkg, &pkg->part_header->info));
+            pkg->part_align = (PkgReadU32(pkg->part+4)==1) ? 4 : 8;
+            NcSetSlot(frame, NSSYM(align), NewtMakeInteger(pkg->part_align));
             NcSetSlot(frame, NSSYM(data), PkgReadNOSPart(pkg));
             break;
         case kProtocolPart:

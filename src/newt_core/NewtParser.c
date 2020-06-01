@@ -219,7 +219,7 @@ newtErr NPSParseFile(const char * path,
         
         if (yyin == NULL)
         {
-            NewtFprintf(stderr, "not open file.\n");
+            NewtFprintf(stderr, "Can't open file.\n");
             return kNErrFileNotOpen;
         }
         

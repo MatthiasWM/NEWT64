@@ -11,6 +11,14 @@
  * Copyright (C) 2003-2004 M.Nukui All rights reserved.
  */
 
+/*
+ Todo:
+ - String literals should support fragments: x := "abc" "def";
+ - Support arbitrarily long strings (MakeBinaryFromHex("...");)
+ - Support #include style statement
+ - NTK creates DefConst statements
+ */
+
 
 /* ヘッダファイル */
 #include <stdio.h>

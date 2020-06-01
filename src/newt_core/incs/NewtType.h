@@ -64,7 +64,12 @@ enum {
     kNewtObjFrame		= 0x02,		///< フレーム
     
     kNewtObjLiteral		= 0x40,		///< リテラル
-    kNewtObjSweep		= 0x80		///< ゴミ掃除（GC用）
+    kNewtObjSweep		= 0x80,		///< ゴミ掃除（GC用）
+    kNewtObjPrintRefOnce    = 0x0100,
+    kNewtObjPrintRefMulti   = 0x0200,
+    kNewtObjPrinted         = 0x0400,
+    kNewtObjPrintView       = 0x0800,
+    kNewtObjPrintFlags      = 0x0F00,
 };
 
 

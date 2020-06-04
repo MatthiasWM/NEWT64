@@ -9,28 +9,14 @@ printUnique := 1;
 //exit();
 
 
-pkg := ReadPkg(LoadBinary("/Users/matt/Desktop/Newton/NewtonDev/NewtonDev.1/Sample Code/System Services/PeriodicElements-1/PeriodicElements.pkg"));
-p(pkg);
-exit();
+//pkg := ReadPkg(LoadBinary("/Users/matt/Desktop/Newton/NewtonDev/NewtonDev.1/Sample Code/System Services/PeriodicElements-1/PeriodicElements.pkg"));
+//p(pkg);
+//exit();
 //bin := MakePkg(pkg);
 //p("Pkg.");
 
 
-lastReported := {
-							text: "<no alarms reported>",
-							viewBounds: {
-								left: 8,
-								top: 64,
-								right: 216,
-								bottom: 88
-							},
-							_proto: @218,
-							debug: "lastReported",
-							preAllocatedContext: 'lastReported
-						};
-
-pkg :=
-{
+pkg := {
 	class: 'PackageHeader,
 	type: 2021161080,
 	pkg_version: 1,
@@ -95,8 +81,11 @@ pkg :=
 										numArgs: 0,
 										DebuggerInfo: NIL
 									},
-									[
-										|6|:
+									arr := [
+         // the array class is an integer!
+         // 4 = it contains _proto
+         // 1 = it's sorted
+			//							6:
 										NIL,
 										'_proto,
 										'ownerName,
@@ -169,7 +158,18 @@ pkg :=
 							_proto: @218,
 							debug: "currentDate"
 						},
-                        lastReported,
+						ref00653631 := {
+							text: "<no alarms reported>",
+							viewBounds: {
+								left: 8,
+								top: 64,
+								right: 216,
+								bottom: 88
+							},
+							_proto: @218,
+							debug: "lastReported",
+							preAllocatedContext: 'lastReported
+						},
 						{
 							buttonClickScript: {
 								class: $\s0003,
@@ -318,7 +318,7 @@ pkg :=
 					lastReported: NIL,
 					stepAllocateContext: [
 						'lastReported,
-                        lastReported
+						ref00653631
 					],
 					appSymbol: '|PeriodicElements:PIEDTS|
 				},
@@ -372,12 +372,15 @@ pkg :=
 	]
 };
 
+SetClass(arr, 6);
+p(arr);
+
 // ------
 bin := MakePkg(pkg);
 p("Bin.");
 SaveBinary(
     bin,
-    "/Users/matt/Desktop/Newton/NewtonDev/NewtonDev.1/Sample Code/System Services/PeriodicElements-1/PeriodicElements.pkg.1"
+    "/Users/matt/Desktop/Newton/NewtonDev/NewtonDev.1/Sample Code/System Services/PeriodicElements-1/PeriodicElements1.pkg"
 );
 p("Done.");
 
@@ -528,6 +531,7 @@ constant kPrefFrame := {
        			SetValue(self, 'viewBounds,	RelBounds(0, 0, myBounds.right, prefBounds.bottom)) ;
        		end
        		};
+
 
 p("B");
 

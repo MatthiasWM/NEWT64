@@ -827,6 +827,22 @@ void NIOPrintObjFrame(newtStream_t * f, newtRefArg r, int32_t depth, bool litera
     uint32_t	len;
     uint32_t	i;
 
+    if (newt_env._printUnique) {
+        newtObjRef v = NewtRefToPointer(r);
+        if (v->header.flags & kNewtObjPrintRefMulti) {
+            if (v->header.flags & kNewtObjPrinted) {
+                //if (NEWT_INDENT) NIOPrintIndent(f, depth);
+                NIOPrintRef(f, r);
+                return;
+            } else {
+                v->header.flags |= kNewtObjPrinted;
+                //if (NEWT_INDENT) NIOPrintIndent(f, depth);
+                NIOPrintRef(f, r);
+                NIOFputs(" := ", f);
+            }
+        }
+    }
+
     if (!newt_env._printBinaries)
     {
         if (NewtRefIsFunction(r) && ! NEWT_DUMPBC)
@@ -1076,11 +1092,11 @@ void NIOPrintUpdateFlags(newtRefArg r)
             } else {
                 v->header.flags |= kNewtObjPrintRefOnce;
                 NIOPrintUpdateFlags( NewtObjBinaryClass(v) );
+                newtRef *slot = NewtObjToSlots(v);
+                int n = NewtObjSlotsLength(v);
+                for (uint32_t i=0; i<n; i++)
+                    NIOPrintUpdateFlags( slot[i] );
             }
-            newtRef *slot = NewtObjToSlots(v);
-            int n = NewtObjSlotsLength(v);
-            for (uint32_t i=0; i<n; i++)
-                NIOPrintUpdateFlags( slot[i] );
             break;
     }
 }

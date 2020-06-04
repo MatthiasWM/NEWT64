@@ -5,14 +5,376 @@ printBinaries := 1;
 printUnique := 1;
 
 
-p( { class: $\s0003 } );
-exit();
+//p( { class: $\s0003 } );
+//exit();
 
 
 pkg := ReadPkg(LoadBinary("/Users/matt/Desktop/Newton/NewtonDev/NewtonDev.1/Sample Code/System Services/PeriodicElements-1/PeriodicElements.pkg"));
 p(pkg);
+exit();
+//bin := MakePkg(pkg);
+//p("Pkg.");
+
+
+lastReported := {
+							text: "<no alarms reported>",
+							viewBounds: {
+								left: 8,
+								top: 64,
+								right: 216,
+								bottom: 88
+							},
+							_proto: @218,
+							debug: "lastReported",
+							preAllocatedContext: 'lastReported
+						};
+
+pkg :=
+{
+	class: 'PackageHeader,
+	type: 2021161080,
+	pkg_version: 1,
+	version: 1,
+	copyright: "Copyright \uc2a9\u1995 Apple Computer, Inc.  All rights reserved.",
+	name: "PeriodicElements:PIEDTS",
+	flags: 33554432,
+	parts: [
+		{
+			class: 'PackagePart,
+			info: MakeBinaryFromHex("41204E6577746F6E20546F6F6C6B6974206170706C69636174696F6E", 'binary),
+			flags: 129,
+			type: 1718579821,
+			align: 4,
+			data: {
+				app: '|PeriodicElements:PIEDTS|,
+				text: "Periodic",
+				icon: {
+					mask: MakeBinaryFromHex("000000000004000000000000001B0018000000000000000000001C0000003F0000003F001FFF7F003FFF7E003FFFFE003FFFFC003FFFFC003FFFF8003FFFF8003FFFF0003FFFF0003FFFE0003FFFE0003FFFC0003FFFC0003FFF80003FFF00003FFF80003FFF80003FFF80001FFF00001FFF00000FFE000000000000", 'mask),
+					bits: MakeBinaryFromHex("000000000004000000000000001B0018000000000000000000001C0000003F00000033001FFF7B003FFF6E003000CE0037FCCC0037FD9C0034059800355338003403300035567000340660003554E000340CC000354FC000340B8000360F000037FE800037FD8000300B8000180300001FFF00000FFE000000000000", 'bits),
+					bounds: {
+						left: 0,
+						top: 0,
+						right: 24,
+						bottom: 27
+					}
+				},
+				theForm: {
+					title: "PeriodicElements",
+					viewBounds: {
+						left: 0,
+						top: 10,
+						right: 220,
+						bottom: 245
+					},
+					viewFormat: 83951953,
+					stepChildren: [
+						stepChildren:
+						{
+							buttonClickScript: {
+								class: $\s0003,
+								instructions: MakeBinaryFromHex("27000B18191A1B041C85A375C56F00147B1E29AD751F00073802", 'instructions),
+								literals: [
+									literals:
+									"Periodic",
+									'|PeriodicElements:PIEDTS|,
+									"Auto Beep",
+									{
+										class: $\s0003,
+										instructions: MakeBinaryFromHex("7019221A2B02", 'instructions),
+										literals: [
+											literals:
+											'base,
+											'myEditor,
+											'SetValue
+										],
+										argFrame: {
+											_nextArgFrame: NIL,
+											_parent: NIL,
+											_implementor: 0
+										},
+										numArgs: 0,
+										DebuggerInfo: NIL
+									},
+									[
+										|6|:
+										NIL,
+										'_proto,
+										'ownerName,
+										'ownerSymbol,
+										'title,
+										'viewQuitScript
+									],
+									'myEditor,
+									'BuildContext,
+									'Open
+								],
+								argFrame: NIL,
+								numArgs: 65536,
+								DebuggerInfo: [
+									dbg1:
+									0,
+									'editor
+								]
+							},
+							text: "Auto Beep Editor",
+							viewBounds: {
+								left: 58,
+								top: 34,
+								right: 166,
+								bottom: 54
+							},
+							_proto: @226,
+							debug: "editAlarms"
+						},
+						{
+							text: "Static Text",
+							viewBounds: {
+								left: 24,
+								top: 128,
+								right: 192,
+								bottom: 152
+							},
+							viewSetupDoneScript: {
+								class: $\s0003,
+								instructions: MakeBinaryFromHex("2403183902", 'instructions),
+								literals: [
+									literals:
+									'SetupIdle
+								],
+								argFrame: NIL,
+								numArgs: 0,
+								DebuggerInfo: NIL
+							},
+							viewIdleScript: {
+								class: $\s0003,
+								instructions: MakeBinaryFromHex("0318191A1B281C291D2702861E282700F01F00072A2702961F00088F0007C700161F00092B002707D002", 'instructions),
+								literals: [
+									literals:
+									'text,
+									"It is now",
+									" ",
+									'Time,
+									'DateNTime,
+									" ",
+									'TimeInSeconds,
+									'|mod|,
+									'array,
+									'SetValue
+								],
+								argFrame: NIL,
+								numArgs: 0,
+								DebuggerInfo: NIL
+							},
+							viewJustify: 8388610,
+							_proto: @218,
+							debug: "currentDate"
+						},
+                        lastReported,
+						{
+							buttonClickScript: {
+								class: $\s0003,
+								instructions: MakeBinaryFromHex("1828271680C1192902", 'instructions),
+								literals: [
+									literals:
+									'Time,
+									'SetTime
+								],
+								argFrame: NIL,
+								numArgs: 0,
+								DebuggerInfo: NIL
+							},
+							text: "Jump -1 Day",
+							viewBounds: {
+								left: 18,
+								top: 162,
+								right: 102,
+								bottom: 182
+							},
+							_proto: @226,
+							debug: "jumpBack"
+						},
+						{
+							buttonClickScript: {
+								class: $\s0003,
+								instructions: MakeBinaryFromHex("1828271680C0192902", 'instructions),
+								literals: [
+									literals:
+									'Time,
+									'SetTime
+								],
+								argFrame: NIL,
+								numArgs: 0,
+								DebuggerInfo: NIL
+							},
+							text: "Jump 1 Day",
+							viewBounds: {
+								left: 122,
+								top: 162,
+								right: 206,
+								bottom: 182
+							},
+							_proto: @226,
+							debug: "jumpForward"
+						},
+						{
+							buttonClickScript: {
+								class: $\s0003,
+								instructions: MakeBinaryFromHex("182824C1192902", 'instructions),
+								literals: [
+									literals:
+									'Time,
+									'SetTime
+								],
+								argFrame: NIL,
+								numArgs: 0,
+								DebuggerInfo: NIL
+							},
+							text: "Jump -1 Minute",
+							viewBounds: {
+								left: 18,
+								top: 192,
+								right: 102,
+								bottom: 212
+							},
+							_proto: @226,
+							debug: "jumpBackMinute"
+						},
+						{
+							buttonClickScript: {
+								class: $\s0003,
+								instructions: MakeBinaryFromHex("182824C0192902", 'instructions),
+								literals: [
+									literals:
+									'Time,
+									'SetTime
+								],
+								argFrame: NIL,
+								numArgs: 0,
+								DebuggerInfo: NIL
+							},
+							text: "Jump 1 Minute",
+							viewBounds: {
+								left: 122,
+								top: 192,
+								right: 206,
+								bottom: 212
+							},
+							_proto: @226,
+							debug: "jumpForwardMinute"
+						}
+					],
+					AlarmsEnabled: {
+						class: $\s0003,
+						instructions: MakeBinaryFromHex("27001A02", 'instructions),
+						literals: NIL,
+						argFrame: NIL,
+						numArgs: 0,
+						DebuggerInfo: NIL
+					},
+					PeriodicAlarm: {
+						class: $\s0003,
+						instructions: MakeBinaryFromHex("181929007B1A2900031B29C56F0013031C3800031D3800031D3800031D3800761F00071F00081F00091F000A281F000B291F000C8BC700161F000D2B02", 'instructions),
+						literals: [
+							literals:
+							"PeriodicElements Alarm called: ",
+							'Write,
+							'Print,
+							'Visible,
+							'Open,
+							'SysBeep,
+							'lastReported,
+							'text,
+							"Last Alarm:",
+							" ",
+							'Time,
+							'DateNTime,
+							'array,
+							'SetValue
+						],
+						argFrame: NIL,
+						numArgs: 1,
+						DebuggerInfo: [
+							dbg1:
+							0,
+							'alarm
+						]
+					},
+					myEditor: NIL,
+					viewQuitScript: {
+						class: $\s0003,
+						instructions: MakeBinaryFromHex("706F000A7019380022A81A5002", 'instructions),
+						literals: [
+							literals:
+							'myEditor,
+							'close,
+							'viewQuitScript
+						],
+						argFrame: NIL,
+						numArgs: 0,
+						DebuggerInfo: NIL
+					},
+					_proto: @157,
+					debug: "myapp",
+					lastReported: NIL,
+					stepAllocateContext: [
+						'lastReported,
+                        lastReported
+					],
+					appSymbol: '|PeriodicElements:PIEDTS|
+				},
+				installScript: {
+					class: $\s0003,
+					instructions: MakeBinaryFromHex("20A4701991A57D1A296F00497D22C70011A700075F003C7F000724C2A67E1B917B1B91C46F003827000C1C1D1E281F00073B00225F0044007F0007057F0007066F00172222A70007007B1F00081F00092A6F00617B7B1F000839007B1F000822987B1F000A229902", 'instructions),
+					literals: [
+						literals:
+						'vars,
+						'extras,
+						'IsArray,
+						'app,
+						"Extras Drawer",
+						"The application you just installed conflicts with another application. Please contact the application vendor for an updated version.",
+						'GetRoot,
+						'Notify,
+						'devInstallScript,
+						'HasSlot,
+						'installScript
+					],
+					argFrame: NIL,
+					numArgs: 262145,
+					DebuggerInfo: [
+						dbg1:
+						0,
+						'p,
+						'i,
+						'extras,
+						'one,
+						'|one\|iter|
+					]
+				},
+				removeScript: {
+					class: $\s0003,
+					instructions: MakeBinaryFromHex("7B18192A6F000E7B7B18395F000F2202", 'instructions),
+					literals: [
+						literals:
+						'devRemoveScript,
+						'HasSlot
+					],
+					argFrame: NIL,
+					numArgs: 1,
+					DebuggerInfo: [
+						dbg1:
+						0,
+						'p
+					]
+				}
+			}
+		}
+	]
+};
+
+// ------
 bin := MakePkg(pkg);
-p("Pkg.");
+p("Bin.");
 SaveBinary(
     bin,
     "/Users/matt/Desktop/Newton/NewtonDev/NewtonDev.1/Sample Code/System Services/PeriodicElements-1/PeriodicElements.pkg.1"

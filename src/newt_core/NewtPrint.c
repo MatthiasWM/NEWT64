@@ -394,7 +394,7 @@ void NIOPrintEscapeStr(newtStream_t * f, char * str, int len, char bar)
 
 void NIOPrintRef(newtStream_t * f, newtRefArg r)
 {
-    NIOFprintf(f, "#%08x", r);
+    NIOFprintf(f, "ref%08x", r);
 }
 
 

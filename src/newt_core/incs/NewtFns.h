@@ -52,6 +52,7 @@
 #define NcMakeFrame()				NsMakeFrame(kNewtRefNIL)
 #define NcMakeBinary(len, klass)	NsMakeBinary(kNewtRefNIL, len, klass)
 #define NcMakeBinaryFromHex(hex, klass)	NsMakeBinaryFromHex(kNewtRefNIL, hex, klass)
+#define NcMakeBinaryFromBC(byteCode)    NsMakeBinaryFromHex(kNewtRefNIL, byteCode)
 #define NcPrintObject(r)			NsPrintObject(kNewtRefNIL, r)
 #define NcPrint(r)					NsPrint(kNewtRefNIL, r)
 
@@ -120,7 +121,8 @@ newtRef		NsMakeSymbol(newtRefArg rcvr, newtRefArg r);
 newtRef		NsMakeFrame(newtRefArg rcvr);
 newtRef     NsMakeArray(newtRefArg rcvr, newtRefArg size, newtRefArg initialValue);
 newtRef		NsMakeBinary(newtRefArg rcvr, newtRefArg length, newtRefArg klass);
-newtRef		NsMakeBinaryFromHex(newtRefArg rcvr, newtRefArg hex, newtRefArg klass);
+newtRef     NsMakeBinaryFromHex(newtRefArg rcvr, newtRefArg hex, newtRefArg klass);
+newtRef     NsMakeBinaryFromBC(newtRefArg rcvr, newtRefArg byteCode);
 
 newtRef		NcBAnd(newtRefArg r1, newtRefArg r2);					// bytecode
 newtRef		NcBOr(newtRefArg r1, newtRefArg r2);					// bytecode

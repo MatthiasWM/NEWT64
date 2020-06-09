@@ -840,6 +840,8 @@ newtRef PkgReadBinaryObject(pkg_stream_t *pkg, uint32_t p_obj)
         result = NewtMakeBinary(klass, pkg->data + p_obj + 12, size-12, true);
     } else if (klass==NSSYM0(nativeModule)) {
         result = NewtMakeBinary(klass, pkg->data + p_obj + 12, size-12, true);
+    } else if (klass==NSSYM0(pattern)) {
+        result = NewtMakeBinary(klass, pkg->data + p_obj + 12, size-12, true);
     } else {
 #		ifdef DEBUG_PKG
         // This output is helpful to find more binary classes that may need 

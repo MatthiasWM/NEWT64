@@ -1,21 +1,20 @@
 
+// Preprocess this file with 'clang -E -P -C -x c++ view.ns' to allow for #ifdef etc.
 printDepth := 9999;
 printLength := 9999;
 printBinaries := 1;
 printUnique := 1;
 
-
 //p( { class: $\s0003 } );
 //exit();
 
-
-//pkg := ReadPkg(LoadBinary("/Users/matt/Desktop/Newton/NewtonDev/NewtonDev.1/Sample Code/System Services/PeriodicElements-1/PeriodicElements.pkg"));
-//p(pkg);
-//exit();
+pkg := ReadPkg(LoadBinary("/Users/matt/Desktop/Newton/NewtonDev/NewtonDev.1/Sample Code/System Services/PeriodicElements-1/PeriodicElements.pkg"));
+p(pkg);
+exit();
 //bin := MakePkg(pkg);
 //p("Pkg.");
 
-
+/*
 pkg := {
 	class: 'PackageHeader,
 	type: 2021161080,
@@ -385,8 +384,9 @@ SaveBinary(
 p("Done.");
 
 exit();
+*/
 
-/*
+
 p(3*3);
 
 
@@ -426,10 +426,11 @@ decompiler.StdObjDesc := GetRoot().|ViewFrame:JRH|.StdObjDesc;
 decompiler.weakling := nil;
 
 
-local ref := func() begin
+local ref := { test: func() begin
     print("test");
     return 3*3;
-end;
+end
+};
 
 p("Testing");
 
@@ -437,12 +438,13 @@ printDepth := 3;
 printLength := 9999;
 printBinaries := true;
 
-local src := decompiler:decompile(ref);
-p(decompiler);
-
-p("Done!");
+local src := decompiler:decompile(ref.test);
 p(src);
+p(ref);
+p("Done!");
+exit();
 
+/*
     newtRef decompiler = NcGetSlot(NcGetGlobals(), NSSYM(decompiler));
     if (NewtRefIsNotNIL(decompiler)) {
       newtRef decompiledString = NcSend(decompiler, NSSYM(decompile), false, 1, ref);
@@ -1253,6 +1255,7 @@ constant |layout_EinsteinPrefs.lyt| := appWindow;
 
 */
 
+/*
 constant app :=
 {
 	class: 'PackageHeader,
@@ -1325,7 +1328,6 @@ constant app :=
 				},
 
 				theForm: appWindow,
-/*
                 InstallScript: func(partFrame)
                 begin
                     //partFrame.removeFrame := (partFrame.theForm):NewtInstallScript(partFrame.theForm);
@@ -1334,7 +1336,6 @@ constant app :=
                 begin
                     //(partFrame.removeFrame):NewtRemoveScript(removeFrame);
                 end
-                */
 			}
 		}
 	]
@@ -1349,3 +1350,6 @@ SaveBinary(pkg2, "/Users/matt/dev/Einstein/test.pkg");
 p("Written.");
 pkg3 := ReadPkg(pkg2);
 p(pkg3);
+
+*/
+

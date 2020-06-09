@@ -15,6 +15,7 @@
 
 %option noyywrap
 
+
 %{
 
 /* ヘッダファイル */

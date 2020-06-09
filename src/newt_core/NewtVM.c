@@ -3638,7 +3638,8 @@ void NVMInitExGlobalFns(void)
 
     NewtDefGlobalFunc(NSSYM(LoadBinary),		NsLoadBinary,		1, "LoadBinary(filename)");
     NewtDefGlobalFunc(NSSYM(SaveBinary),		NsSaveBinary,		2, "SaveBinary(data, filename)");
-    NewtDefGlobalFunc(NSSYM(MakeBinaryFromHex),		NsMakeBinaryFromHex,	2, "MakeBinaryFromHex(hexString, class)");
+    NewtDefGlobalFunc(NSSYM(MakeBinaryFromHex), NsMakeBinaryFromHex,2, "MakeBinaryFromHex(hexString, class)");
+    NewtDefGlobalFunc(NSSYM(MakeBinaryFromBC),  NsMakeBinaryFromBC, 1, "MakeBinaryFromBC(bytecodes)");
 
     NewtDefGlobalFunc(NSSYM(MakeNSOF),	NsMakeNSOF,			2, "MakeNSOF(obj, ver)");
     NewtDefGlobalFunc(NSSYM(ReadNSOF),	NsReadNSOF,			1, "ReadNSOF(nsof)");

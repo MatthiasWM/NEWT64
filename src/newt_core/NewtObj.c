@@ -1246,6 +1246,85 @@ newtRef NewtMakeBinaryFromHex(newtRefArg klass, const char *hex, bool literal)
 
 
 /*------------------------------------------------------------------------*/
+/** Make a binary object from aan array of bytecode instructions.
+ *
+ * Bytecodes are NS integers. They create 1 or 3 byte sized bc commends.
+ * We expect an array of integers. Every integer is a bc commend.
+ *
+ * <tt>|xxs0.0000|AAAA.Abbb|BBBB.BBBB|BBBB.BBBB|</tt>
+ *
+ * x = bits not availabel in NewtonScript integers
+ * s = NewtonScript integer sign bit
+ * AAAAA = instruction
+ * bbb = parameter, if bbb=111, the bytecode is three bytes long
+ * BBBBBBBBBBBBBBBB = 16 bit parameter
+ *
+ * \code{.unparsed}
+ * MakeBinaryFromBC( [
+ *     0x580000 // branch to pc=2 (octal 142)
+ *     0x5f0009 // branch to pc=9 (octal 147 000 012)
+ *     0x020000 // return         (octal 002 000 000
+ * ] );
+ * \endcode
+ * @param byteCodeArray           [in] array of bytecodes
+ * @param literal       [in] make new object a literal
+ *
+ * @return                      new binary object
+ */
+
+newtRef NewtMakeBinaryFromBC(newtRefArg byteCodeArray, bool literal)
+{
+    if (NewtRefIsArray(byteCodeArray)) {
+        uint32_t size = 0;
+        uint32_t nSlots = NewtArrayLength(byteCodeArray);
+        newtRef *slot = NewtRefToSlots(byteCodeArray);
+        // find the size for the binary object
+        for (uint32_t i=0; i<nSlots; i++) {
+            newtRef s = slot[i];
+            if (NewtRefIsInteger(s)) {
+                uint32_t inst = (uint32_t)NewtRefToInteger(s);
+                if ( (inst & 0xff000000) == 0x00000000 ) {
+                    if ( (inst & 0x00070000) == 0x00070000 )
+                        size += 3;
+                    else
+                        size += 1;
+                } else {
+                    NewtFprintf(stderr, "*** NewtMakeBinaryFromBC: invalid instruction 0x%08x\n", inst);
+                }
+            } else {
+                NewtFprintf(stderr, "*** NewtMakeBinaryFromBC: invalid instruction, integer expected\n");
+            }
+        }
+        // write the bytecode into a binary object
+        newtRef obj = NewtMakeBinary(NSSYM0(instructions), 0, size, literal);
+        if (obj) {
+            uint8_t *dst = NewtRefToBinary(obj);
+            for (uint32_t i=0; i<nSlots; i++) {
+                newtRef s = slot[i];
+                if (NewtRefIsInteger(s)) {
+                    uint32_t inst = (uint32_t)NewtRefToInteger(s);
+                    if ( (inst & 0xff000000) == 0x00000000 ) {
+                        if ( (inst & 0x00070000) == 0x00070000 ) {
+                            *dst++ = (uint8_t)(inst>>16);
+                            *dst++ = (uint8_t)(inst>>8);
+                            *dst++ = (uint8_t)(inst);
+                        } else {
+                            *dst++ = (uint8_t)(inst>>16);
+                        }
+                    }
+                }
+            }
+            return obj;
+        }
+
+    } else {
+        NewtFprintf(stderr, "*** NewtMakeBinaryFromBC: array of instructions expected\n");
+    }
+    return kNewtRefUnbind;
+}
+
+
+/*------------------------------------------------------------------------*/
 /** バイナリオブジェクトのオブジェクトデータのサイズを変更する
  *
  * @param obj		[in] オブジェクトデータ

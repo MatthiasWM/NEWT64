@@ -1416,6 +1416,24 @@ newtRef NsMakeBinaryFromHex(newtRefArg rcvr, newtRefArg hex, newtRefArg klass)
 }
 
 
+/*------------------------------------------------------------------------*/
+/** Make a binary object from aan array of bytecode instructions.
+ *
+ * @param rcvr        [in] receiver
+ * @param byteCode [in] array of bytecodes
+ *
+ * @return            a new binary object
+ */
+
+newtRef NsMakeBinaryFromBC(newtRefArg rcvr, newtRefArg byteCode)
+{
+    if (! NewtRefIsArray(byteCode))
+        return NewtThrow(kNErrNotAnArray, byteCode);
+
+    return NewtMakeBinaryFromBC(byteCode, false);
+}
+
+
 #if 0
 #pragma mark -
 #endif

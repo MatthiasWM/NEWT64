@@ -561,6 +561,7 @@ void NIOPrintObjBinary(newtStream_t * f, newtRefArg r)
     klass = NcClassOf(r);
     if (newt_env._printBinaries)
     {
+        // TODO: if class=='instructions
         uint8_t *data = NewtRefToBinary(r);
         NIOFputs("MakeBinaryFromHex(\"", f);
         int i; for (i=0; i<len; i++) NIOFprintf(f, "%02X", data[i]);

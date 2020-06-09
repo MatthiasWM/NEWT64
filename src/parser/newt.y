@@ -30,6 +30,7 @@
 
 %}
 
+
 %union {
     newtRefVar	obj;	// オブジェクト
     uint32_t	op;		// 演算子

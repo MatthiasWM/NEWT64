@@ -1,0 +1,599 @@
+
+printDepth := 9999;
+printLength := 9999;
+printBinaries := 1;
+printUnique := 1;
+
+constant src :=
+{
+    class: 'PackageHeader,
+    type: 2021161080,
+    pkg_version: 1,
+    version: 1,
+    copyright: "Copyright \uc2a9\u1995 Apple Computer, Inc.  All rights reserved.",
+    name: "PeriodicElements:PIEDTS",
+    flags: 33554432,
+    parts: [
+        {
+            class: 'PackagePart,
+            info: MakeBinaryFromHex("41204E6577746F6E20546F6F6C6B6974206170706C69636174696F6E", 'binary),
+            flags: 129,
+            type: 1718579821,
+            align: 4,
+            data: {
+                app: '|PeriodicElements:PIEDTS|,
+                text: "Periodic",
+                icon: {
+                    mask: MakeBinaryFromHex("000000000004000000000000001B0018000000000000000000001C0000003F0000003F001FFF7F003FFF7E003FFFFE003FFFFC003FFFFC003FFFF8003FFFF8003FFFF0003FFFF0003FFFE0003FFFE0003FFFC0003FFFC0003FFF80003FFF00003FFF80003FFF80003FFF80001FFF00001FFF00000FFE000000000000", 'mask),
+                    bits: MakeBinaryFromHex("000000000004000000000000001B0018000000000000000000001C0000003F00000033001FFF7B003FFF6E003000CE0037FCCC0037FD9C0034059800355338003403300035567000340660003554E000340CC000354FC000340B8000360F000037FE800037FD8000300B8000180300001FFF00000FFE000000000000", 'bits),
+                    bounds: {
+                        left: 0,
+                        top: 0,
+                        right: 24,
+                        bottom: 27
+                    }
+                },
+                theForm: {
+                    title: "PeriodicElements",
+                    viewBounds: {
+                        left: 0,
+                        top: 10,
+                        right: 220,
+                        bottom: 245
+                    },
+                    viewFormat: 83951953,
+                    stepChildren: [
+                        stepChildren:
+                        {
+                            buttonClickScript: {
+                                class: $\s0003,
+                                instructions: MakeBinaryFromBC( [
+                                    0x27000B,    //   0: bc:PushConst(11)
+                                    0x180000,    //   3: bc:Push(0)
+                                    0x190000,    //   4: bc:Push(1)
+                                    0x1A0000,    //   5: bc:Push(2)
+                                    0x1B0000,    //   6: bc:Push(3)
+                                    0x040000,    //   7: bc:SetLexScope()
+                                    0x1C0000,    //   8: bc:Push(4)
+                                    0x850000,    //   9: bc:MakeFrame(5)
+                                    0xA30000,    //  10: bc:SetVar(3)
+                                    0x750000,    //  11: bc:FindVar(5)
+                                    0xC50000,    //  12: bc:LNot()
+                                    0x6F0014,    //  13: bc:BranchIfFalse(20)
+                                    0x7B0000,    //  16: bc:GetVar(3)
+                                    0x1E0000,    //  17: bc:Push(6)
+                                    0x290000,    //  18: bc:CallGlobal(1)
+                                    0xAD0000,    //  19: bc:FindAndSetVar(5)
+                                    0x750000,    //  20: bc:FindVar(5)
+                                    0x1F0007,    //  21: bc:Push(7)
+                                    0x380000,    //  24: bc:Send(0)
+                                    0x020000     //  25: bc:Ret()
+                                ] ),
+                                literals: [
+                                    literals:
+                                    "Periodic",
+                                    '|PeriodicElements:PIEDTS|,
+                                    "Auto Beep",
+                                    {
+                                        class: $\s0003,
+                                        instructions: MakeBinaryFromBC( [
+                                            0x700000,    //   0: bc:FindVar(0)
+                                            0x190000,    //   1: bc:Push(1)
+                                            0x220000,    //   2: bc:PushConst(2)
+                                            0x1A0000,    //   3: bc:Push(2)
+                                            0x2B0000,    //   4: bc:CallGlobal(3)
+                                            0x020000     //   5: bc:Ret()
+                                        ] ),
+                                        literals: [
+                                            literals:
+                                            'base,
+                                            'myEditor,
+                                            'SetValue
+                                        ],
+                                        argFrame: {
+                                            _nextArgFrame: NIL,
+                                            _parent: NIL,
+                                            _implementor: 0
+                                        },
+                                        numArgs: 0,
+                                        DebuggerInfo: NIL
+                                    },
+                                    [
+                                        6:
+                                        NIL,
+                                        '_proto,
+                                        'ownerName,
+                                        'ownerSymbol,
+                                        'title,
+                                        'viewQuitScript
+                                    ],
+                                    'myEditor,
+                                    'BuildContext,
+                                    'Open
+                                ],
+                                argFrame: NIL,
+                                numArgs: 65536,
+                                DebuggerInfo: [
+                                    dbg1:
+                                    0,
+                                    'editor
+                                ]
+                            },
+                            text: "Auto Beep Editor",
+                            viewBounds: {
+                                left: 58,
+                                top: 34,
+                                right: 166,
+                                bottom: 54
+                            },
+                            _proto: @226,
+                            debug: "editAlarms"
+                        },
+                        {
+                            text: "Static Text",
+                            viewBounds: {
+                                left: 24,
+                                top: 128,
+                                right: 192,
+                                bottom: 152
+                            },
+                            viewSetupDoneScript: {
+                                class: $\s0003,
+                                instructions: MakeBinaryFromBC( [
+                                    0x240000,    //   0: bc:PushConst(4)
+                                    0x030000,    //   1: bc:PushSelf()
+                                    0x180000,    //   2: bc:Push(0)
+                                    0x390000,    //   3: bc:Send(1)
+                                    0x020000     //   4: bc:Ret()
+                                ] ),
+                                literals: [
+                                    literals:
+                                    'SetupIdle
+                                ],
+                                argFrame: NIL,
+                                numArgs: 0,
+                                DebuggerInfo: NIL
+                            },
+                            viewIdleScript: {
+                                class: $\s0003,
+                                instructions: MakeBinaryFromBC( [
+                                    0x030000,    //   0: bc:PushSelf()
+                                    0x180000,    //   1: bc:Push(0)
+                                    0x190000,    //   2: bc:Push(1)
+                                    0x1A0000,    //   3: bc:Push(2)
+                                    0x1B0000,    //   4: bc:Push(3)
+                                    0x280000,    //   5: bc:CallGlobal(0)
+                                    0x1C0000,    //   6: bc:Push(4)
+                                    0x290000,    //   7: bc:CallGlobal(1)
+                                    0x1D0000,    //   8: bc:Push(5)
+                                    0x270286,    //   9: bc:PushConst(646)
+                                    0x1E0000,    //  12: bc:Push(6)
+                                    0x280000,    //  13: bc:CallGlobal(0)
+                                    0x2700F0,    //  14: bc:PushConst(240)
+                                    0x1F0007,    //  17: bc:Push(7)
+                                    0x2A0000,    //  20: bc:CallGlobal(2)
+                                    0x270296,    //  21: bc:PushConst(662)
+                                    0x1F0008,    //  24: bc:Push(8)
+                                    0x8F0007,    //  27: bc:MakeArray(7)
+                                    0xC70016,    //  30: bc:Stringer()
+                                    0x1F0009,    //  33: bc:Push(9)
+                                    0x2B0000,    //  36: bc:CallGlobal(3)
+                                    0x000000,    //  37: bc:Pop()
+                                    0x2707D0,    //  38: bc:PushConst(2000)
+                                    0x020000     //  41: bc:Ret()
+                                ] ),
+                                literals: [
+                                    literals:
+                                    'text,
+                                    "It is now",
+                                    " ",
+                                    'Time,
+                                    'DateNTime,
+                                    " ",
+                                    'TimeInSeconds,
+                                    '|mod|,
+                                    'array,
+                                    'SetValue
+                                ],
+                                argFrame: NIL,
+                                numArgs: 0,
+                                DebuggerInfo: NIL
+                            },
+                            viewJustify: 8388610,
+                            _proto: @218,
+                            debug: "currentDate"
+                        },
+                        ref034142c1 := {
+                            text: "<no alarms reported>",
+                            viewBounds: {
+                                left: 8,
+                                top: 64,
+                                right: 216,
+                                bottom: 88
+                            },
+                            _proto: @218,
+                            debug: "lastReported",
+                            preAllocatedContext: 'lastReported
+                        },
+                        {
+                            buttonClickScript: {
+                                class: $\s0003,
+                                instructions: MakeBinaryFromBC( [
+                                    0x180000,    //   0: bc:Push(0)
+                                    0x280000,    //   1: bc:CallGlobal(0)
+                                    0x271680,    //   2: bc:PushConst(5760)
+                                    0xC10000,    //   5: bc:Subtract()
+                                    0x190000,    //   6: bc:Push(1)
+                                    0x290000,    //   7: bc:CallGlobal(1)
+                                    0x020000     //   8: bc:Ret()
+                                ] ),
+                                literals: [
+                                    literals:
+                                    'Time,
+                                    'SetTime
+                                ],
+                                argFrame: NIL,
+                                numArgs: 0,
+                                DebuggerInfo: NIL
+                            },
+                            text: "Jump -1 Day",
+                            viewBounds: {
+                                left: 18,
+                                top: 162,
+                                right: 102,
+                                bottom: 182
+                            },
+                            _proto: @226,
+                            debug: "jumpBack"
+                        },
+                        {
+                            buttonClickScript: {
+                                class: $\s0003,
+                                instructions: MakeBinaryFromBC( [
+                                    0x180000,    //   0: bc:Push(0)
+                                    0x280000,    //   1: bc:CallGlobal(0)
+                                    0x271680,    //   2: bc:PushConst(5760)
+                                    0xC00000,    //   5: bc:Add()
+                                    0x190000,    //   6: bc:Push(1)
+                                    0x290000,    //   7: bc:CallGlobal(1)
+                                    0x020000     //   8: bc:Ret()
+                                ] ),
+                                literals: [
+                                    literals:
+                                    'Time,
+                                    'SetTime
+                                ],
+                                argFrame: NIL,
+                                numArgs: 0,
+                                DebuggerInfo: NIL
+                            },
+                            text: "Jump 1 Day",
+                            viewBounds: {
+                                left: 122,
+                                top: 162,
+                                right: 206,
+                                bottom: 182
+                            },
+                            _proto: @226,
+                            debug: "jumpForward"
+                        },
+                        {
+                            buttonClickScript: {
+                                class: $\s0003,
+                                instructions: MakeBinaryFromBC( [
+                                    0x180000,    //   0: bc:Push(0)
+                                    0x280000,    //   1: bc:CallGlobal(0)
+                                    0x240000,    //   2: bc:PushConst(4)
+                                    0xC10000,    //   3: bc:Subtract()
+                                    0x190000,    //   4: bc:Push(1)
+                                    0x290000,    //   5: bc:CallGlobal(1)
+                                    0x020000     //   6: bc:Ret()
+                                ] ),
+                                literals: [
+                                    literals:
+                                    'Time,
+                                    'SetTime
+                                ],
+                                argFrame: NIL,
+                                numArgs: 0,
+                                DebuggerInfo: NIL
+                            },
+                            text: "Jump -1 Minute",
+                            viewBounds: {
+                                left: 18,
+                                top: 192,
+                                right: 102,
+                                bottom: 212
+                            },
+                            _proto: @226,
+                            debug: "jumpBackMinute"
+                        },
+                        {
+                            buttonClickScript: {
+                                class: $\s0003,
+                                instructions: MakeBinaryFromBC( [
+                                    0x180000,    //   0: bc:Push(0)
+                                    0x280000,    //   1: bc:CallGlobal(0)
+                                    0x240000,    //   2: bc:PushConst(4)
+                                    0xC00000,    //   3: bc:Add()
+                                    0x190000,    //   4: bc:Push(1)
+                                    0x290000,    //   5: bc:CallGlobal(1)
+                                    0x020000     //   6: bc:Ret()
+                                ] ),
+                                literals: [
+                                    literals:
+                                    'Time,
+                                    'SetTime
+                                ],
+                                argFrame: NIL,
+                                numArgs: 0,
+                                DebuggerInfo: NIL
+                            },
+                            text: "Jump 1 Minute",
+                            viewBounds: {
+                                left: 122,
+                                top: 192,
+                                right: 206,
+                                bottom: 212
+                            },
+                            _proto: @226,
+                            debug: "jumpForwardMinute"
+                        }
+                    ],
+                    AlarmsEnabled: {
+                        class: $\s0003,
+                        instructions: MakeBinaryFromBC( [
+                            0x27001A,    //   0: bc:PushConst(26)
+                            0x020000     //   3: bc:Ret()
+                        ] ),
+                        literals: NIL,
+                        argFrame: NIL,
+                        numArgs: 0,
+                        DebuggerInfo: NIL
+                    },
+                    PeriodicAlarm: {
+                        class: $\s0003,
+                        instructions: MakeBinaryFromBC( [
+                            0x180000,    //   0: bc:Push(0)
+                            0x190000,    //   1: bc:Push(1)
+                            0x290000,    //   2: bc:CallGlobal(1)
+                            0x000000,    //   3: bc:Pop()
+                            0x7B0000,    //   4: bc:GetVar(3)
+                            0x1A0000,    //   5: bc:Push(2)
+                            0x290000,    //   6: bc:CallGlobal(1)
+                            0x000000,    //   7: bc:Pop()
+                            0x030000,    //   8: bc:PushSelf()
+                            0x1B0000,    //   9: bc:Push(3)
+                            0x290000,    //  10: bc:CallGlobal(1)
+                            0xC50000,    //  11: bc:LNot()
+                            0x6F0013,    //  12: bc:BranchIfFalse(19)
+                            0x030000,    //  15: bc:PushSelf()
+                            0x1C0000,    //  16: bc:Push(4)
+                            0x380000,    //  17: bc:Send(0)
+                            0x000000,    //  18: bc:Pop()
+                            0x030000,    //  19: bc:PushSelf()
+                            0x1D0000,    //  20: bc:Push(5)
+                            0x380000,    //  21: bc:Send(0)
+                            0x000000,    //  22: bc:Pop()
+                            0x030000,    //  23: bc:PushSelf()
+                            0x1D0000,    //  24: bc:Push(5)
+                            0x380000,    //  25: bc:Send(0)
+                            0x000000,    //  26: bc:Pop()
+                            0x030000,    //  27: bc:PushSelf()
+                            0x1D0000,    //  28: bc:Push(5)
+                            0x380000,    //  29: bc:Send(0)
+                            0x000000,    //  30: bc:Pop()
+                            0x760000,    //  31: bc:FindVar(6)
+                            0x1F0007,    //  32: bc:Push(7)
+                            0x1F0008,    //  35: bc:Push(8)
+                            0x1F0009,    //  38: bc:Push(9)
+                            0x1F000A,    //  41: bc:Push(10)
+                            0x280000,    //  44: bc:CallGlobal(0)
+                            0x1F000B,    //  45: bc:Push(11)
+                            0x290000,    //  48: bc:CallGlobal(1)
+                            0x1F000C,    //  49: bc:Push(12)
+                            0x8B0000,    //  52: bc:MakeArray(3)
+                            0xC70016,    //  53: bc:Stringer()
+                            0x1F000D,    //  56: bc:Push(13)
+                            0x2B0000,    //  59: bc:CallGlobal(3)
+                            0x020000     //  60: bc:Ret()
+                        ] ),
+                        literals: [
+                            literals:
+                            "PeriodicElements Alarm called: ",
+                            'Write,
+                            'Print,
+                            'Visible,
+                            'Open,
+                            'SysBeep,
+                            'lastReported,
+                            'text,
+                            "Last Alarm:",
+                            " ",
+                            'Time,
+                            'DateNTime,
+                            'array,
+                            'SetValue
+                        ],
+                        argFrame: NIL,
+                        numArgs: 1,
+                        DebuggerInfo: [
+                            dbg1:
+                            0,
+                            'alarm
+                        ]
+                    },
+                    myEditor: NIL,
+                    viewQuitScript: {
+                        class: $\s0003,
+                        instructions: MakeBinaryFromBC( [
+                            0x700000,    //   0: bc:FindVar(0)
+                            0x6F000A,    //   1: bc:BranchIfFalse(10)
+                            0x700000,    //   4: bc:FindVar(0)
+                            0x190000,    //   5: bc:Push(1)
+                            0x380000,    //   6: bc:Send(0)
+                            0x000000,    //   7: bc:Pop()
+                            0x220000,    //   8: bc:PushConst(2)
+                            0xA80000,    //   9: bc:FindAndSetVar(0)
+                            0x1A0000,    //  10: bc:Push(2)
+                            0x500000,    //  11: bc:ResendIfDef(0)
+                            0x020000     //  12: bc:Ret()
+                        ] ),
+                        literals: [
+                            literals:
+                            'myEditor,
+                            'Close,
+                            'viewQuitScript
+                        ],
+                        argFrame: NIL,
+                        numArgs: 0,
+                        DebuggerInfo: NIL
+                    },
+                    _proto: @157,
+                    debug: "myapp",
+                    lastReported: NIL,
+                    stepAllocateContext: [
+                        'lastReported,
+                        ref034142c1
+                    ],
+                    appSymbol: '|PeriodicElements:PIEDTS|
+                },
+                installScript: {
+                    class: $\s0003,
+                    instructions: MakeBinaryFromBC( [
+                        0x200000,    //   0: bc:PushConst(0)
+                        0xA40000,    //   1: bc:SetVar(4)
+                        0x700000,    //   2: bc:FindVar(0)
+                        0x190000,    //   3: bc:Push(1)
+                        0x910000,    //   4: bc:GetPath(1)
+                        0xA50000,    //   5: bc:SetVar(5)
+                        0x7D0000,    //   6: bc:GetVar(5)
+                        0x1A0000,    //   7: bc:Push(2)
+                        0x290000,    //   8: bc:CallGlobal(1)
+                        0x6F0049,    //   9: bc:BranchIfFalse(73)
+                        0x7D0000,    //  12: bc:GetVar(5)
+                        0x220000,    //  13: bc:PushConst(2)
+                        0xC70011,    //  14: bc:NewIter()
+                        0xA70007,    //  17: bc:SetVar(7)
+                        0x5F003C,    //  20: bc:Branch(60)
+                        0x7F0007,    //  23: bc:GetVar(7)
+                        0x240000,    //  26: bc:PushConst(4)
+                        0xC20000,    //  27: bc:ARef()
+                        0xA60000,    //  28: bc:SetVar(6)
+                        0x7E0000,    //  29: bc:GetVar(6)
+                        0x1B0000,    //  30: bc:Push(3)
+                        0x910000,    //  31: bc:GetPath(1)
+                        0x7B0000,    //  32: bc:GetVar(3)
+                        0x1B0000,    //  33: bc:Push(3)
+                        0x910000,    //  34: bc:GetPath(1)
+                        0xC40000,    //  35: bc:Equals()
+                        0x6F0038,    //  36: bc:BranchIfFalse(56)
+                        0x27000C,    //  39: bc:PushConst(12)
+                        0x1C0000,    //  42: bc:Push(4)
+                        0x1D0000,    //  43: bc:Push(5)
+                        0x1E0000,    //  44: bc:Push(6)
+                        0x280000,    //  45: bc:CallGlobal(0)
+                        0x1F0007,    //  46: bc:Push(7)
+                        0x3B0000,    //  49: bc:Send(3)
+                        0x000000,    //  50: bc:Pop()
+                        0x220000,    //  51: bc:PushConst(2)
+                        0x5F0044,    //  52: bc:Branch(68)
+                        0x000000,    //  55: bc:Pop()
+                        0x7F0007,    //  56: bc:GetVar(7)
+                        0x050000,    //  59: bc:IterNext()
+                        0x7F0007,    //  60: bc:GetVar(7)
+                        0x060000,    //  63: bc:IterDone()
+                        0x6F0017,    //  64: bc:BranchIfFalse(23)
+                        0x220000,    //  67: bc:PushConst(2)
+                        0x220000,    //  68: bc:PushConst(2)
+                        0xA70007,    //  69: bc:SetVar(7)
+                        0x000000,    //  72: bc:Pop()
+                        0x7B0000,    //  73: bc:GetVar(3)
+                        0x1F0008,    //  74: bc:Push(8)
+                        0x1F0009,    //  77: bc:Push(9)
+                        0x2A0000,    //  80: bc:CallGlobal(2)
+                        0x6F0061,    //  81: bc:BranchIfFalse(97)
+                        0x7B0000,    //  84: bc:GetVar(3)
+                        0x7B0000,    //  85: bc:GetVar(3)
+                        0x1F0008,    //  86: bc:Push(8)
+                        0x390000,    //  89: bc:Send(1)
+                        0x000000,    //  90: bc:Pop()
+                        0x7B0000,    //  91: bc:GetVar(3)
+                        0x1F0008,    //  92: bc:Push(8)
+                        0x220000,    //  95: bc:PushConst(2)
+                        0x980000,    //  96: bc:SetPath(0)
+                        0x7B0000,    //  97: bc:GetVar(3)
+                        0x1F000A,    //  98: bc:Push(10)
+                        0x220000,    // 101: bc:PushConst(2)
+                        0x990000,    // 102: bc:SetPath(1)
+                        0x020000     // 103: bc:Ret()
+                    ] ),
+                    literals: [
+                        literals:
+                        'vars,
+                        'extras,
+                        'IsArray,
+                        'app,
+                        "Extras Drawer",
+                        "The application you just installed conflicts with another application. Please contact the application vendor for an updated version.",
+                        'GetRoot,
+                        'Notify,
+                        'devInstallScript,
+                        'HasSlot,
+                        'installScript
+                    ],
+                    argFrame: NIL,
+                    numArgs: 262145,
+                    DebuggerInfo: [
+                        dbg1:
+                        0,
+                        'p,
+                        'i,
+                        'extras,
+                        'one,
+                        '|one\|iter|
+                    ]
+                },
+                removeScript: {
+                    class: $\s0003,
+                    instructions: MakeBinaryFromBC( [
+                        0x7B0000,    //   0: bc:GetVar(3)
+                        0x180000,    //   1: bc:Push(0)
+                        0x190000,    //   2: bc:Push(1)
+                        0x2A0000,    //   3: bc:CallGlobal(2)
+                        0x6F000E,    //   4: bc:BranchIfFalse(14)
+                        0x7B0000,    //   7: bc:GetVar(3)
+                        0x7B0000,    //   8: bc:GetVar(3)
+                        0x180000,    //   9: bc:Push(0)
+                        0x390000,    //  10: bc:Send(1)
+                        0x5F000F,    //  11: bc:Branch(15)
+                        0x220000,    //  14: bc:PushConst(2)
+                        0x020000     //  15: bc:Ret()
+                    ] ),
+                    literals: [
+                        literals:
+                        'devRemoveScript,
+                        'HasSlot
+                    ],
+                    argFrame: NIL,
+                    numArgs: 1,
+                    DebuggerInfo: [
+                        dbg1:
+                        0,
+                        'p
+                    ]
+                }
+            }
+        }
+    ]
+}
+;
+
+pkg := MakePkg(src);
+SaveBinary(pkg, "/Users/matt/dev/Newton/NewtonDev/NewtonDev.1/Sample Code/System Services/PeriodicElements-1/PeriodicElements1.pkg");
+
+newSrc := ReadPkg(pkg);
+p(newSrc);
+
+p("Done.");
+

@@ -732,7 +732,7 @@ int lex_makenamedmp(char *s, bool trunc)
 	pos = lex_update_tokenpos(kMAGICPOINTER);
 
 	// NOS2 非互換
-	WORN_NOS2("Named Magic Pinter");
+	WORN_NOS2("Named Magic Pointer");
 
 	return pos;
 }

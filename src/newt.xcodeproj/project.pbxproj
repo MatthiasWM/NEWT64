@@ -50,6 +50,7 @@
 		C91FB168249038ED0058EDE4 /* newt.bc.2.2.ns */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = newt.bc.2.2.ns; sourceTree = "<group>"; };
 		C91FB169249038ED0058EDE4 /* newt.2.2.ns */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = newt.2.2.ns; sourceTree = "<group>"; };
 		C91FB16A249255840058EDE4 /* test.ns */ = {isa = PBXFileReference; lastKnownFileType = text; path = test.ns; sourceTree = "<group>"; };
+		C91FB16B249263290058EDE4 /* pkg.ns */ = {isa = PBXFileReference; lastKnownFileType = text; path = pkg.ns; sourceTree = "<group>"; };
 		F503AC6A0851DFD9009BA497 /* endian_utils.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = endian_utils.c; sourceTree = "<group>"; };
 		F503AC6B0851DFD9009BA497 /* endian_utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = endian_utils.h; sourceTree = "<group>"; };
 		F52FA68B0594742F00087763 /* libl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libl.a; path = /usr/lib/libl.a; sourceTree = "<absolute>"; };
@@ -98,7 +99,7 @@
 		F5E14B0905798559009742A2 /* lookup_words.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lookup_words.c; sourceTree = "<group>"; };
 		F5E14B0A05798559009742A2 /* lookup_words.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lookup_words.h; sourceTree = "<group>"; };
 		F5E14B0B05798559009742A2 /* newt.l */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.lex; path = newt.l; sourceTree = "<group>"; };
-		F5E14B0C05798559009742A2 /* newt.y */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.yacc; path = newt.y; sourceTree = "<group>"; };
+		F5E14B0C05798559009742A2 /* newt.y */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.yacc; path = newt.y; sourceTree = "<group>"; usesTabs = 1; };
 		F5E14B0D05798559009742A2 /* yacc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yacc.h; sourceTree = "<group>"; };
 		F5F69C0107E8F36E0086BCEA /* platform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = platform.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -148,9 +149,10 @@
 		C91FB167249038B90058EDE4 /* Defs */ = {
 			isa = PBXGroup;
 			children = (
-				C91FB16A249255840058EDE4 /* test.ns */,
 				C91FB169249038ED0058EDE4 /* newt.2.2.ns */,
 				C91FB168249038ED0058EDE4 /* newt.bc.2.2.ns */,
+				C91FB16A249255840058EDE4 /* test.ns */,
+				C91FB16B249263290058EDE4 /* pkg.ns */,
 			);
 			name = Defs;
 			path = ../defs;

@@ -304,7 +304,7 @@ path_expr
 		;
 
 array
-		: '[' kSYMBOL ':' array_item_list ']'	{ $$ = NcSetClass($4, $2); } 
+		: '[' kSYMBOL ':' array_item_list ']'   { $$ = NcSetClass($4, $2); }
 		| '[' array_item_list ']'				{ $$ = $2; }
 		;
 
@@ -341,6 +341,8 @@ binary_item_list
 constructor
 		// 配列の生成
 		: '[' kSYMBOL ':' expr_list ']'		{ $$ = NPSGenNode2(kNPSMakeArray, $2, $4); }
+		// To create a map, we allow the use of an integer as the 'class' argument
+		| '[' kINTEGER ':' expr_list ']'	{ $$ = NPSGenNode2(kNPSMakeArray, $2, $4); }
 		| '[' expr_list ']'					{ $$ = NPSGenNode2(kNPSMakeArray, kNewtRefUnbind, $2); }
 
 		// フレームの生成

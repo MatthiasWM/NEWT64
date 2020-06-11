@@ -78,10 +78,10 @@ constant bc := {
 };
 
 
-//pkg := ReadPkg(LoadBinary("/Users/matt/dev/Newton/NewtonDev/NewtonDev.1/Sample Code/System Services/PeriodicElements-1/PeriodicElements.pkg"));
-//p(pkg);
+pkg := ReadPkg(LoadBinary("/Users/matt/dev/Newton/NewtonDev/NewtonDev.1/Sample Code/System Services/PeriodicElements-1/PeriodicElements.pkg"));
+p(pkg);
 
-p(MakeBinaryFromBC( [ 0x020000, bc:Ret(), bc:Pop(), bc:PopHandlers(), bc:Push(123), bc:PushConst(4) ] ));
+
 p("OK");
 exit();
 //bin := MakePkg(pkg);

@@ -1,10 +1,10 @@
 
-printDepth := 9999;
+//printDepth := 9999;
 printLength := 9999;
 printBinaries := 1;
 printUnique := 1;
 
-constant bc := {
+global bc := {
     // generate a 1-byte or 3-byte bytecode instruction from two integers
     MakeBytecode: func(a, b)
         if b>6 then
@@ -14,7 +14,7 @@ constant bc := {
     // generate a 3-byte bytecode instruction from two integers
     // TODO: or an integer and a symbol, used as a label
     MakeBytecodePC: func(a, pc)
-        return bOr( bOr( bAnd(a<<19, 0xF80000), 0x070000 ), bAnd(b, 0xFFFF) ),
+        return bOr( bOr( bAnd(a<<19, 0xF80000), 0x070000 ), bAnd(pc, 0xFFFF) ),
     Pop:            func() return :MakeBytecode(0, 0),
     Dup:            func() return :MakeBytecode(0, 1),
     Ret:            func() return :MakeBytecode(0, 2),
@@ -31,9 +31,9 @@ constant bc := {
     SendIfDef:      func(nArgs) return :MakeBytecode(8, nArgs),
     Resend:         func(nArgs) return :MakeBytecode(9, nArgs),
     ResendIfDef:    func(nArgs) return :MakeBytecode(10, nArgs),
-    Branch:         func(pc)    return :MakeBytecode(11, pc), // FIXME: allow sybols!
-    BranchIfTrue:   func(pc)    return :MakeBytecode(12, pc), // FIXME: allow sybols!
-    BranchIfFalse:  func(pc)    return :MakeBytecode(13, pc), // FIXME: allow sybols!
+    Branch:         func(pc)    if IsSymbol(pc) then return [:MakeBytecodePC(11, 0), pc] else return :MakeBytecodePC(11, pc),
+    BranchIfTrue:   func(pc)    if IsSymbol(pc) then return [:MakeBytecodePC(12, 0), pc] else return :MakeBytecodePC(12, pc),
+    BranchIfFalse:  func(pc)    if IsSymbol(pc) then return [:MakeBytecodePC(13, 0), pc] else return :MakeBytecodePC(13, pc),
     FindVar:        func(lit)   return :MakeBytecode(14, lit),
     GetVar:         func(loc)   return :MakeBytecode(15, loc),
     MakeFrame:      func(nSlts) return :MakeBytecode(16, nSlts),
@@ -43,7 +43,7 @@ constant bc := {
     SetVar:         func(loc)   return :MakeBytecode(20, loc),
     FindAndSetVar:  func(lit)   return :MakeBytecode(21, lit),
     IncrVar:        func(loc)   return :MakeBytecode(22, loc),
-    BranchIfNotDone:func(pc)    return :MakeBytecode(23, pc), // FIXME: allow sybols!
+    BranchIfNotDone:func(pc)    if IsSymbol(pc) then return [:MakeBytecodePC(23, 0), pc] else return :MakeBytecodePC(23, pc),
     Add:            func()  return :MakeBytecode(24, 0),
     Subtract:       func()  return :MakeBytecode(24, 1),
     ARef:           func()  return :MakeBytecode(24, 2),
@@ -72,8 +72,42 @@ constant bc := {
     NewHandlers:    func(nEx)   return :MakeBytecode(25, nEx),
 };
 
+p("start...");
+//p(func() if 3=4 then 12 else 17 );
+
+fn := {
+    class: 'CodeBlock,
+    instructions: MakeBinaryFromBC( [
+        binary:
+        /*   0: 27 000C */ bc:PushConst(12), // 3
+        /*   3: 27 0010 */ bc:PushConst(16), // 4
+        /*   6: C4      */ bc:Equals(),
+        /*   7: 6F 0010 */ bc:BranchIfFalse('label_16),
+        /*  10: 27 0030 */ bc:PushConst(48), // 12
+        /*  13: 5F 0013 */ bc:Branch('label_19),
+            'label_16,
+        /*  16: 27 0044 */ bc:PushConst(68), // 17
+            'label_19,
+        /*  19: 02      */ bc:Ret()
+    ] ),
+    literals: NIL,
+    argFrame: {
+        _nextArgFrame: {
+            _nextArgFrame: NIL,
+            _parent: NIL,
+            _implementor: NIL
+        },
+        _parent: NIL,
+        _implementor: NIL
+    },
+    numArgs: 0
+};
+
+p("hallo");
+p(fn);
 
 p("start...");
+exit();
 
 constant src :=
 {
@@ -120,24 +154,25 @@ constant src :=
                                 class: $\s0003,
                                 instructions: MakeBinaryFromBC( [
                                     instructions:
-                                    /*   0: 27 000B */ bc:PushConst(11),
-                                    /*   3: 18      */ bc:Push(0),
-                                    /*   4: 19      */ bc:Push(1),
-                                    /*   5: 1A      */ bc:Push(2),
-                                    /*   6: 1B      */ bc:Push(3),
+                                    /*   0: 27 000B */ bc:PushConst(11), // @2
+                                    /*   3: 18      */ bc:Push(0), // "Periodic"
+                                    /*   4: 19      */ bc:Push(1), // |PeriodicElements:PIEDTS|
+                                    /*   5: 1A      */ bc:Push(2), // "Auto Beep"
+                                    /*   6: 1B      */ bc:Push(3), // { ... }
                                     /*   7: 04      */ bc:SetLexScope(),
-                                    /*   8: 1C      */ bc:Push(4),
+                                    /*   8: 1C      */ bc:Push(4), // [ ... ]
                                     /*   9: 85      */ bc:MakeFrame(5),
                                     /*  10: A3      */ bc:SetVar(3),
-                                    /*  11: 75      */ bc:FindVar(5),
+                                    /*  11: 75      */ bc:FindVar(5), // myEditor
                                     /*  12: C5      */ bc:LNot(),
-                                    /*  13: 6F 0014 */ bc:BranchIfFalse(20),
+                                    /*  13: 6F 0014 */ bc:BranchIfFalse('label_20),
                                     /*  16: 7B      */ bc:GetVar(3),
-                                    /*  17: 1E      */ bc:Push(6),
+                                    /*  17: 1E      */ bc:Push(6), // BuildContext
                                     /*  18: 29      */ bc:CallGlobal(1),
-                                    /*  19: AD      */ bc:FindAndSetVar(5),
-                                    /*  20: 75      */ bc:FindVar(5),
-                                    /*  21: 1F 0007 */ bc:Push(7),
+                                    /*  19: AD      */ bc:FindAndSetVar(5), // myEditor
+                                        'label_20,
+                                    /*  20: 75      */ bc:FindVar(5), // myEditor
+                                    /*  21: 1F 0007 */ bc:Push(7), // Open
                                     /*  24: 38      */ bc:Send(0),
                                     /*  25: 02      */ bc:Ret()
                                 ] ),
@@ -150,10 +185,10 @@ constant src :=
                                         class: $\s0003,
                                         instructions: MakeBinaryFromBC( [
                                             instructions:
-                                            /*   0: 70      */ bc:FindVar(0),
-                                            /*   1: 19      */ bc:Push(1),
-                                            /*   2: 22      */ bc:PushConst(2),
-                                            /*   3: 1A      */ bc:Push(2),
+                                            /*   0: 70      */ bc:FindVar(0), // base
+                                            /*   1: 19      */ bc:Push(1), // myEditor
+                                            /*   2: 22      */ bc:PushConst(2), // NIL
+                                            /*   3: 1A      */ bc:Push(2), // SetValue
                                             /*   4: 2B      */ bc:CallGlobal(3),
                                             /*   5: 02      */ bc:Ret()
                                         ] ),
@@ -214,9 +249,9 @@ constant src :=
                                 class: $\s0003,
                                 instructions: MakeBinaryFromBC( [
                                     instructions:
-                                    /*   0: 24      */ bc:PushConst(4),
+                                    /*   0: 24      */ bc:PushConst(4), // 1
                                     /*   1: 03      */ bc:PushSelf(),
-                                    /*   2: 18      */ bc:Push(0),
+                                    /*   2: 18      */ bc:Push(0), // SetupIdle
                                     /*   3: 39      */ bc:Send(1),
                                     /*   4: 02      */ bc:Ret()
                                 ] ),
@@ -233,28 +268,28 @@ constant src :=
                                 instructions: MakeBinaryFromBC( [
                                     instructions:
                                     /*   0: 03      */ bc:PushSelf(),
-                                    /*   1: 18      */ bc:Push(0),
-                                    /*   2: 19      */ bc:Push(1),
-                                    /*   3: 1A      */ bc:Push(2),
-                                    /*   4: 1B      */ bc:Push(3),
+                                    /*   1: 18      */ bc:Push(0), // text
+                                    /*   2: 19      */ bc:Push(1), // "It is now"
+                                    /*   3: 1A      */ bc:Push(2), // " "
+                                    /*   4: 1B      */ bc:Push(3), // Time
                                     /*   5: 28      */ bc:CallGlobal(0),
-                                    /*   6: 1C      */ bc:Push(4),
+                                    /*   6: 1C      */ bc:Push(4), // DateNTime
                                     /*   7: 29      */ bc:CallGlobal(1),
-                                    /*   8: 1D      */ bc:Push(5),
-                                    /*   9: 27 0286 */ bc:PushConst(646),
-                                    /*  12: 1E      */ bc:Push(6),
+                                    /*   8: 1D      */ bc:Push(5), // " "
+                                    /*   9: 27 0286 */ bc:PushConst(646), // $(
+                                    /*  12: 1E      */ bc:Push(6), // TimeInSeconds
                                     /*  13: 28      */ bc:CallGlobal(0),
-                                    /*  14: 27 00F0 */ bc:PushConst(240),
-                                    /*  17: 1F 0007 */ bc:Push(7),
+                                    /*  14: 27 00F0 */ bc:PushConst(240), // 60
+                                    /*  17: 1F 0007 */ bc:Push(7), // mod
                                     /*  20: 2A      */ bc:CallGlobal(2),
-                                    /*  21: 27 0296 */ bc:PushConst(662),
-                                    /*  24: 1F 0008 */ bc:Push(8),
+                                    /*  21: 27 0296 */ bc:PushConst(662), // $)
+                                    /*  24: 1F 0008 */ bc:Push(8), // array
                                     /*  27: 8F 0007 */ bc:MakeArray(7),
                                     /*  30: C7 0016 */ bc:Stringer(),
-                                    /*  33: 1F 0009 */ bc:Push(9),
+                                    /*  33: 1F 0009 */ bc:Push(9), // SetValue
                                     /*  36: 2B      */ bc:CallGlobal(3),
                                     /*  37: 00      */ bc:Pop(),
-                                    /*  38: 27 07D0 */ bc:PushConst(2000),
+                                    /*  38: 27 07D0 */ bc:PushConst(2000), // 500
                                     /*  41: 02      */ bc:Ret()
                                 ] ),
                                 literals: [
@@ -278,7 +313,7 @@ constant src :=
                             _proto: @218,
                             debug: "currentDate"
                         },
-                        ref00734501 := {
+                        ref00574b01 := {
                             text: "<no alarms reported>",
                             viewBounds: {
                                 left: 8,
@@ -295,11 +330,11 @@ constant src :=
                                 class: $\s0003,
                                 instructions: MakeBinaryFromBC( [
                                     instructions:
-                                    /*   0: 18      */ bc:Push(0),
+                                    /*   0: 18      */ bc:Push(0), // Time
                                     /*   1: 28      */ bc:CallGlobal(0),
-                                    /*   2: 27 1680 */ bc:PushConst(5760),
+                                    /*   2: 27 1680 */ bc:PushConst(5760), // 1440
                                     /*   5: C1      */ bc:Subtract(),
-                                    /*   6: 19      */ bc:Push(1),
+                                    /*   6: 19      */ bc:Push(1), // SetTime
                                     /*   7: 29      */ bc:CallGlobal(1),
                                     /*   8: 02      */ bc:Ret()
                                 ] ),
@@ -327,11 +362,11 @@ constant src :=
                                 class: $\s0003,
                                 instructions: MakeBinaryFromBC( [
                                     instructions:
-                                    /*   0: 18      */ bc:Push(0),
+                                    /*   0: 18      */ bc:Push(0), // Time
                                     /*   1: 28      */ bc:CallGlobal(0),
-                                    /*   2: 27 1680 */ bc:PushConst(5760),
+                                    /*   2: 27 1680 */ bc:PushConst(5760), // 1440
                                     /*   5: C0      */ bc:Add(),
-                                    /*   6: 19      */ bc:Push(1),
+                                    /*   6: 19      */ bc:Push(1), // SetTime
                                     /*   7: 29      */ bc:CallGlobal(1),
                                     /*   8: 02      */ bc:Ret()
                                 ] ),
@@ -359,11 +394,11 @@ constant src :=
                                 class: $\s0003,
                                 instructions: MakeBinaryFromBC( [
                                     instructions:
-                                    /*   0: 18      */ bc:Push(0),
+                                    /*   0: 18      */ bc:Push(0), // Time
                                     /*   1: 28      */ bc:CallGlobal(0),
-                                    /*   2: 24      */ bc:PushConst(4),
+                                    /*   2: 24      */ bc:PushConst(4), // 1
                                     /*   3: C1      */ bc:Subtract(),
-                                    /*   4: 19      */ bc:Push(1),
+                                    /*   4: 19      */ bc:Push(1), // SetTime
                                     /*   5: 29      */ bc:CallGlobal(1),
                                     /*   6: 02      */ bc:Ret()
                                 ] ),
@@ -391,11 +426,11 @@ constant src :=
                                 class: $\s0003,
                                 instructions: MakeBinaryFromBC( [
                                     instructions:
-                                    /*   0: 18      */ bc:Push(0),
+                                    /*   0: 18      */ bc:Push(0), // Time
                                     /*   1: 28      */ bc:CallGlobal(0),
-                                    /*   2: 24      */ bc:PushConst(4),
+                                    /*   2: 24      */ bc:PushConst(4), // 1
                                     /*   3: C0      */ bc:Add(),
-                                    /*   4: 19      */ bc:Push(1),
+                                    /*   4: 19      */ bc:Push(1), // SetTime
                                     /*   5: 29      */ bc:CallGlobal(1),
                                     /*   6: 02      */ bc:Ret()
                                 ] ),
@@ -423,7 +458,7 @@ constant src :=
                         class: $\s0003,
                         instructions: MakeBinaryFromBC( [
                             instructions:
-                            /*   0: 27 001A */ bc:PushConst(26),
+                            /*   0: 27 001A */ bc:PushConst(26), // TRUE
                             /*   3: 02      */ bc:Ret()
                         ] ),
                         literals: NIL,
@@ -435,47 +470,48 @@ constant src :=
                         class: $\s0003,
                         instructions: MakeBinaryFromBC( [
                             instructions:
-                            /*   0: 18      */ bc:Push(0),
-                            /*   1: 19      */ bc:Push(1),
+                            /*   0: 18      */ bc:Push(0), // "PeriodicElements Alarm called: "
+                            /*   1: 19      */ bc:Push(1), // Write
                             /*   2: 29      */ bc:CallGlobal(1),
                             /*   3: 00      */ bc:Pop(),
                             /*   4: 7B      */ bc:GetVar(3),
-                            /*   5: 1A      */ bc:Push(2),
+                            /*   5: 1A      */ bc:Push(2), // Print
                             /*   6: 29      */ bc:CallGlobal(1),
                             /*   7: 00      */ bc:Pop(),
                             /*   8: 03      */ bc:PushSelf(),
-                            /*   9: 1B      */ bc:Push(3),
+                            /*   9: 1B      */ bc:Push(3), // Visible
                             /*  10: 29      */ bc:CallGlobal(1),
                             /*  11: C5      */ bc:LNot(),
-                            /*  12: 6F 0013 */ bc:BranchIfFalse(19),
+                            /*  12: 6F 0013 */ bc:BranchIfFalse('label_19),
                             /*  15: 03      */ bc:PushSelf(),
-                            /*  16: 1C      */ bc:Push(4),
+                            /*  16: 1C      */ bc:Push(4), // Open
                             /*  17: 38      */ bc:Send(0),
                             /*  18: 00      */ bc:Pop(),
+                                'label_19,
                             /*  19: 03      */ bc:PushSelf(),
-                            /*  20: 1D      */ bc:Push(5),
+                            /*  20: 1D      */ bc:Push(5), // SysBeep
                             /*  21: 38      */ bc:Send(0),
                             /*  22: 00      */ bc:Pop(),
                             /*  23: 03      */ bc:PushSelf(),
-                            /*  24: 1D      */ bc:Push(5),
+                            /*  24: 1D      */ bc:Push(5), // SysBeep
                             /*  25: 38      */ bc:Send(0),
                             /*  26: 00      */ bc:Pop(),
                             /*  27: 03      */ bc:PushSelf(),
-                            /*  28: 1D      */ bc:Push(5),
+                            /*  28: 1D      */ bc:Push(5), // SysBeep
                             /*  29: 38      */ bc:Send(0),
                             /*  30: 00      */ bc:Pop(),
-                            /*  31: 76      */ bc:FindVar(6),
-                            /*  32: 1F 0007 */ bc:Push(7),
-                            /*  35: 1F 0008 */ bc:Push(8),
-                            /*  38: 1F 0009 */ bc:Push(9),
-                            /*  41: 1F 000A */ bc:Push(10),
+                            /*  31: 76      */ bc:FindVar(6), // lastReported
+                            /*  32: 1F 0007 */ bc:Push(7), // text
+                            /*  35: 1F 0008 */ bc:Push(8), // "Last Alarm:"
+                            /*  38: 1F 0009 */ bc:Push(9), // " "
+                            /*  41: 1F 000A */ bc:Push(10), // Time
                             /*  44: 28      */ bc:CallGlobal(0),
-                            /*  45: 1F 000B */ bc:Push(11),
+                            /*  45: 1F 000B */ bc:Push(11), // DateNTime
                             /*  48: 29      */ bc:CallGlobal(1),
-                            /*  49: 1F 000C */ bc:Push(12),
+                            /*  49: 1F 000C */ bc:Push(12), // array
                             /*  52: 8B      */ bc:MakeArray(3),
                             /*  53: C7 0016 */ bc:Stringer(),
-                            /*  56: 1F 000D */ bc:Push(13),
+                            /*  56: 1F 000D */ bc:Push(13), // SetValue
                             /*  59: 2B      */ bc:CallGlobal(3),
                             /*  60: 02      */ bc:Ret()
                         ] ),
@@ -509,15 +545,16 @@ constant src :=
                         class: $\s0003,
                         instructions: MakeBinaryFromBC( [
                             instructions:
-                            /*   0: 70      */ bc:FindVar(0),
-                            /*   1: 6F 000A */ bc:BranchIfFalse(10),
-                            /*   4: 70      */ bc:FindVar(0),
-                            /*   5: 19      */ bc:Push(1),
+                            /*   0: 70      */ bc:FindVar(0), // myEditor
+                            /*   1: 6F 000A */ bc:BranchIfFalse('label_10),
+                            /*   4: 70      */ bc:FindVar(0), // myEditor
+                            /*   5: 19      */ bc:Push(1), // Close
                             /*   6: 38      */ bc:Send(0),
                             /*   7: 00      */ bc:Pop(),
-                            /*   8: 22      */ bc:PushConst(2),
-                            /*   9: A8      */ bc:FindAndSetVar(0),
-                            /*  10: 1A      */ bc:Push(2),
+                            /*   8: 22      */ bc:PushConst(2), // NIL
+                            /*   9: A8      */ bc:FindAndSetVar(0), // myEditor
+                                'label_10,
+                            /*  10: 1A      */ bc:Push(2), // viewQuitScript
                             /*  11: 50      */ bc:ResendIfDef(0),
                             /*  12: 02      */ bc:Ret()
                         ] ),
@@ -536,7 +573,7 @@ constant src :=
                     lastReported: NIL,
                     stepAllocateContext: [
                         'lastReported,
-                        ref00734501
+                        ref00574b01
                     ],
                     appSymbol: '|PeriodicElements:PIEDTS|
                 },
@@ -544,70 +581,76 @@ constant src :=
                     class: $\s0003,
                     instructions: MakeBinaryFromBC( [
                         instructions:
-                        /*   0: 20      */ bc:PushConst(0),
+                        /*   0: 20      */ bc:PushConst(0), // 0
                         /*   1: A4      */ bc:SetVar(4),
-                        /*   2: 70      */ bc:FindVar(0),
-                        /*   3: 19      */ bc:Push(1),
+                        /*   2: 70      */ bc:FindVar(0), // vars
+                        /*   3: 19      */ bc:Push(1), // extras
                         /*   4: 91      */ bc:GetPath(1),
                         /*   5: A5      */ bc:SetVar(5),
                         /*   6: 7D      */ bc:GetVar(5),
-                        /*   7: 1A      */ bc:Push(2),
+                        /*   7: 1A      */ bc:Push(2), // IsArray
                         /*   8: 29      */ bc:CallGlobal(1),
-                        /*   9: 6F 0049 */ bc:BranchIfFalse(73),
+                        /*   9: 6F 0049 */ bc:BranchIfFalse('label_73),
                         /*  12: 7D      */ bc:GetVar(5),
-                        /*  13: 22      */ bc:PushConst(2),
+                        /*  13: 22      */ bc:PushConst(2), // NIL
                         /*  14: C7 0011 */ bc:NewIter(),
                         /*  17: A7 0007 */ bc:SetVar(7),
-                        /*  20: 5F 003C */ bc:Branch(60),
+                        /*  20: 5F 003C */ bc:Branch('label_60),
+                            'label_23,
                         /*  23: 7F 0007 */ bc:GetVar(7),
-                        /*  26: 24      */ bc:PushConst(4),
+                        /*  26: 24      */ bc:PushConst(4), // 1
                         /*  27: C2      */ bc:ARef(),
                         /*  28: A6      */ bc:SetVar(6),
                         /*  29: 7E      */ bc:GetVar(6),
-                        /*  30: 1B      */ bc:Push(3),
+                        /*  30: 1B      */ bc:Push(3), // app
                         /*  31: 91      */ bc:GetPath(1),
                         /*  32: 7B      */ bc:GetVar(3),
-                        /*  33: 1B      */ bc:Push(3),
+                        /*  33: 1B      */ bc:Push(3), // app
                         /*  34: 91      */ bc:GetPath(1),
                         /*  35: C4      */ bc:Equals(),
-                        /*  36: 6F 0038 */ bc:BranchIfFalse(56),
-                        /*  39: 27 000C */ bc:PushConst(12),
-                        /*  42: 1C      */ bc:Push(4),
-                        /*  43: 1D      */ bc:Push(5),
-                        /*  44: 1E      */ bc:Push(6),
+                        /*  36: 6F 0038 */ bc:BranchIfFalse('label_56),
+                        /*  39: 27 000C */ bc:PushConst(12), // 3
+                        /*  42: 1C      */ bc:Push(4), // "Extras Drawer"
+                        /*  43: 1D      */ bc:Push(5), // "The application you just installed conflicts with another application. Please contact the application vendor for an updated version."
+                        /*  44: 1E      */ bc:Push(6), // GetRoot
                         /*  45: 28      */ bc:CallGlobal(0),
-                        /*  46: 1F 0007 */ bc:Push(7),
+                        /*  46: 1F 0007 */ bc:Push(7), // Notify
                         /*  49: 3B      */ bc:Send(3),
                         /*  50: 00      */ bc:Pop(),
-                        /*  51: 22      */ bc:PushConst(2),
-                        /*  52: 5F 0044 */ bc:Branch(68),
+                        /*  51: 22      */ bc:PushConst(2), // NIL
+                        /*  52: 5F 0044 */ bc:Branch('label_68),
                         /*  55: 00      */ bc:Pop(),
+                            'label_56,
                         /*  56: 7F 0007 */ bc:GetVar(7),
                         /*  59: 05      */ bc:IterNext(),
+                            'label_60,
                         /*  60: 7F 0007 */ bc:GetVar(7),
                         /*  63: 06      */ bc:IterDone(),
-                        /*  64: 6F 0017 */ bc:BranchIfFalse(23),
-                        /*  67: 22      */ bc:PushConst(2),
-                        /*  68: 22      */ bc:PushConst(2),
+                        /*  64: 6F 0017 */ bc:BranchIfFalse('label_23),
+                        /*  67: 22      */ bc:PushConst(2), // NIL
+                            'label_68,
+                        /*  68: 22      */ bc:PushConst(2), // NIL
                         /*  69: A7 0007 */ bc:SetVar(7),
                         /*  72: 00      */ bc:Pop(),
+                            'label_73,
                         /*  73: 7B      */ bc:GetVar(3),
-                        /*  74: 1F 0008 */ bc:Push(8),
-                        /*  77: 1F 0009 */ bc:Push(9),
+                        /*  74: 1F 0008 */ bc:Push(8), // devInstallScript
+                        /*  77: 1F 0009 */ bc:Push(9), // HasSlot
                         /*  80: 2A      */ bc:CallGlobal(2),
-                        /*  81: 6F 0061 */ bc:BranchIfFalse(97),
+                        /*  81: 6F 0061 */ bc:BranchIfFalse('label_97),
                         /*  84: 7B      */ bc:GetVar(3),
                         /*  85: 7B      */ bc:GetVar(3),
-                        /*  86: 1F 0008 */ bc:Push(8),
+                        /*  86: 1F 0008 */ bc:Push(8), // devInstallScript
                         /*  89: 39      */ bc:Send(1),
                         /*  90: 00      */ bc:Pop(),
                         /*  91: 7B      */ bc:GetVar(3),
-                        /*  92: 1F 0008 */ bc:Push(8),
-                        /*  95: 22      */ bc:PushConst(2),
+                        /*  92: 1F 0008 */ bc:Push(8), // devInstallScript
+                        /*  95: 22      */ bc:PushConst(2), // NIL
                         /*  96: 98      */ bc:SetPath(0),
+                            'label_97,
                         /*  97: 7B      */ bc:GetVar(3),
-                        /*  98: 1F 000A */ bc:Push(10),
-                        /* 101: 22      */ bc:PushConst(2),
+                        /*  98: 1F 000A */ bc:Push(10), // installScript
+                        /* 101: 22      */ bc:PushConst(2), // NIL
                         /* 102: 99      */ bc:SetPath(1),
                         /* 103: 02      */ bc:Ret()
                     ] ),
@@ -642,16 +685,18 @@ constant src :=
                     instructions: MakeBinaryFromBC( [
                         instructions:
                         /*   0: 7B      */ bc:GetVar(3),
-                        /*   1: 18      */ bc:Push(0),
-                        /*   2: 19      */ bc:Push(1),
+                        /*   1: 18      */ bc:Push(0), // devRemoveScript
+                        /*   2: 19      */ bc:Push(1), // HasSlot
                         /*   3: 2A      */ bc:CallGlobal(2),
-                        /*   4: 6F 000E */ bc:BranchIfFalse(14),
+                        /*   4: 6F 000E */ bc:BranchIfFalse('label_14),
                         /*   7: 7B      */ bc:GetVar(3),
                         /*   8: 7B      */ bc:GetVar(3),
-                        /*   9: 18      */ bc:Push(0),
+                        /*   9: 18      */ bc:Push(0), // devRemoveScript
                         /*  10: 39      */ bc:Send(1),
-                        /*  11: 5F 000F */ bc:Branch(15),
-                        /*  14: 22      */ bc:PushConst(2),
+                        /*  11: 5F 000F */ bc:Branch('label_15),
+                            'label_14,
+                        /*  14: 22      */ bc:PushConst(2), // NIL
+                            'label_15,
                         /*  15: 02      */ bc:Ret()
                     ] ),
                     literals: [

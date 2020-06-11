@@ -565,7 +565,30 @@ void NIOPrintObjBinaryInstructions(newtStream_t * f, newtRefArg r, newtRefArg co
 
     newtRef literals = NewtObjGetSlot(NewtRefToPointer(codeBlock), NSSYM0(literals));
 
+    // first, mark all the locations that are jump targets and need a label:
+    uint8_t *needsLabel = (uint8_t*)calloc(1, len);
     for (uint32_t pc=0; pc<len; ) {
+        uint8_t inst = data[pc];
+        uint8_t a = inst>>3, n = 1;
+        uint16_t b = 0;
+        if ( (inst & 0x07) == 0x07 ) {
+            b = (data[pc+1]<<8) | (data[pc+2]);
+            n = 3;
+        } else {
+            b = inst & 0x07;
+            n = 1;
+        }
+        if ((a==11) || (a==12) || (a==13) || (a==23)) {
+            needsLabel[b] = 1;
+        }
+        pc += n;
+    }
+
+    for (uint32_t pc=0; pc<len; ) {
+        if (needsLabel[pc]) {
+            if (NEWT_INDENT) NIOPrintIndent(f, depth-1);
+            NIOFprintf(f, "    'label_%d,", pc);
+        }
         if (NEWT_INDENT) NIOPrintIndent(f, depth-1);
         uint8_t inst = data[pc];
         uint8_t a = inst>>3, n = 1;
@@ -607,9 +630,9 @@ void NIOPrintObjBinaryInstructions(newtStream_t * f, newtRefArg r, newtRefArg co
             case 8: NIOFprintf(f, "bc:SendIfDef(%d)", b); break;
             case 9: NIOFprintf(f, "bc:Resend(%d)", b); break;
             case 10: NIOFprintf(f, "bc:ResendIfDef(%d)", b); break;
-            case 11: NIOFprintf(f, "bc:Branch(%d)", b); break;
-            case 12: NIOFprintf(f, "bc:BranchIfTrue(%d)", b); break;
-            case 13: NIOFprintf(f, "bc:BranchIfFalse(%d)", b); break;
+            case 11: NIOFprintf(f, "bc:Branch('label_%d)", b); break;
+            case 12: NIOFprintf(f, "bc:BranchIfTrue('label_%d)", b); break;
+            case 13: NIOFprintf(f, "bc:BranchIfFalse('label_%d)", b); break;
             case 14: NIOFprintf(f, "bc:FindVar(%d)", b); pLit = 1; break;
             case 15: NIOFprintf(f, "bc:GetVar(%d)", b); break;
             case 16: NIOFprintf(f, "bc:MakeFrame(%d)", b); break;
@@ -619,7 +642,7 @@ void NIOPrintObjBinaryInstructions(newtStream_t * f, newtRefArg r, newtRefArg co
             case 20: NIOFprintf(f, "bc:SetVar(%d)", b); break;
             case 21: NIOFprintf(f, "bc:FindAndSetVar(%d)", b); pLit = 1; break;
             case 22: NIOFprintf(f, "bc:IncrVar(%d)", b); break;
-            case 23: NIOFprintf(f, "bc:BranchIfNotDone(%d)", b); break;
+            case 23: NIOFprintf(f, "bc:BranchIfNotDone('label_%d)", b); break;
             case 24:
                 switch (b) {
                     case 0: NIOFputs("bc:Add()", f); break;
@@ -670,6 +693,8 @@ void NIOPrintObjBinaryInstructions(newtStream_t * f, newtRefArg r, newtRefArg co
     }
     if (NEWT_INDENT) NIOPrintIndent(f, depth);
     NIOFputs("] )", f);
+
+    free(needsLabel);
 }
 
 

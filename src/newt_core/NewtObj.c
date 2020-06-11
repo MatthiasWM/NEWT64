@@ -1281,10 +1281,14 @@ newtRef NewtMakeBinaryFromBC(newtRefArg byteCodeArray, bool literal)
         uint32_t size = 0;
         uint32_t nSlots = NewtArrayLength(byteCodeArray);
         newtRef *slot = NewtRefToSlots(byteCodeArray);
-        // find the size for the binary object
+
+        // remember where all the labels are
+        newtRef labelList = NewtMakeFrame(kNewtRefNIL, 0);
+        // find the size for the binary object and the positions of the labels
         for (uint32_t i=0; i<nSlots; i++) {
             newtRef s = slot[i];
             if (NewtRefIsInteger(s)) {
+                // all integers are bytecode instructions that can be copied verbatim
                 uint32_t inst = (uint32_t)NewtRefToInteger(s);
                 if ( (inst & 0xff000000) == 0x00000000 ) {
                     if ( (inst & 0x00070000) == 0x00070000 )
@@ -1294,13 +1298,23 @@ newtRef NewtMakeBinaryFromBC(newtRefArg byteCodeArray, bool literal)
                 } else {
                     NewtFprintf(stderr, "*** NewtMakeBinaryFromBC: invalid instruction 0x%08x\n", inst);
                 }
+            } else if (NewtRefIsArray(s)) {
+                // the first slot in the array is an integer with a 3 byte branch instruction
+                //newtRef t = NewtGetArraySlot(s, 0); // check if this is valid
+                //uint32_t inst = (uint32_t)NewtRefToInteger(s); // check if this is valid
+                size += 3;
+            } else if (NewtRefIsSymbol(s)) {
+                // store the PC for every label we find in the labelList frame
+                NcSetSlot(labelList, s, NewtMakeInteger(size));
             } else {
-                NewtFprintf(stderr, "*** NewtMakeBinaryFromBC: invalid instruction, integer expected\n");
+                NewtFprintf(stderr, "*** NewtMakeBinaryFromBC: invalid instruction, integer or symbol expected\n");
             }
         }
+
         // write the bytecode into a binary object
         newtRef obj = NewtMakeBinary(NSSYM0(instructions), 0, size, literal);
         if (obj) {
+            // loop through all instructions
             uint8_t *dst = NewtRefToBinary(obj);
             for (uint32_t i=0; i<nSlots; i++) {
                 newtRef s = slot[i];
@@ -1315,6 +1329,15 @@ newtRef NewtMakeBinaryFromBC(newtRefArg byteCodeArray, bool literal)
                             *dst++ = (uint8_t)(inst>>16);
                         }
                     }
+                } else if (NewtRefIsArray(s)) {
+                    newtRef t = NewtGetArraySlot(s, 0);
+                    newtRef label = NewtGetArraySlot(s, 1);
+                    newtRef pc = NcGetSlot(labelList, label);
+                    uint32_t inst = (uint32_t)NewtRefToInteger(t);
+                    uint16_t b = (uint16_t)NewtRefToInteger(pc);
+                    *dst++ = (uint8_t)(inst>>16);
+                    *dst++ = (uint8_t)(b>>8);
+                    *dst++ = (uint8_t)(b);
                 }
             }
             return obj;

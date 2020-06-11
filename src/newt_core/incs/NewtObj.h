@@ -31,7 +31,8 @@ extern "C" {
 
 enum {
     kNewtNotFunction			= 0,
-    kNewtCodeBlock,						// バイトコード関数
+    kNewtCodeBlock,                     // バイトコード関数
+    kNewtCodeBlock21,                   // NewtonOS 2.1 function block
     kNewtNativeFn,						// ネイティブ関数（rcvrなし、old style）
     kNewtNativeFunc						// ネイティブ関数（rcvrあり、new style）
 };

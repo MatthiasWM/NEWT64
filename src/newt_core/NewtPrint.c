@@ -41,7 +41,7 @@ static void			NIOPrintReal(newtStream_t * f, newtRefArg r);
 static void			NIOPrintObjCharacter(newtStream_t * f, newtRefArg r);
 static void			NIOPrintObjNamedMP(newtStream_t * f, newtRefArg r);
 static void			NIOPrintObjMagicPointer(newtStream_t * f, newtRefArg r);
-static void         NIOPrintObjBinaryInstructions(newtStream_t * f, newtRefArg r, int32_t depth);
+static void         NIOPrintObjBinaryInstructions(newtStream_t * f, newtRefArg r, newtRefArg codeBlock, int32_t depth);
 static void			NIOPrintObjBinary(newtStream_t * f, newtRefArg r, int32_t depth);
 static void			NIOPrintObjSymbol(newtStream_t * f, newtRefArg r);
 static void			NIOPrintObjString(newtStream_t * f, newtRefArg r);
@@ -549,13 +549,22 @@ void NIOPrintObjMagicPointer(newtStream_t * f, newtRefArg r)
  * @param r            [in] binary object with NewtonScript bytecode instructions
  */
 
-void NIOPrintObjBinaryInstructions(newtStream_t * f, newtRefArg r, int32_t depth)
+void NIOPrintObjBinaryInstructions(newtStream_t * f, newtRefArg r, newtRefArg codeBlock, int32_t depth)
 {
+    newtObjRef array = NewtRefToPointer(r);
     uint32_t len = NewtBinaryLength(r);
     uint8_t *data = NewtRefToBinary(r);
     NIOFputs("MakeBinaryFromBC( [", f);
+
     if (NEWT_INDENT) NIOPrintIndent(f, depth-1);
-    NIOFputs("instructions:", f);
+    newtRef klass = NewtObjArrayClass(array);
+    if (NewtRefIsNIL(klass))
+        NIOFputs("binary:", f);
+    else
+        NIOFprintf(f, "%s:", NewtSymbolGetName(klass));
+
+    newtRef literals = NewtObjGetSlot(NewtRefToPointer(codeBlock), NSSYM0(literals));
+
     for (uint32_t pc=0; pc<len; ) {
         if (NEWT_INDENT) NIOPrintIndent(f, depth-1);
         uint8_t inst = data[pc];
@@ -574,6 +583,8 @@ void NIOPrintObjBinaryInstructions(newtStream_t * f, newtRefArg r, int32_t depth
             b = inst & 0x07;
             n = 1;
         }
+        int pLit = 0;
+        int pImm = 0;
         switch (a) {
             case 0:
                 switch (b) {
@@ -588,8 +599,8 @@ void NIOPrintObjBinaryInstructions(newtStream_t * f, newtRefArg r, int32_t depth
                     default: NIOFputs("bc:Invalid()", f); break;
                 }
                 break;
-            case 3: NIOFprintf(f, "bc:Push(%d)", b); break;
-            case 4: NIOFprintf(f, "bc:PushConst(%d)", b); break;
+            case 3: NIOFprintf(f, "bc:Push(%d)", b); pLit = 1; break;
+            case 4: NIOFprintf(f, "bc:PushConst(%d)", b); pImm = 1; break;
             case 5: NIOFprintf(f, "bc:CallGlobal(%d)", b); break;
             case 6: NIOFprintf(f, "bc:Invoke(%d)", b); break;
             case 7: NIOFprintf(f, "bc:Send(%d)", b); break;
@@ -599,14 +610,14 @@ void NIOPrintObjBinaryInstructions(newtStream_t * f, newtRefArg r, int32_t depth
             case 11: NIOFprintf(f, "bc:Branch(%d)", b); break;
             case 12: NIOFprintf(f, "bc:BranchIfTrue(%d)", b); break;
             case 13: NIOFprintf(f, "bc:BranchIfFalse(%d)", b); break;
-            case 14: NIOFprintf(f, "bc:FindVar(%d)", b); break;
+            case 14: NIOFprintf(f, "bc:FindVar(%d)", b); pLit = 1; break;
             case 15: NIOFprintf(f, "bc:GetVar(%d)", b); break;
             case 16: NIOFprintf(f, "bc:MakeFrame(%d)", b); break;
             case 17: NIOFprintf(f, "bc:MakeArray(%d)", b); break;
             case 18: NIOFprintf(f, "bc:GetPath(%d)", b); break;
             case 19: NIOFprintf(f, "bc:SetPath(%d)", b); break;
             case 20: NIOFprintf(f, "bc:SetVar(%d)", b); break;
-            case 21: NIOFprintf(f, "bc:FindAndSetVar(%d)", b); break;
+            case 21: NIOFprintf(f, "bc:FindAndSetVar(%d)", b); pLit = 1; break;
             case 22: NIOFprintf(f, "bc:IncrVar(%d)", b); break;
             case 23: NIOFprintf(f, "bc:BranchIfNotDone(%d)", b); break;
             case 24:
@@ -643,6 +654,18 @@ void NIOPrintObjBinaryInstructions(newtStream_t * f, newtRefArg r, int32_t depth
             default: NIOFputs("bc:Invalid()", f); break;
         }
         if (pc<len-1) NIOFputs(",", f); else NIOFputs(" ", f);
+        if (pLit==1 && NewtRefIsNotNIL(literals)) {
+            NIOFputs(" // ", f);
+            newtRef lit = NewtGetArraySlot(literals, b);
+            if (NewtRefIsArray(lit)) NIOFputs("[ ... ]", f);
+            else if (NewtRefIsFrame(lit)) NIOFputs("{ ... }", f);
+            else NIOPrintObj2(f, NewtGetArraySlot(literals, b), 0, true);
+        }
+        if (pImm==1) {
+            NIOFputs(" // ", f);
+            newtRef imm = (newtRef)((int32_t)((int16_t)(b)));
+            NIOPrintObj2(f, imm, 0, true);
+        }
         pc += n;
     }
     if (NEWT_INDENT) NIOPrintIndent(f, depth);
@@ -670,21 +693,17 @@ void NIOPrintObjBinary(newtStream_t * f, newtRefArg r, int32_t depth)
     klass = NcClassOf(r);
     if (newt_env._printBinaries)
     {
-        if (NewtSymbolEqual(klass, NSSYM0(instructions))) {
-            NIOPrintObjBinaryInstructions(f, r, depth);
+        uint8_t *data = NewtRefToBinary(r);
+        NIOFputs("MakeBinaryFromHex(\"", f);
+        int i; for (i=0; i<len; i++) NIOFprintf(f, "%02X", data[i]);
+        if (NewtRefIsSymbol(klass))
+        {
+            NIOFputs("\", '", f);
+            NIOPrintObj2(f, klass, 0, true);
         } else {
-            uint8_t *data = NewtRefToBinary(r);
-            NIOFputs("MakeBinaryFromHex(\"", f);
-            int i; for (i=0; i<len; i++) NIOFprintf(f, "%02X", data[i]);
-            if (NewtRefIsSymbol(klass))
-            {
-                NIOFputs("\", '", f);
-                NIOPrintObj2(f, klass, 0, true);
-            } else {
-                NIOFputs("\", NIL)", f);
-            }
-            NIOFputs(")", f);
+            NIOFputs("\", NIL)", f);
         }
+        NIOFputs(")", f);
     } else {
         NIOFputs("<Binary, ", f);
         if (NewtRefIsSymbol(klass))
@@ -944,12 +963,10 @@ void NIOPrintObjFrame(newtStream_t * f, newtRefArg r, int32_t depth, bool litera
         newtObjRef v = NewtRefToPointer(r);
         if (v->header.flags & kNewtObjPrintRefMulti) {
             if (v->header.flags & kNewtObjPrinted) {
-                //if (NEWT_INDENT) NIOPrintIndent(f, depth);
                 NIOPrintRef(f, r);
                 return;
             } else {
                 v->header.flags |= kNewtObjPrinted;
-                //if (NEWT_INDENT) NIOPrintIndent(f, depth);
                 NIOPrintRef(f, r);
                 NIOFputs(" := ", f);
             }
@@ -983,6 +1000,7 @@ void NIOPrintObjFrame(newtStream_t * f, newtRefArg r, int32_t depth, bool litera
     }
     else
     {
+        bool isFunction = NewtRefIsFunction(r);
         int32_t	printLength;
         
         depth--;
@@ -1007,7 +1025,10 @@ void NIOPrintObjFrame(newtStream_t * f, newtRefArg r, int32_t depth, bool litera
             
             NIOPrintObjSymbol(f, slot);
             NIOFputs(": ", f);
-            NIOPrintObj2(f, slots[i], depth, literal);
+            if (isFunction && NewtSymbolEqual(slot, NSSYM0(instructions)))
+                NIOPrintObjBinaryInstructions(f, slots[i], r, depth);
+            else
+                NIOPrintObj2(f, slots[i], depth, literal);
             
         }
         if (NEWT_INDENT) NIOPrintIndent(f, depth+1);

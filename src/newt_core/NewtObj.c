@@ -1112,6 +1112,9 @@ int NewtRefFunctionType(newtRefArg r)
         if (NewtRefEqual(klass, NSSYM0(CodeBlock)))
             return kNewtCodeBlock;
         
+        if (klass==50) // special code
+            return kNewtCodeBlock21;
+
         if (NewtRefEqual(klass, NSSYM0(_function.native0)))
             return kNewtNativeFn;
         

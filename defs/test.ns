@@ -5,12 +5,6 @@ printLength := 9999;
 printBinaries := 1;
 printUnique := 1;
 
-a := { test: func() return 3 };
-
-p(a . test);
-
-exit();
-
 //Load("/Users/matt/dev/newt64/defs/newt.2.2.ns");
 //Load("/Users/matt/dev/newt64/defs/newt.bc.2.2.ns");
 

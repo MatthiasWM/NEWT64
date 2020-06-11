@@ -47,6 +47,9 @@
 
 /* Begin PBXFileReference section */
 		8DD76FB20486AB0100D96B5E /* newt */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = newt; sourceTree = BUILT_PRODUCTS_DIR; };
+		C91FB168249038ED0058EDE4 /* newt.bc.2.2.ns */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = newt.bc.2.2.ns; sourceTree = "<group>"; };
+		C91FB169249038ED0058EDE4 /* newt.2.2.ns */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = newt.2.2.ns; sourceTree = "<group>"; };
+		C91FB16A249255840058EDE4 /* test.ns */ = {isa = PBXFileReference; lastKnownFileType = text; path = test.ns; sourceTree = "<group>"; };
 		F503AC6A0851DFD9009BA497 /* endian_utils.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = endian_utils.c; sourceTree = "<group>"; };
 		F503AC6B0851DFD9009BA497 /* endian_utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = endian_utils.h; sourceTree = "<group>"; };
 		F52FA68B0594742F00087763 /* libl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libl.a; path = /usr/lib/libl.a; sourceTree = "<absolute>"; };
@@ -117,6 +120,7 @@
 				08FB7795FE84155DC02AAC07 /* Sources */,
 				F52FA68F0594745700087763 /* Frameworks */,
 				1AB674ADFE9D54B511CA2CBB /* Products */,
+				C91FB167249038B90058EDE4 /* Defs */,
 			);
 			name = newt;
 			sourceTree = "<group>";
@@ -139,6 +143,17 @@
 				8DD76FB20486AB0100D96B5E /* newt */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		C91FB167249038B90058EDE4 /* Defs */ = {
+			isa = PBXGroup;
+			children = (
+				C91FB16A249255840058EDE4 /* test.ns */,
+				C91FB169249038ED0058EDE4 /* newt.2.2.ns */,
+				C91FB168249038ED0058EDE4 /* newt.bc.2.2.ns */,
+			);
+			name = Defs;
+			path = ../defs;
 			sourceTree = "<group>";
 		};
 		F503AC690851DFD9009BA497 /* utils */ = {

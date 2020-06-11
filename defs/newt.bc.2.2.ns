@@ -1,0 +1,1 @@
+/* Copyright:	(c) 2020, Matthias Melcher, all rights reserved. "Newton 2.2" Newton ByteCode File*/constant kBcReturn := 0x020000;BC_Return := func() return 0x020000;

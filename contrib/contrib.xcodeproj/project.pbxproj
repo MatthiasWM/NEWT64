@@ -58,7 +58,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		C9485AA0246B49D000092B13 /* view.ns */ = {isa = PBXFileReference; lastKnownFileType = text; name = view.ns; path = ../ViewFrame/view.ns; sourceTree = "<group>"; };
 		DAE3D2F90A429D6A00FE1B1F /* NativeCalls.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = NativeCalls.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		DAE3D3040A429D9000FE1B1F /* NativeCalls.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = NativeCalls.c; sourceTree = "<group>"; };
 		DAE3D3080A429D9000FE1B1F /* AppKitFunctions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = AppKitFunctions.h; sourceTree = "<group>"; };
@@ -145,7 +144,6 @@
 		08FB7795FE84155DC02AAC07 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				C9485AA0246B49D000092B13 /* view.ns */,
 				DAE3D3010A429D9000FE1B1F /* NativeCalls */,
 				DAE3D3060A429D9000FE1B1F /* NewtObjC */,
 			);

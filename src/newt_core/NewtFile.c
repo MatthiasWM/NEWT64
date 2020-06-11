@@ -456,12 +456,12 @@ newtRef NsLoadLib(newtRefArg rcvr, newtRefArg r)
 
 
 /*------------------------------------------------------------------------*/
-/** ソースファイルのロード
+/** Load source file
  *
- * @param rcvr		[in] レシーバ
- * @param r			[in] ロードするソースファイルのパス
+ * @param rcvr [in] receiver
+ * @param r [in] Path of the source file to load
  *
- * @return			実行結果のオブジェクト
+ * @return Object of execution result
  */
 
 newtRef NsLoad(newtRefArg rcvr, newtRefArg r)
@@ -479,16 +479,16 @@ newtRef NsLoad(newtRefArg rcvr, newtRefArg r)
 
 
 /*------------------------------------------------------------------------*/
-/** ライブラリの要求
+/** library request
  *
- * @param r			[in] ロードするライブラリのシンボル文字列
+ * @param r [in] Symbol string of library to load
  *
- * @return			ロードされたライブラリのシンボル
+ * @return Symbol of loaded library
  *
- * @note			シンボルによりライブラリを要求する。
- *					拡張子は必要ない。適宜ライブラリパスにより検索される。
- *					一度ロードされたライブラリは読込まれない。
- *					ライブラリが見つからなくても例外は発生しない。
+ * @note Request a library by symbol.
+ * No extension required. It is searched by the library path as appropriate.
+ * Once loaded, the library will not be read.
+ * No exception is raised if the library cannot be found.
  */
 
 newtRef NcRequire0(newtRefArg r)
@@ -603,16 +603,16 @@ newtRef NcRequire0(newtRefArg r)
 
 
 /*------------------------------------------------------------------------*/
-/** ライブラリの要求
+/** library request
  *
- * @param rcvr		[in] レシーバ
- * @param r			[in] ロードするライブラリのシンボル文字列
+ * @param rcvr [in] receiver
+ * @param r [in] Symbol string of library to load
  *
- * @return			ロードされたライブラリのシンボル
+ * @return Symbol of loaded library
  *
- * @note			シンボルによりライブラリを要求する。
- *					拡張子は必要ない。適宜ライブラリパスにより検索される。
- *					一度ロードされたライブラリは読込まれない。
+ * @note Request a library by symbol.
+ * No extension required. It is searched by the library path as appropriate.
+ * Once loaded, the library will not be read.
  */
 
 newtRef NsRequire(newtRefArg rcvr, newtRefArg r)

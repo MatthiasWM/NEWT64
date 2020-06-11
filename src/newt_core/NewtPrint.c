@@ -41,7 +41,8 @@ static void			NIOPrintReal(newtStream_t * f, newtRefArg r);
 static void			NIOPrintObjCharacter(newtStream_t * f, newtRefArg r);
 static void			NIOPrintObjNamedMP(newtStream_t * f, newtRefArg r);
 static void			NIOPrintObjMagicPointer(newtStream_t * f, newtRefArg r);
-static void			NIOPrintObjBinary(newtStream_t * f, newtRefArg r);
+static void         NIOPrintObjBinaryInstructions(newtStream_t * f, newtRefArg r, int32_t depth);
+static void			NIOPrintObjBinary(newtStream_t * f, newtRefArg r, int32_t depth);
 static void			NIOPrintObjSymbol(newtStream_t * f, newtRefArg r);
 static void			NIOPrintObjString(newtStream_t * f, newtRefArg r);
 static void			NIOPrintObjArray(newtStream_t * f, newtRefArg r, int32_t depth, bool literal);
@@ -542,6 +543,111 @@ void NIOPrintObjMagicPointer(newtStream_t * f, newtRefArg r)
 
 
 /*------------------------------------------------------------------------*/
+/** Print bytecode instructions.
+ *
+ * @param f            [in] output stream
+ * @param r            [in] binary object with NewtonScript bytecode instructions
+ */
+
+void NIOPrintObjBinaryInstructions(newtStream_t * f, newtRefArg r, int32_t depth)
+{
+    uint32_t len = NewtBinaryLength(r);
+    uint8_t *data = NewtRefToBinary(r);
+    NIOFputs("MakeBinaryFromBC( [", f);
+    for (uint32_t pc=0; pc<len; ) {
+        if (NEWT_INDENT) NIOPrintIndent(f, depth-1);
+        uint8_t inst = data[pc];
+        uint8_t a = inst>>3, n = 1;
+        uint16_t b = 0;
+        if ( (inst & 0x07) == 0x07 ) {
+            // 3 byte instruction
+            NIOFprintf(f, "0x%06X", (inst<<16) | (data[pc+1]<<8) | (data[pc+2]));
+            b = (data[pc+1]<<8) | (data[pc+2]);
+            n = 3;
+        } else {
+            // 1 byte instruction
+            NIOFprintf(f, "0x%06X", (inst<<16));
+            b = inst & 0x07;
+            n = 1;
+        }
+        if (pc<len-1) NIOFputs(",", f); else NIOFputs(" ", f);
+        NIOFprintf(f, "    // %3d: ", pc);
+        switch (a) {
+            case 0:
+                switch (b) {
+                    case 0: NIOFputs("bc:Pop()", f); break;
+                    case 1: NIOFputs("bc:Dup()", f); break;
+                    case 2: NIOFputs("bc:Ret()", f); break;
+                    case 3: NIOFputs("bc:PushSelf()", f); break;
+                    case 4: NIOFputs("bc:SetLexScope()", f); break;
+                    case 5: NIOFputs("bc:IterNext()", f); break;
+                    case 6: NIOFputs("bc:IterDone()", f); break;
+                    case 7: NIOFputs("bc:PopHandlers()", f); break;
+                    default: NIOFputs("bc:Invalid()", f); break;
+                }
+                break;
+            case 3: NIOFprintf(f, "bc:Push(%d)", b); break;
+            case 4: NIOFprintf(f, "bc:PushConst(%d)", b); break;
+            case 5: NIOFprintf(f, "bc:CallGlobal(%d)", b); break;
+            case 6: NIOFprintf(f, "bc:Invoke(%d)", b); break;
+            case 7: NIOFprintf(f, "bc:Send(%d)", b); break;
+            case 8: NIOFprintf(f, "bc:SendIfDef(%d)", b); break;
+            case 9: NIOFprintf(f, "bc:Resend(%d)", b); break;
+            case 10: NIOFprintf(f, "bc:ResendIfDef(%d)", b); break;
+            case 11: NIOFprintf(f, "bc:Branch(%d)", b); break;
+            case 12: NIOFprintf(f, "bc:BranchIfTrue(%d)", b); break;
+            case 13: NIOFprintf(f, "bc:BranchIfFalse(%d)", b); break;
+            case 14: NIOFprintf(f, "bc:FindVar(%d)", b); break;
+            case 15: NIOFprintf(f, "bc:GetVar(%d)", b); break;
+            case 16: NIOFprintf(f, "bc:MakeFrame(%d)", b); break;
+            case 17: NIOFprintf(f, "bc:MakeArray(%d)", b); break;
+            case 18: NIOFprintf(f, "bc:GetPath(%d)", b); break;
+            case 19: NIOFprintf(f, "bc:SetPath(%d)", b); break;
+            case 20: NIOFprintf(f, "bc:SetVar(%d)", b); break;
+            case 21: NIOFprintf(f, "bc:FindAndSetVar(%d)", b); break;
+            case 22: NIOFprintf(f, "bc:IncrVar(%d)", b); break;
+            case 23: NIOFprintf(f, "bc:BranchIfNotDone(%d)", b); break;
+            case 24:
+                switch (b) {
+                    case 0: NIOFputs("bc:Add()", f); break;
+                    case 1: NIOFputs("bc:Subtract()", f); break;
+                    case 2: NIOFputs("bc:ARef()", f); break;
+                    case 3: NIOFputs("bc:SetARef()", f); break;
+                    case 4: NIOFputs("bc:Equals()", f); break;
+                    case 5: NIOFputs("bc:LNot()", f); break;
+                    case 6: NIOFputs("bc:NotEquals()", f); break;
+                    case 7: NIOFputs("bc:Multiply()", f); break;
+                    case 8: NIOFputs("bc:Divide()", f); break;
+                    case 9: NIOFputs("bc:DivInt()", f); break;
+                    case 10: NIOFputs("bc:Less()", f); break;
+                    case 11: NIOFputs("bc:Greater()", f); break;
+                    case 12: NIOFputs("bc:GreaterOrEqual()", f); break;
+                    case 13: NIOFputs("bc:LessOrEqual()", f); break;
+                    case 14: NIOFputs("bc:BAnd()", f); break;
+                    case 15: NIOFputs("bc:BOr()", f); break;
+                    case 16: NIOFputs("bc:BNot()", f); break;
+                    case 17: NIOFputs("bc:NewIter()", f); break;
+                    case 18: NIOFputs("bc:Length()", f); break;
+                    case 19: NIOFputs("bc:Clone()", f); break;
+                    case 20: NIOFputs("bc:SetClass()", f); break;
+                    case 21: NIOFputs("bc:AddSlot()", f); break;
+                    case 22: NIOFputs("bc:Stringer()", f); break;
+                    case 23: NIOFputs("bc:HasPath()", f); break;
+                    case 24: NIOFputs("bc:ClassOf()", f); break;
+                    default: NIOFputs("bc:Invalid()", f); break;
+                }
+                break;
+            case 25: NIOFprintf(f, "bc:NewHandlers(%d)", b); break;
+            default: NIOFputs("bc:Invalid()", f); break;
+        }
+        pc += n;
+    }
+    if (NEWT_INDENT) NIOPrintIndent(f, depth);
+    NIOFputs("] )", f);
+}
+
+
+/*------------------------------------------------------------------------*/
 /** 出力ファイルにバイナリオブジェクトをプリントする
  *
  * @param f			[in] 出力ファイル
@@ -552,7 +658,7 @@ void NIOPrintObjMagicPointer(newtStream_t * f, newtRefArg r)
  * @note			newtStream_t を使用
  */
 
-void NIOPrintObjBinary(newtStream_t * f, newtRefArg r)
+void NIOPrintObjBinary(newtStream_t * f, newtRefArg r, int32_t depth)
 {
     newtRefVar	klass;
     int	len;
@@ -561,18 +667,21 @@ void NIOPrintObjBinary(newtStream_t * f, newtRefArg r)
     klass = NcClassOf(r);
     if (newt_env._printBinaries)
     {
-        // TODO: if class=='instructions
-        uint8_t *data = NewtRefToBinary(r);
-        NIOFputs("MakeBinaryFromHex(\"", f);
-        int i; for (i=0; i<len; i++) NIOFprintf(f, "%02X", data[i]);
-        if (NewtRefIsSymbol(klass))
-        {
-            NIOFputs("\", '", f);
-            NIOPrintObj2(f, klass, 0, true);
+        if (NewtSymbolEqual(klass, NSSYM0(instructions))) {
+            NIOPrintObjBinaryInstructions(f, r, depth);
         } else {
-            NIOFputs("\", NIL)", f);
+            uint8_t *data = NewtRefToBinary(r);
+            NIOFputs("MakeBinaryFromHex(\"", f);
+            int i; for (i=0; i<len; i++) NIOFprintf(f, "%02X", data[i]);
+            if (NewtRefIsSymbol(klass))
+            {
+                NIOFputs("\", '", f);
+                NIOPrintObj2(f, klass, 0, true);
+            } else {
+                NIOFputs("\", NIL)", f);
+            }
+            NIOFputs(")", f);
         }
-        NIOFputs(")", f);
     } else {
         NIOFputs("<Binary, ", f);
         if (NewtRefIsSymbol(klass))
@@ -999,7 +1108,7 @@ void NIOPrintObj2(newtStream_t * f, newtRefArg r, int32_t depth, bool literal)
             break;
             
         case kNewtBinary:
-            NIOPrintObjBinary(f, r);
+            NIOPrintObjBinary(f, r, depth);
             break;
             
         case kNewtArray:

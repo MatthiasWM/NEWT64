@@ -554,24 +554,26 @@ void NIOPrintObjBinaryInstructions(newtStream_t * f, newtRefArg r, int32_t depth
     uint32_t len = NewtBinaryLength(r);
     uint8_t *data = NewtRefToBinary(r);
     NIOFputs("MakeBinaryFromBC( [", f);
+    if (NEWT_INDENT) NIOPrintIndent(f, depth-1);
+    NIOFputs("instructions:", f);
     for (uint32_t pc=0; pc<len; ) {
         if (NEWT_INDENT) NIOPrintIndent(f, depth-1);
         uint8_t inst = data[pc];
         uint8_t a = inst>>3, n = 1;
         uint16_t b = 0;
+        NIOFprintf(f, "/* %3d: ", pc);
         if ( (inst & 0x07) == 0x07 ) {
             // 3 byte instruction
-            NIOFprintf(f, "0x%06X", (inst<<16) | (data[pc+1]<<8) | (data[pc+2]));
+            NIOFprintf(f, "%02X ", inst);
+            NIOFprintf(f, "%04X */ ", (data[pc+1]<<8) | (data[pc+2]));
             b = (data[pc+1]<<8) | (data[pc+2]);
             n = 3;
         } else {
             // 1 byte instruction
-            NIOFprintf(f, "0x%06X", (inst<<16));
+            NIOFprintf(f, "%02X      */ ", inst);
             b = inst & 0x07;
             n = 1;
         }
-        if (pc<len-1) NIOFputs(",", f); else NIOFputs(" ", f);
-        NIOFprintf(f, "    // %3d: ", pc);
         switch (a) {
             case 0:
                 switch (b) {
@@ -640,6 +642,7 @@ void NIOPrintObjBinaryInstructions(newtStream_t * f, newtRefArg r, int32_t depth
             case 25: NIOFprintf(f, "bc:NewHandlers(%d)", b); break;
             default: NIOFputs("bc:Invalid()", f); break;
         }
+        if (pc<len-1) NIOFputs(",", f); else NIOFputs(" ", f);
         pc += n;
     }
     if (NEWT_INDENT) NIOPrintIndent(f, depth);
@@ -1137,11 +1140,9 @@ void NIOPrintObj2(newtStream_t * f, newtRefArg r, int32_t depth, bool literal)
 }
 
 /**
- * Recursively clear all printing related flags in all referenced objects.
- *
- * This function assumes that there is no cyclic dependency in the object tree.
+ * Recursion pert of clearing all printing related flags.
  */
-void NIOPrintClearFlags(newtRefArg r)
+static void ClearFlags(newtRefArg r, int *nCleared, uint32_t pattern)
 {
     newtObjRef v = NULL;
     uint32_t type = NewtGetRefType(r, true);
@@ -1152,18 +1153,44 @@ void NIOPrintClearFlags(newtRefArg r)
         case kNewtString:   // binary
         case kNewtBinary:
             v = NewtRefToPointer(r);
-            v->header.flags &= ~kNewtObjPrintFlags;
-            NIOPrintClearFlags( NewtObjBinaryClass(v) );
+            if ((v->header.flags & kNewtObjPrintFlags) == pattern)
+                return;
+            v->header.flags = (v->header.flags & ~kNewtObjPrintFlags) | pattern;
+            (*nCleared)++;
+            ClearFlags( NewtObjBinaryClass(v), nCleared, pattern );
             break;
         case kNewtFrame:
         case kNewtArray:
             v = NewtRefToPointer(r);
-            v->header.flags &= ~kNewtObjPrintFlags;
+            if ((v->header.flags & kNewtObjPrintFlags) == pattern)
+                return;
+            v->header.flags = (v->header.flags & ~kNewtObjPrintFlags) | pattern;
+            (*nCleared)++;
             // no need to follow class or map
             newtRef *slot = NewtObjToSlots(v);
             int n = NewtObjSlotsLength(v);
             for (uint32_t i=0; i<n; i++)
-                NIOPrintClearFlags( slot[i] );
+                ClearFlags( slot[i], nCleared, pattern );
+            break;
+    }
+}
+
+/**
+ * Recursively clear all printing related flags in all referenced objects.
+ *
+ * This function detects nested cyclic recursion and will not get stuck in a loop.
+ */
+void NIOPrintClearFlags(newtRefArg r)
+{
+    // loop until setting and clearing the flags changes the same number of
+    // objects, which indicates that we have reached the end of recursion
+    // without visiting objects twice or following a cyclic recursion.
+    for (;;) {
+        int n1 = 0;
+        ClearFlags(r, &n1, kNewtObjPrintRefOnce);
+        int n2 = 0;
+        ClearFlags(r, &n2, 0);
+        if (n1==n2)
             break;
     }
 }
@@ -1173,8 +1200,6 @@ void NIOPrintClearFlags(newtRefArg r)
  *
  * Find all objects that are referenced more than once, so we can print them seperately.
  * Find and mark all objects that are a view, so we can print those seperately as well.
- *
- * This function assumes that there is no cyclic dependency in the object tree.
  */
 void NIOPrintUpdateFlags(newtRefArg r)
 {

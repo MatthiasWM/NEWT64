@@ -5,15 +5,15 @@ printLength := 9999;
 printBinaries := 1;
 printUnique := 1;
 
+a := { test: func() return 3 };
+
+p(a . test);
+
+exit();
+
 //Load("/Users/matt/dev/newt64/defs/newt.2.2.ns");
 //Load("/Users/matt/dev/newt64/defs/newt.bc.2.2.ns");
 
-a := "hallo" "welt";
-b := [ "hallo" "welt", "von" "morgen"];
-p(a);
-p(b);
-
-/*
 constant bc := {
     // generate a 1-byte or 3-byte bytecode instruction from two integers
     MakeBytecode: func(a, b)
@@ -82,10 +82,8 @@ constant bc := {
     NewHandlers:    func(nEx)   return :MakeBytecode(25, nEx),
 };
 
-
 pkg := ReadPkg(LoadBinary("/Users/matt/dev/Newton/NewtonDev/NewtonDev.1/Sample Code/System Services/PeriodicElements-1/PeriodicElements.pkg"));
 p(pkg);
-*/
 
 p("OK");
 exit();

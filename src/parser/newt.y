@@ -63,6 +63,7 @@
 %type	<node>	global_declaration	global_function_decl	function_decl
 %type	<node>	type
 
+%type	<obj>	string
 %type	<obj>	literal
 %type	<obj>	simple_literal
 %type	<obj>	object
@@ -262,9 +263,18 @@ expr_sequence
 		| expr_sequence error ';'   { yyerrok; }
 		;
 
+string	: string kSTRING	{
+								newtRefVar str = NSSTR("");
+								NcStrCat(str, $1);
+								NcStrCat(str, $2);
+								$$ = str;
+							}
+		| kSTRING { $$ = $1; }
+		;
+
 literal
 		: simple_literal
-		| kSTRING		{ $$ = NPSGenNode1(kNPSClone, $1); }
+		| string		{ $$ = NPSGenNode1(kNPSClone, $1); }
 		| binary		{	// バイナリデータ（独自拡張）
 							ERR_NOS2C("Binary Syntax");	// NOS2 非互換
 							$$ = NPSGenNode1(kNPSClone, $1);
@@ -290,7 +300,7 @@ simple_literal
 
 object
 		: simple_literal
-		| kSTRING
+		| string
 		| kSYMBOL				// NewtonScript の構文図ではこれがない（記述漏れ？）
 		| path_expr
 		| array
@@ -353,7 +363,7 @@ constructor
                         { $$ = NPSGenNode2(kNPSFunc, $4, $6); }
 
 		// 正規表現オブジェクトの生成
-		| kREGEX kSTRING			{ $$ = NPSGenNode2(kNPSMakeRegex, $1, $2); }
+		| kREGEX string			{ $$ = NPSGenNode2(kNPSMakeRegex, $1, $2); }
 		| kREGEX					{ $$ = NPSGenNode2(kNPSMakeRegex, $1, kNewtRefNIL); }
 		;
 

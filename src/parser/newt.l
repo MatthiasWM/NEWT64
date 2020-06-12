@@ -57,8 +57,15 @@ static int			lex_makereal(double n);
 static int			lex_makemagicpointer(int n);
 static int			lex_makenamedmp(char *s, bool trunc);
 
+static int          lex_include_file(char *s);
+static void         lex_include_invalid_filename(void);
+static int          lex_include_done(void);
+
 static void			lex_debug(int type);
 
+#define MAX_INCLUDE_DEPTH 10
+YY_BUFFER_STATE include_stack[MAX_INCLUDE_DEPTH];
+int include_stack_ptr = 0;
 
 /* マクロ */
 #undef YY_INPUT
@@ -73,6 +80,7 @@ static void			lex_debug(int type);
 %s BINARY
 %x STRING
 %x REGEX
+%x INCL
 
 ALPHA					[A-Za-z]
 DIGIT					[0-9]
@@ -82,7 +90,9 @@ REAL					{DIGIT}+"."{DIGIT}*([eE]-?{DIGIT}+)?
 NEWLINE					("\r\n"|"\r"|"\n")
 SPACE					[ \t]
 STRING-CHARACTER		[\x20-\x21\x23-\x5b\x5d-\x7f]
-SYMBOL-CHARACTER		[\x20-\x5b\x5d-\x7b\x7d-\x7f]
+SYMBOL-CHARACTER        [\x20-\x5b\x5d-\x7b\x7d-\x7f]
+FILENAME-CHARACTER      [\x20-\x21\x23-\x29\x2b-\x2e\x30-\x39\x3b\x3d\x3f-\x5b\x5d-\x7b\7d\x7e\x80-\xff]
+FILEPATH-CHARACTER      ({FILENAME-CHARACTER}|[\x2f\x3a\x5c])
 REGEX-CHARACTER			({STRING-CHARACTER}|"\"")
 NON-ESCAPE-CHARACTER	[\x20-\x5b\x5d-\x7f]
 ESCAPE-CHAR				("\""|[\\nrt/])
@@ -105,6 +115,16 @@ ELSE					[Ee][Ll][Ss][Ee]
         BEGIN SHELL;
     }
 %}
+
+                                /* allow "C" style including of more script files */
+^[ \t]*"#"[ \t]*"include"[ \t]+ { BEGIN INCL; }
+                                /* eat the whitespace */
+<INCL>[ \t]*
+                                /* read the file name in double quotes */
+<INCL>"\""{FILEPATH-CHARACTER}*"\"" lex_include_file(yytext);
+<INCL>{NEWLINE}                 lex_include_invalid_filename();
+<INCL>.                         lex_include_invalid_filename();
+<<EOF>>                         if (lex_include_done()==0) return 0;
 
 
 "//".*$
@@ -200,12 +220,14 @@ __LINE__						{ return lex_makeinteger(nps_env.lineno); }
 
 .								{ return lex_update_tokenpos(yytext[0]); }
 
-<SHELL>^"#".*$					{ BEGIN INITIAL; }
-<SHELL>{NEWLINE}				lex_newline();
-<SHELL>.						{
-									unput(*yytext);
-									BEGIN INITIAL;
-								}
+                                /* if the very first line starts witha "shebang" (#!),
+                                 * Unix shells will run the tool indicated following the #! */
+                                /* if the line starts with #!, ignore the entire line, then start parsing */
+<SHELL>^"#!".*$					{ BEGIN INITIAL; }
+                                /* if the line is empty, count it and start parsing */
+<SHELL>{NEWLINE}				{ lex_newline(); BEGIN INITIAL; }
+                                /* any other character on the input line will unread it and start parsing */
+<SHELL>.						{ unput(*yytext); BEGIN INITIAL; }
 
 %%
 
@@ -823,6 +845,68 @@ void lex_debug(int type)
     NewtPrintObject(stderr, yylval.obj);
 }
 
+#if 0
+#pragma mark -
+#endif
+//--------------------------------------------------------------------------
+/**
+ * Include a file into the source code.
+ */
+int lex_include_file(char *filename)
+{
+    filename++; filename[strlen(filename)-1]=0;
+    if (include_stack_ptr>=MAX_INCLUDE_DEPTH) {
+        NewtFprintf(stderr, "%s:%d: error: includes nested too deeply.\n",
+            nps_env.fname?nps_env.fname:"-",
+            nps_env.lineno);
+        exit(1);
+    }
+    include_stack[include_stack_ptr++] = YY_CURRENT_BUFFER;
+    yyin = fopen( filename, "rb" );
+    if (!yyin) {
+        NewtFprintf(stderr, "%s:%d: error: %s: %s\n%s\n",
+            nps_env.fname?nps_env.fname:"-",
+            nps_env.lineno,
+            filename,
+            strerror(errno));
+        exit(1);
+    }
+
+    yy_switch_to_buffer(
+        yy_create_buffer( yyin, YY_BUF_SIZE )
+    );
+
+    BEGIN INITIAL;
+    return lex_update_tokenpos(0);
+}
+
+/**
+ * If we could not read the filename, give an error message and terminate.
+ * FIXME: this should unroll the include buffer and return gracefully.
+ */
+void lex_include_invalid_filename()
+{
+    NewtFprintf(stderr, "%s:%d: error: include: Invalid filename.\n%s\n",
+        nps_env.fname?nps_env.fname:"-",
+        nps_env.lineno,
+        nps_env.linebuf);
+    exit(1);
+}
+
+/**
+ * We reached the end of the current file; unroll the include stack and terminate
+ * if there are no more files.
+ *
+ * @return 0 if there are no more files on the stack and we should terminate
+ */
+int lex_include_done()
+{
+    if ( --include_stack_ptr < 0 )
+        yyterminate(); // this macro returns 0!
+    else
+        yy_switch_to_buffer( include_stack[include_stack_ptr] );
+    return 1;
+}
 
 #if 0
 #pragma mark -
@@ -857,6 +941,6 @@ int nps_yycleanup(void)
 {
 	BEGIN INITIAL;
 	YY_FLUSH_BUFFER;
-  memset(nps_env.linebuf, '\0', sizeof(nps_env.linebuf));
+    memset(nps_env.linebuf, '\0', sizeof(nps_env.linebuf));
 	yyterminate();
 }

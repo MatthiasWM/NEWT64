@@ -1,5 +1,5 @@
 
-//printDepth := 9999;
+printDepth := 9999;
 printLength := 9999;
 printBinaries := 1;
 printUnique := 1;
@@ -73,41 +73,6 @@ global bc := {
 };
 
 p("start...");
-//p(func() if 3=4 then 12 else 17 );
-
-fn := {
-    class: 'CodeBlock,
-    instructions: MakeBinaryFromBC( [
-        binary:
-        /*   0: 27 000C */ bc:PushConst(12), // 3
-        /*   3: 27 0010 */ bc:PushConst(16), // 4
-        /*   6: C4      */ bc:Equals(),
-        /*   7: 6F 0010 */ bc:BranchIfFalse('label_16),
-        /*  10: 27 0030 */ bc:PushConst(48), // 12
-        /*  13: 5F 0013 */ bc:Branch('label_19),
-            'label_16,
-        /*  16: 27 0044 */ bc:PushConst(68), // 17
-            'label_19,
-        /*  19: 02      */ bc:Ret()
-    ] ),
-    literals: NIL,
-    argFrame: {
-        _nextArgFrame: {
-            _nextArgFrame: NIL,
-            _parent: NIL,
-            _implementor: NIL
-        },
-        _parent: NIL,
-        _implementor: NIL
-    },
-    numArgs: 0
-};
-
-p("hallo");
-p(fn);
-
-p("start...");
-exit();
 
 constant src :=
 {
@@ -313,7 +278,7 @@ constant src :=
                             _proto: @218,
                             debug: "currentDate"
                         },
-                        ref00574b01 := {
+                        ref02a3a251 := {
                             text: "<no alarms reported>",
                             viewBounds: {
                                 left: 8,
@@ -573,7 +538,7 @@ constant src :=
                     lastReported: NIL,
                     stepAllocateContext: [
                         'lastReported,
-                        ref00574b01
+                        ref02a3a251
                     ],
                     appSymbol: '|PeriodicElements:PIEDTS|
                 },
@@ -719,9 +684,9 @@ constant src :=
 ;
 
 //p("read...");
-//p(src);
-//p("read...");
-
+p(src);
+p("read...");
+exit();
 pkg := MakePkg(src);
 SaveBinary(pkg, "/Users/matt/dev/Newton/NewtonDev/NewtonDev.1/Sample Code/System Services/PeriodicElements-1/PeriodicElements1.pkg");
 

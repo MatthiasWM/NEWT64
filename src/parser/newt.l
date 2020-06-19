@@ -61,6 +61,9 @@ static int          lex_include_file(char *s);
 static void         lex_include_invalid_filename(void);
 static int          lex_include_done(void);
 
+static int          lex_set_line(char *s);
+static void         lex_invalid_line(void);
+
 static void			lex_debug(int type);
 
 #define MAX_INCLUDE_DEPTH 10
@@ -81,6 +84,7 @@ int include_stack_ptr = 0;
 %x STRING
 %x REGEX
 %x INCL
+%x LINE
 
 ALPHA					[A-Za-z]
 DIGIT					[0-9]
@@ -118,13 +122,20 @@ ELSE					[Ee][Ll][Ss][Ee]
 
                                 /* allow "C" style including of more script files */
 ^[ \t]*"#"[ \t]*"include"[ \t]+ { BEGIN INCL; }
-                                /* eat the whitespace */
-<INCL>[ \t]*
+<LINE>[ \t]*                    /* eat the whitespace */
                                 /* read the file name in double quotes */
 <INCL>"\""{FILEPATH-CHARACTER}*"\"" lex_include_file(yytext);
 <INCL>{NEWLINE}                 lex_include_invalid_filename();
 <INCL>.                         lex_include_invalid_filename();
 <<EOF>>                         if (lex_include_done()==0) return 0;
+
+                                /* allow '#line n' to change current line number */
+^[ \t]*"#"[ \t]*"line"[ \t]+ { BEGIN LINE; }
+<LINE>[ \t]*                    /* eat the whitespace */
+                                /* read the line number */
+<LINE>{DIGIT}+                  lex_set_line(yytext);
+<INCL>{NEWLINE}                 lex_invalid_line();
+<INCL>.                         lex_invalid_line();
 
 
 "//".*$
@@ -906,6 +917,27 @@ int lex_include_done()
     else
         yy_switch_to_buffer( include_stack[include_stack_ptr] );
     return 1;
+}
+
+#if 0
+#pragma mark -
+#endif
+//--------------------------------------------------------------------------
+
+int lex_set_line(char *s)
+{
+    nps_env.lineno = atoi(s);
+    BEGIN INITIAL;
+    return lex_update_tokenpos(0);
+}
+
+void lex_invalid_line(void)
+{
+    NewtFprintf(stderr, "%s:%d: error: line: Invalid format.\n%s\n",
+    nps_env.fname?nps_env.fname:"-",
+    nps_env.lineno,
+    nps_env.linebuf);
+    exit(1);
 }
 
 #if 0

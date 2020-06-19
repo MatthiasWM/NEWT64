@@ -13,10 +13,7 @@
 
 /*
  Todo:
- - String literals should support fragments: x := "abc" "def";
  - Support arbitrarily long strings (MakeBinaryFromHex("...");)
- + Adding MakeBinaryFromBC([bytecode, ...]);
- - Support #include style statement
  - NTK creates DefConst statements
  */
 

@@ -18,6 +18,7 @@
 
 #include "config.h"
 
+#include "NewtType.h"
 #include "NewtCore.h"
 #include "NewtGC.h"
 #include "NewtIO.h"
@@ -289,19 +290,23 @@ uint16_t NewtGetRefType(newtRefArg r, bool detail)
         case 2:	// Character or Special
             switch (r)
             {
-                case kNewtRefNIL:
+                //case kNewtRefNIL: // Note: pedantic gcc 5.x does not allow this! g++ does, though.
+                case 0x00000002:
                     type = kNewtNil;
                     break;
                     
-                case kNewtRefTRUE:
+                //case kNewtRefTRUE:
+                case 0x0000001A:
                     type = kNewtTrue;
                     break;
                     
-                case kNewtRefUnbind:
+                //case kNewtRefUnbind:
+                case 0x0000FFF2:
                     type = kNewtUnbind;
                     break;
                     
-                case kNewtSymbolClass:
+                //case kNewtSymbolClass:
+                case 0x00055552:
                     type = kNewtSymbol;
                     break;
                     

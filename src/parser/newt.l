@@ -122,7 +122,7 @@ ELSE					[Ee][Ll][Ss][Ee]
 
                                 /* allow "C" style including of more script files */
 ^[ \t]*"#"[ \t]*"include"[ \t]+ { BEGIN INCL; }
-<LINE>[ \t]*                    /* eat the whitespace */
+<INCL>[ \t]*                    /* eat the whitespace */
                                 /* read the file name in double quotes */
 <INCL>"\""{FILEPATH-CHARACTER}*"\"" lex_include_file(yytext);
 <INCL>{NEWLINE}                 lex_include_invalid_filename();
@@ -134,8 +134,8 @@ ELSE					[Ee][Ll][Ss][Ee]
 <LINE>[ \t]*                    /* eat the whitespace */
                                 /* read the line number */
 <LINE>{DIGIT}+                  lex_set_line(yytext);
-<INCL>{NEWLINE}                 lex_invalid_line();
-<INCL>.                         lex_invalid_line();
+<LINE>{NEWLINE}                 lex_invalid_line();
+<LINE>.                         lex_invalid_line();
 
 
 "//".*$

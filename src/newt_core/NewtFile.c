@@ -13,7 +13,10 @@
 /* ヘッダファイル */
 #include <stdlib.h>
 #include <string.h>
+
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif
 
 #include "NewtType.h"
 
@@ -434,7 +437,7 @@ newtRef NsLoadLib(newtRefArg rcvr, newtRefArg r)
     
     if (lib != NULL)
     {
-        return NewtMakeInteger((int32_t)lib);
+        return NewtMakeInteger((int64_t)lib);
     }
     else
     {

@@ -81,151 +81,13 @@ set ( headers
 #)
 
 
-if (APPLE)
-    set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-    source_group(TREE "${CMAKE_SOURCE_DIR}" PREFIX "Sources" FILES ${sources})
-
-	add_executable(newt
+    add_executable(newt
         ${sources}
         src/main.c
     )
-	add_library(newt64
+    add_library(newt64
         ${sources}
     )
-
-	# how to compile and link
-#	target_compile_options(newt PUBLIC -Wall)
-#	target_compile_definitions(newt PRIVATE TARGET_UI_FLTK=1 NO_PORT_AUDIO NO_X11 TARGET_OS_OPENSTEP=1 TARGET_OS_MAC=1 NS_BLOCK_ASSERTIONS=1)
-    target_include_directories(
-        newt PUBLIC
-        src/newt_core/incs/Darwin
-    )
-    target_include_directories(
-        newt64 PUBLIC
-        src/newt_core/incs/Darwin
-    )
-	target_link_libraries(newt
-        iconv
-    )
-
-elseif (UNIX)
-
-	# configure to use FLTK as the GUI
-	set(FLTK_SKIP_OPENGL true)
-	set(FLTK_FLUID_EXECUTABLE /usr/local/bin/fluid)
-	find_package(FLTK REQUIRED NO_MODULE)
-
-    build_with_fluid(TFLAppUI app)
-    build_with_fluid(TFLSettingsUI app)
-    build_with_fluid(TFLToolkitUI Toolkit)
-
-	# additional source code
-	list (APPEND sources
-			# calling native functions (very limited support in this version of EInsten)
-			Emulator/NativeCalls/NativeCallsDefines.h
-			Emulator/NativeCalls/TNativeCalls.cpp
-			Emulator/NativeCalls/TNativeCalls.h
-			# Unix sound support
-			Emulator/Sound/TPulseAudioSoundManager.cpp
-			Emulator/Sound/TPulseAudioSoundManager.h
-			# Network card emulations
-			Emulator/Network/TUsermodeNetwork.cpp
-			Emulator/Network/TUsermodeNetwork.h
-			)
-    set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-    source_group(TREE "${CMAKE_SOURCE_DIR}" PREFIX "Sources" FILES ${sources})
-
-	# create the application
-	add_executable(Einstein ${sources})
-
-    # add all the source file that Fluid generates for us
-    #add_dependencies(Einstein ${fluid_dependencies})
-
-	# how to compile and link
-	target_compile_options(Einstein PUBLIC -Wall -Wno-multichar)
-	target_compile_definitions(Einstein PRIVATE TARGET_UI_FLTK=1 TARGET_OS_LINUX=1)
-	target_link_libraries(Einstein
-			fltk
-			pulse # sound
-			)
-
-    if ( USE_NEWT64 MATCHES true )
-        message(STATUS ${newt64_lib_path})
-        target_include_directories(Einstein SYSTEM PUBLIC ${newt64_incl_path} ${newt64_incl_path}/darwin)
-        target_link_libraries(Einstein
-            ${newt64_lib}
-            iconv
-            )
-        target_compile_definitions(Einstein PRIVATE USE_NEWT64=1)
-    endif ()
-
-elseif (WIN32)
-
-	# configure to use FLTK as the GUI
-	set(FLTK_DIR "C:/Program Files/FLTK")
-    set(FLTK_FLUID_EXECUTABLE "C:/Program Files/FLTK/bin/fluid.exe")
-	set(FLTK_SKIP_OPENGL true)
-	find_package(FLTK REQUIRED NO_MODULE)
-
-    build_with_fluid(TFLAppUI app)
-    build_with_fluid(TFLSettingsUI app)
-    build_with_fluid(TFLToolkitUI Toolkit)
-
-	# additional source code
-	list (APPEND sources
-			# calling native functions (very limited support in this version of EInsten)
-			Emulator/NativeCalls/NativeCallsDefines.h
-			Emulator/NativeCalls/TNativeCalls.cpp
-			Emulator/NativeCalls/TNativeCalls.h
-			# Windows sound support
-			Emulator/Sound/TWaveSoundManager.cpp
-			Emulator/Sound/TWaveSoundManager.h
-			# Network card emulations
-			Emulator/Network/TUsermodeNetwork.cpp
-			Emulator/Network/TUsermodeNetwork.h
-			)
-    set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-    source_group(TREE "${CMAKE_SOURCE_DIR}" PREFIX "Sources" FILES ${sources} Resources/MSWindows/Einstein.rc.in)
-
-	# Create a resources file for Windows
-	configure_file(
-			Resources/MSWindows/Einstein.rc.in
-			Einstein.rc
-	)
-
-	# create the application
-	add_executable(Einstein WIN32
-			${sources} ${data}
-			${CMAKE_CURRENT_BINARY_DIR}/Einstein.rc
-			)
-
-    # add all the source file that Fluid generates for us
-    add_dependencies(Einstein ${fluid_dependencies})
-
-	# how to compile and link
-	target_compile_options(Einstein PUBLIC "/bigobj")
-	target_compile_definitions(Einstein PRIVATE TARGET_UI_FLTK=1 TARGET_OS_WIN32=1 WIN32_LEAN_AND_MEAN=1 _CRT_SECURE_NO_WARNINGS=1)
-	target_link_libraries(Einstein
-			# this vvv always includes the debug version, even in release mode
-			fltk
-			# alternatively, this loads the correct library but needs additional libs that would be included automatically in the line above
-			#"${FLTK_BASE_LIBRARY_RELEASE}" # FIXME: or it will select the debug version even in release mode!
-			#comctl32
-			#ws2_32
-			# end of alternative
-			winmm
-			)
-	if (CMAKE_BUILD_TYPE MATCHES Debug)
-		target_link_options(Einstein PUBLIC /NODEFAULTLIB:msvcrt.lib )
-	else()
-		target_link_options(Einstein PUBLIC /NODEFAULTLIB:libcmtd.lib /NODEFAULTLIB:msvcrtd.lib)
-	endif()
-
-else()
-
-	message ("Einstein CMake is not configured for this platform.")
-
-endif(APPLE)
 
 
 target_include_directories(
@@ -240,4 +102,47 @@ target_include_directories(
     src/parser/
     src/
 )
+if (APPLE)
+    set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+    source_group(TREE "${CMAKE_SOURCE_DIR}" PREFIX "Sources" FILES ${sources})
+
+    target_include_directories(
+        newt PUBLIC
+        src/newt_core/incs/Darwin
+    )
+    target_include_directories(
+        newt64 PUBLIC
+        src/newt_core/incs/Darwin
+    )
+    target_link_libraries(newt
+	    PUBLIC iconv
+    )
+elseif (UNIX)
+
+    set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+    source_group(TREE "${CMAKE_SOURCE_DIR}" PREFIX "Sources" FILES ${sources})
+
+    target_include_directories(
+        newt PUBLIC
+        src/newt_core/incs/Darwin
+    )
+    target_include_directories(
+        newt64 PUBLIC
+        src/newt_core/incs/Darwin
+    )
+    target_link_libraries(newt
+	    PUBLIC /usr/local/lib/libiconv.a dl
+    )
+elseif (WIN32)
+
+    set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+    source_group(TREE "${CMAKE_SOURCE_DIR}" PREFIX "Sources" FILES ${sources} Resources/MSWindows/Einstein.rc.in)
+
+else()
+
+	message ("NEWT/64 CMake is not configured for this platform.")
+
+endif(APPLE)
+
+
 

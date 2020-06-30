@@ -10,6 +10,8 @@
  */
 
 
+#include "config.h"
+
 /* ヘッダファイル */
 #include <stdlib.h>
 #include <string.h>

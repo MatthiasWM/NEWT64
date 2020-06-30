@@ -26,8 +26,9 @@
 /* マクロ */
 #define NSOFIsNOS(verno)	((verno == 1) || (verno == 2))	///< Newton OS　互換の NSOF
 
+#if TARGET_OS_WINDOWS
 #define htonll(x) ((1==htonl(1)) ? (x) : (((uint64_t)htonl((x) & 0xFFFFFFFFUL)) << 32) | htonl((uint32_t)((x) >> 32)))
-
+#endif
 
 
 /* 型宣言 */

@@ -1,85 +1,37 @@
 
+//p("a");
+#include "/Users/matt/dev/newt64/defs/newt.2.2.ns"
+//p("b");
+
 // Preprocess this file with 'clang -E -P -C -x c++ view.ns' to allow for #ifdef etc.
 printDepth := 9999;
 printLength := 9999;
 printBinaries := 1;
 printUnique := 1;
 
+//p(platformVersion);
+
 //Load("/Users/matt/dev/newt64/defs/newt.2.2.ns");
 //Load("/Users/matt/dev/newt64/defs/newt.bc.2.2.ns");
 
-constant bc := {
-    // generate a 1-byte or 3-byte bytecode instruction from two integers
-    MakeBytecode: func(a, b)
-        if b>6 then
-          return bOr( bOr( bAnd(a<<19, 0xF80000), 0x070000 ), bAnd(b, 0xFFFF) )
-        else
-          return bOr( bAnd(a<<19, 0xF80000), bAnd(b<<16, 0x070000) ),
-    // generate a 3-byte bytecode instruction from two integers
-    // TODO: or an integer and a symbol, used as a label
-    MakeBytecodePC: func(a, pc)
-        return bOr( bOr( bAnd(a<<19, 0xF80000), 0x070000 ), bAnd(b, 0xFFFF) ),
-    Pop:            func() return :MakeBytecode(0, 0),
-    Dup:            func() return :MakeBytecode(0, 1),
-    Ret:            func() return :MakeBytecode(0, 2),
-    PushSelf:       func() return :MakeBytecode(0, 3),
-    SetLexScope:    func() return :MakeBytecode(0, 4),
-    IterNext:       func() return :MakeBytecode(0, 5),
-    IterDone:       func() return :MakeBytecode(0, 6),
-    PopHandlers:    func() return :MakeBytecode(0, 7),
-    Push:           func(lit)   return :MakeBytecode(3, lit),
-    PushConst:      func(sImm)  return :MakeBytecode(4, sImm), // FIXME: signed immediate!
-    CallGlobal:     func(nArgs) return :MakeBytecode(5, nArgs),
-    Invoke:         func(nArgs) return :MakeBytecode(6, nArgs),
-    Send:           func(nArgs) return :MakeBytecode(7, nArgs),
-    SendIfDef:      func(nArgs) return :MakeBytecode(8, nArgs),
-    Resend:         func(nArgs) return :MakeBytecode(9, nArgs),
-    ResendIfDef:    func(nArgs) return :MakeBytecode(10, nArgs),
-    Branch:         func(pc)    return :MakeBytecode(11, pc), // FIXME: allow sybols!
-    BranchIfTrue:   func(pc)    return :MakeBytecode(12, pc), // FIXME: allow sybols!
-    BranchIfFalse:  func(pc)    return :MakeBytecode(13, pc), // FIXME: allow sybols!
-    FindVar:        func(lit)   return :MakeBytecode(14, lit),
-    GetVar:         func(loc)   return :MakeBytecode(15, loc),
-    MakeFrame:      func(nSlts) return :MakeBytecode(16, nSlts),
-    MakeArray:      func(nVals) return :MakeBytecode(17, nVals),
-    GetPath:        func(flag)  return :MakeBytecode(18, flag),
-    SetPath:        func(flag)  return :MakeBytecode(19, flag),
-    SetVar:         func(loc)   return :MakeBytecode(20, loc),
-    FindAndSetVar:  func(lit)   return :MakeBytecode(21, lit),
-    IncrVar:        func(loc)   return :MakeBytecode(22, loc),
-    BranchIfNotDone:func(pc)    return :MakeBytecode(23, pc), // FIXME: allow sybols!
-    Add:            func()  return :MakeBytecode(24, 0),
-    Subtract:       func()  return :MakeBytecode(24, 1),
-    ARef:           func()  return :MakeBytecode(24, 2),
-    SetARef:        func()  return :MakeBytecode(24, 3),
-    Equals:         func()  return :MakeBytecode(24, 4),
-    LNot:           func()  return :MakeBytecode(25, 5), // logic
-    NotEquals:      func()  return :MakeBytecode(24, 6),
-    Multiply:       func()  return :MakeBytecode(24, 7),
-    Divide:         func()  return :MakeBytecode(24, 8),
-    DivInt:         func()  return :MakeBytecode(24, 9),
-    Less:           func()  return :MakeBytecode(24, 10),
-    Greater:        func()  return :MakeBytecode(24, 11),
-    GreaterOrEqual: func()  return :MakeBytecode(24, 12),
-    LessOrEqual:    func()  return :MakeBytecode(24, 13),
-    BAnd:           func()  return :MakeBytecode(24, 14),
-    BOr:            func()  return :MakeBytecode(24, 15),
-    BNot:           func()  return :MakeBytecode(24, 16),
-    NewIter:        func()  return :MakeBytecode(24, 17),
-    Length:         func()  return :MakeBytecode(24, 18),
-    Clone:          func()  return :MakeBytecode(24, 19),
-    SetClass:       func()  return :MakeBytecode(24, 20),
-    AddSlot:        func()  return :MakeBytecode(24, 21),
-    Stringer:       func()  return :MakeBytecode(24, 22),
-    HasPath:        func()  return :MakeBytecode(24, 23),
-    ClassOf:        func()  return :MakeBytecode(24, 24),
-    NewHandlers:    func(nEx)   return :MakeBytecode(25, nEx),
-};
-
-pkg := ReadPkg(LoadBinary("/Users/matt/dev/Newton/NewtonDev/NewtonDev.1/Sample Code/System Services/PeriodicElements-1/PeriodicElements.pkg"));
+//pkg := ReadPkg(LoadBinary("/Users/matt/dev/Newton/NewtonDev/NewtonDev.1/Sample Code/System Services/PeriodicElements-1/PeriodicElements.pkg"));
+//pkg := ReadPkg(LoadBinary("/Users/matt/dev/newt64/ViewFrame/VF+Function.pkg"));
+//pkg := ReadPkg(LoadBinary("/Users/matt/dev/Newton/NewtonDev/NewtonDev.1/Sample Code/Pickers, Popups, and Overviews/PictIndex-1/pictIndex.pkg"));
+//pkg := ReadPkg(LoadBinary("/Users/matt/dev/newton-test/mini.pkg"));
+pkg := ReadPkg(LoadBinary("/Users/matt/dev/Einstein/pguyot.mattAndroid/Packages/ROMDumper/ROMDumper.pkg"));
 p(pkg);
 
 p("OK");
-exit();
+//exit();
+p("Better");
 //bin := MakePkg(pkg);
 //p("Pkg.");
+
+/*
+  548  cp /Users/matt/Library/Developer/Xcode/DerivedData/newt_all-dwtewkohxhpsptgvmbufkeachdoe/Build/Products/Debug/libnewt64.a /usr/local/lib/
+  549  mkdir /usr/local/include/newt64
+  550  cp -R /Users/matt/dev/newt64/src/newt_core/incs/* /usr/local/include/newt64/
+  551  ls -r /usr/local/include/newt64
+  552  ls -R /usr/local/include/newt64
+*/
+

@@ -10,3 +10,4 @@ build/
 xcuserdata
 *.xcworkspacedata
 *.xccheckout
+src/version.h

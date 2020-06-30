@@ -33,7 +33,7 @@
 
 #define __PLATFORM__ "darwin"
 #define __DYLIBSUFFIX__ ".dylib"
-#define __LIBDIR__ "/usr/local/lib/newt0"
+#define __LIBDIR__ "/usr/local/lib/newt64"
 
 /* #undef __IPOD__ */
 

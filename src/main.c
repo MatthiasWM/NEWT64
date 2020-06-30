@@ -18,6 +18,8 @@
  */
 
 
+#include "config.h"
+
 /* ヘッダファイル */
 #include <stdio.h>
 #include <stdlib.h>

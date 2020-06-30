@@ -6,19 +6,31 @@
  * @author  M.Nukui
  * @date	2003-11-07
  *
- * Copyright (C) 2003-2005 M.Nukui All rights reserved.
+ * Copyright (C) 2003-2020 M.Nukui All rights reserved.
  */
 
 
 #ifndef	NEWTVERSION_H
 #define	NEWTVERSION_H
 
+
+#define PROJECT_NAME "@PROJECT_NAME@"
+#define PROJECT_VER  "@PROJECT_VERSION@"
+#define PROJECT_VER_MAJOR "@PROJECT_VERSION_MAJOR@"
+#define PROJECT_VER_MINOR "@PROJECT_VERSION_MINOR@"
+#define PROJECT_VER_PATCH "@PROJECT_VERSION_PATCH@"
+
+#define COMPILE_TIME_YYYY @COMPILE_TIME_YYYY@
+#define COMPILE_TIME_MM @COMPILE_TIME_MM@
+#define COMPILE_TIME_DD @COMPILE_TIME_DD@
+
+
 /* マクロ定義 */
 #define NEWT_NAME		"newt"									///< コマンド名
 #define NEWT_PROTO		"/0"									///< プロト
 
 #ifndef NEWT_VERSION
-#define NEWT_VERSION	"v0.2.0"								///< バージョン
+#define NEWT_VERSION	"v" PROJECT_VER							///< バージョン
 #endif
 
 #ifndef NEWT_BUILD

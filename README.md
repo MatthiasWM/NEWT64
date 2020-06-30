@@ -68,3 +68,18 @@ Please refer to the file COPYING.ja.
 
 Comments, bug reports gnue@so-kukan.com others. 
 http://www.so-kukan.com/gnue/
+
+* Make CMake
+
+mkdir \_Build\_; cd \_Build\_
+mkdir Debug; cd Debug
+cmake --DCMAKE\_BUILD\_TYPE=Debug ../..
+
+mkdir \_Build\_; cd \_Build\_
+mkdir Release; cd Release
+cmake --DCMAKE\_BUILD\_TYPE=Release ../..
+
+mkdir \_Build\_; cd \_Build\_
+mkdir Release; cd Release
+cmake -P Xcode ../..
+

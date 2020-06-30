@@ -24,6 +24,8 @@ elseif (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
 	# MSWindows
 	cmake_policy(SET CMP0091 NEW)
 	set (CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+	set(BISON_ROOT c:/GnuWin32/bin)
+	set(FLEX_ROOT c:/GnuWin32/bin)
 
 else ()
 
@@ -108,11 +110,9 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 # ---- lex and yacc -----------------------------------------------------------
 #
 
-set(FLEX_ROOT c:/GnuWin32/bin)
 find_package(FLEX REQUIRED)
 flex_target(lexer src/parser/newt.l ${CMAKE_CURRENT_BINARY_DIR}/newt.l.c)
 
-set(BISON_ROOT c:/GnuWin32/bin)
 find_package(BISON REQUIRED)
 bison_target(parser src/parser/newt.y ${CMAKE_CURRENT_BINARY_DIR}/y.tab.c)
 

@@ -41,6 +41,6 @@
 
 #define strcasecmp stricmp
 #define strncasecmp strnicmp
-#define strcasestr StrStrIA
+#define strcasestr StrStrI
 
 #endif /* CONFIG_H */

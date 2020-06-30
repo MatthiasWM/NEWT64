@@ -23,8 +23,9 @@
 #include "NewtType.h"
 
 
-#if defined(__WIN32__)
+#if defined(WIN32)
 #include "win/dlfcn.h"
+#include <direct.h>
 #elif defined(HAVE_DLOPEN)
 #include <dlfcn.h>
 #endif
@@ -312,7 +313,7 @@ newtRef NewtExpandPath(const char *	s)
     {
         dir = (char *)s;
     }
-#ifdef __WIN32__
+#ifdef WIN32
     else if (isalpha(*s) && s[1] == ':')
     {
         dir = (char *)s;

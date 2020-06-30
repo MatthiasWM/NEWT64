@@ -309,7 +309,7 @@ void NewtInitARGV(int argc, const char * argv[], int n)
         NewtSetArraySlot(r, j, NewtMakeString(argv[i], true));
     }
     
-#ifdef __WIN32__
+#ifdef WIN32
     {
         char	sep;
         

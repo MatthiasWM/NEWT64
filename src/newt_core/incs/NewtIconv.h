@@ -18,27 +18,15 @@
 #include "NewtType.h"
 
 
-#ifdef HAVE_LIBICONV
-#include <iconv.h>
-
-
-/* マクロ */
-
-
-/* 関数プロトタイプ */
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-
-char *		NewtIconv(iconv_t cd, char* src, size_t srclen, size_t* dstlenp);
-
+char *      NewtUtf8To16(const char* src, size_t srclen, size_t* dstlenp);
+char *      NewtUtf16To8(const char* src, size_t srclen, size_t* dstlenp);
 
 #ifdef __cplusplus
 }
 #endif
 
-
-#endif /* HAVE_LIBICONV */
 #endif /* NEWTICONV_H */

@@ -140,8 +140,8 @@ target_include_directories (libnewt64 PUBLIC
 )
 
 target_link_libraries(libnewt64 PUBLIC 
-	$<$<PLATFORM_ID:Darwin>:  iconv >
-	$<$<PLATFORM_ID:Linux>:   /usr/local/lib/libiconv.a dl >
+	$<$<PLATFORM_ID:Darwin>:  >
+	$<$<PLATFORM_ID:Linux>:   >
 	$<$<PLATFORM_ID:Windows>: shlwapi >
 )
 

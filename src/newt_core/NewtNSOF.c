@@ -33,14 +33,6 @@
 
 /* 型宣言 */
 
-/// NSOF変換に使用する iconv変換ディスクリプター
-#ifdef HAVE_LIBICONV
-typedef struct {
-    iconv_t		utf16be;	///< iconv変換ディスクリプター（UTF16-BE）
-    iconv_t		macroman;	///< iconv変換ディスクリプター（MACROMAN）
-} nsof_iconv_t;
-#endif /* HAVE_LIBICONV */
-
 /// NSOFストリーム構造体
 typedef struct {
     int32_t		verno;			///< NSOFバージョン番号
@@ -49,13 +41,6 @@ typedef struct {
     uint32_t	offset;			///< 作業中の位置
     newtRefVar	precedents;		///< 出現済みオブジェクトのリスト
     newtErr		lastErr;		///< 最後のエラーコード
-    
-#ifdef HAVE_LIBICONV
-    struct {
-        nsof_iconv_t	to;		///< NSOFエンコーディングへの変換用
-        nsof_iconv_t	from;	///< NSOFエンコーディングからの変換用
-    } cd; ///< iconv変換ディスクリプター
-#endif /* HAVE_LIBICONV */
 } nsof_stream_t;
 
 
@@ -390,17 +375,15 @@ newtErr NSOFWriteBinary(nsof_stream_t * nsof, newtRefArg r, uint16_t objtype)
     
     size = NewtBinaryLength(r);
     
-#ifdef HAVE_LIBICONV
     if (objtype == kNewtString)
     {
         size_t	bufflen;
         char *	s;
         
         s = NewtRefToString(r);
-        buff = NewtIconv(nsof->cd.to.utf16be, (char *)s, size, &bufflen);
+        buff = NewtUtf8To16((char *)s, size, &bufflen);
         if (buff) size = (uint32_t)bufflen;
     }
-#endif /* HAVE_LIBICONV */
     
     NSOFWriteByte(nsof, type);
     NSOFWriteXlong(nsof, size);
@@ -478,20 +461,6 @@ newtErr NSOFWriteSymbol(nsof_stream_t * nsof, newtRefArg r)
     
     size = NewtSymbolLength(r);
     name = NewtRefToSymbol(r)->name;
-    
-#ifdef HAVE_LIBICONV
-    {
-        size_t		bufflen;
-        
-        buff = NewtIconv(nsof->cd.to.macroman, (char *)name, size, &bufflen);
-        
-        if (buff)
-        {
-            name = buff;
-            size = (uint32_t)bufflen;
-        }
-    }
-#endif /* HAVE_LIBICONV */
     
     NSOFWriteByte(nsof, kNSOFSymbol);
     NSOFWriteXlong(nsof, size);
@@ -760,22 +729,6 @@ newtRef NsMakeNSOF(newtRefArg rcvr, newtRefArg r, newtRefArg ver)
     nsof.precedents = NewtMakeArray(kNewtRefUnbind, 0);
     nsof.offset = 1;
     
-#ifdef HAVE_LIBICONV
-    if (NSOFIsNOS(nsof.verno))
-    {
-        char *		encoding;
-        
-        encoding = NewtDefaultEncoding();
-        nsof.cd.to.utf16be = iconv_open("UTF-16BE", encoding);
-        nsof.cd.to.macroman = iconv_open("MACROMAN", encoding);
-    }
-    else
-    {
-        nsof.cd.to.utf16be = (iconv_t)-1;
-        nsof.cd.to.macroman = (iconv_t)-1;
-    }
-#endif /* HAVE_LIBICONV */
-    
     // 必要なサイズの計算
     NewtWriteNSOF(&nsof, r);
     
@@ -799,11 +752,6 @@ newtRef NsMakeNSOF(newtRefArg rcvr, newtRefArg r, newtRefArg ver)
     {
         result = NewtThrow(nsof.lastErr, r);
     }
-    
-#ifdef HAVE_LIBICONV
-    if (nsof.cd.to.utf16be != (iconv_t)-1) iconv_close(nsof.cd.to.utf16be);
-    if (nsof.cd.to.macroman != (iconv_t)-1) iconv_close(nsof.cd.to.macroman);
-#endif /* HAVE_LIBICONV */
     
     return result;
 }
@@ -865,12 +813,11 @@ newtRef NSOFReadBinary(nsof_stream_t * nsof, int type)
         n = ntohd(n);
         r= NewtMakeReal(n);
     }
-#ifdef HAVE_LIBICONV
     else if (NewtIsSubclass(klass, NSSYM0(string)))
     {
         char *	buff;
         
-        buff = NewtIconv(nsof->cd.from.utf16be, (char *)data, xlen, NULL);
+        buff = NewtUtf16To8((char *)data, xlen, NULL);
         
         if (buff)
         {
@@ -882,7 +829,6 @@ newtRef NSOFReadBinary(nsof_stream_t * nsof, int type)
             r = NewtMakeBinary(klass, data, xlen, false);
         }
     }
-#endif /* HAVE_LIBICONV */
     else
     {
         r = NewtMakeBinary(klass, data, xlen, false);
@@ -1004,21 +950,9 @@ newtRef NSOFReadSymbol(nsof_stream_t * nsof)
     {
         memcpy(name, nsof->data + nsof->offset, xlen);
         name[xlen] = '\0';
-        
-#ifdef HAVE_LIBICONV
-        {
-            char *	buff;
-            
-            buff = NewtIconv(nsof->cd.from.macroman, name, xlen + 1, NULL);
-            
-            if (buff)
-            {	// 変換された
-                r = NewtMakeSymbol(buff);
-                free(buff);
-            }
-        }
-#endif /* HAVE_LIBICONV */
-        
+
+        r = NewtMakeSymbol(name);
+
         if (r == kNewtRefUnbind)
             r = NewtMakeSymbol(name);
         
@@ -1191,28 +1125,7 @@ newtRef NewtReadNSOF(uint8_t * data, size_t size)
     nsof.precedents = NewtMakeArray(kNewtRefUnbind, 0);
     nsof.verno = NSOFReadByte(&nsof);
     
-#ifdef HAVE_LIBICONV
-    if (NSOFIsNOS(nsof.verno))
-    {
-        char *		encoding;
-        
-        encoding = NewtDefaultEncoding();
-        nsof.cd.from.utf16be = iconv_open(encoding, "UTF-16BE");
-        nsof.cd.from.macroman = iconv_open(encoding, "MACROMAN");
-    }
-    else
-    {
-        nsof.cd.from.utf16be = (iconv_t)-1;
-        nsof.cd.from.macroman = (iconv_t)-1;
-    }
-#endif /* HAVE_LIBICONV */
-    
     result = NSOFReadNSOF(&nsof);
-    
-#ifdef HAVE_LIBICONV
-    if (nsof.cd.from.utf16be != (iconv_t)-1) iconv_close(nsof.cd.from.utf16be);
-    if (nsof.cd.from.macroman != (iconv_t)-1) iconv_close(nsof.cd.from.macroman);
-#endif /* HAVE_LIBICONV */
     
     return result;
 }

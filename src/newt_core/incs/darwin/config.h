@@ -24,7 +24,6 @@
 #define HAVE_MACHINE_ENDIAN_H 1
 #define HAVE_TERMIOS_H 1
 
-#define HAVE_LIBICONV 1
 #define HAVE_DLOPEN 1
 #define HAVE_MMAP 1
 #define HAVE_CHDIR 1

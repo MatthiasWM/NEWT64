@@ -151,9 +151,12 @@ target_compile_definitions(libnewt64 PRIVATE
 	$<$<PLATFORM_ID:Windows>: TARGET_OS_WINDOWS=1 >
 )
 
-set_target_properties(libnewt64 PROPERTIES PUBLIC_HEADER ${headers})
-install(TARGETS libnewt64
-    PUBLIC_HEADER
+install (TARGETS libnewt64
+    ARCHIVE DESTINATION lib
+)
+
+install (DIRECTORY src/newt_core/incs/
+    DESTINATION include/newt64
 )
 
 #
@@ -176,5 +179,9 @@ target_include_directories (newt64 PUBLIC
 target_link_libraries(newt64
 	PUBLIC 
 	libnewt64
+)
+
+install (TARGETS newt64
+    RUNTIME DESTINATION bin
 )
 

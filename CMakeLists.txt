@@ -126,9 +126,15 @@ add_library (libnewt64 STATIC
 	${sources}
 	${headers}
 )
+
 set_target_properties(libnewt64
 	PROPERTIES OUTPUT_NAME newt64
 )
+
+if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+	target_compile_options(libnewt64 PUBLIC "/bigobj")
+	target_compile_definitions(libnewt64 PRIVATE WIN32_LEAN_AND_MEAN=1 _CRT_SECURE_NO_WARNINGS=1)
+endif ()
 
 target_include_directories (libnewt64 PUBLIC
 	src/newt_core/incs/
@@ -140,8 +146,8 @@ target_include_directories (libnewt64 PUBLIC
 )
 
 target_link_libraries(libnewt64 PUBLIC 
-	$<$<PLATFORM_ID:Darwin>:  iconv >
-	$<$<PLATFORM_ID:Linux>:   /usr/local/lib/libiconv.a dl >
+	$<$<PLATFORM_ID:Darwin>:  >
+	$<$<PLATFORM_ID:Linux>:   >
 	$<$<PLATFORM_ID:Windows>: shlwapi >
 )
 
@@ -151,9 +157,12 @@ target_compile_definitions(libnewt64 PRIVATE
 	$<$<PLATFORM_ID:Windows>: TARGET_OS_WINDOWS=1 >
 )
 
-set_target_properties(libnewt64 PROPERTIES PUBLIC_HEADER ${headers})
-install(TARGETS libnewt64
-    PUBLIC_HEADER
+install (TARGETS libnewt64
+	ARCHIVE DESTINATION lib
+)
+
+install (DIRECTORY src/newt_core/incs/
+	DESTINATION include/newt64
 )
 
 #
@@ -163,6 +172,11 @@ install(TARGETS libnewt64
 add_executable(newt64
 	src/main.c
 )
+
+if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+	target_compile_options(newt64 PUBLIC "/bigobj")
+	target_compile_definitions(newt64 PRIVATE WIN32_LEAN_AND_MEAN=1 _CRT_SECURE_NO_WARNINGS=1)
+endif ()
 
 target_include_directories (newt64 PUBLIC
 	src/newt_core/incs/
@@ -176,5 +190,9 @@ target_include_directories (newt64 PUBLIC
 target_link_libraries(newt64
 	PUBLIC 
 	libnewt64
+)
+
+install (TARGETS newt64
+    RUNTIME DESTINATION bin
 )
 

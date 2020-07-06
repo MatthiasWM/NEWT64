@@ -17,6 +17,10 @@
 #include "NewtCore.h"
 #include "NewtStr.h"
 
+#ifdef WIN32
+#include <shlwapi.h>
+#endif
+
 
 /* 関数プロトタイプ */
 static newtRef  NewtParamStr(char * baseStr, size_t baseStrLen, newtRefArg paramStrArray, bool ifthen);

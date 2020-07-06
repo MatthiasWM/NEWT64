@@ -22,7 +22,6 @@
 #undef HAVE_MACHINE_ENDIAN_H
 #undef HAVE_TERMIOS_H 
 
-#define HAVE_LIBICONV 1
 #undef HAVE_DLOPEN
 #undef HAVE_MMAP
 #undef HAVE_CHDIR

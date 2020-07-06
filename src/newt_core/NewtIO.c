@@ -22,7 +22,7 @@
 #include <termios.h>
 #include <unistd.h>
 #include <sys/select.h>
-#elif defined(__WIN32__)
+#elif defined(WIN32)
 #include <conio.h>
 #endif
 
@@ -30,7 +30,7 @@
 /* マクロ */
 #if defined(HAVE_TERMIOS_H)
 #define	newt_getch()	tcgetch(0)
-#elif defined(__WIN32__)
+#elif defined(WIN32)
 #define	newt_getch()	getch()
 #else
 #define	newt_getch()	(0)

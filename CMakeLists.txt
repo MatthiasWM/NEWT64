@@ -99,8 +99,8 @@ set (headers
 	src/newt_core/incs/platform.h
 	src/newt_core/incs/win/config.h
 	src/newt_core/incs/win/NewtConf.h
-	$<$<PLATFORM_ID:Darwin>:  src/newt_core/incs/Darwin/config.h src/newt_core/incs/Darwin/NewtConf.h>
-	$<$<PLATFORM_ID:Linux>:   src/newt_core/incs/Darwin/config.h src/newt_core/incs/Darwin/NewtConf.h>
+	$<$<PLATFORM_ID:Darwin>:  src/newt_core/incs/darwin/config.h src/newt_core/incs/darwin/NewtConf.h>
+	$<$<PLATFORM_ID:Linux>:   src/newt_core/incs/darwin/config.h src/newt_core/incs/darwin/NewtConf.h>
 	$<$<PLATFORM_ID:Windows>: src/newt_core/incs/win/config.h src/newt_core/incs/win/NewtConf.h>
 )
 
@@ -134,8 +134,8 @@ target_include_directories (libnewt64 PUBLIC
 	src/newt_core/incs/
 	src/parser/
 	src/
-	$<$<PLATFORM_ID:Darwin>:  src/newt_core/incs/Darwin >
-	$<$<PLATFORM_ID:Linux>:   src/newt_core/incs/Darwin >
+	$<$<PLATFORM_ID:Darwin>:  src/newt_core/incs/darwin >
+	$<$<PLATFORM_ID:Linux>:   src/newt_core/incs/darwin >
 	$<$<PLATFORM_ID:Windows>: src/newt_core/incs/win >
 )
 
@@ -168,8 +168,8 @@ target_include_directories (newt64 PUBLIC
 	src/newt_core/incs/
 	src/parser/
 	src/
-	$<$<PLATFORM_ID:Darwin>:  src/newt_core/incs/Darwin >
-	$<$<PLATFORM_ID:Linux>:   src/newt_core/incs/Darwin >
+	$<$<PLATFORM_ID:Darwin>:  src/newt_core/incs/darwin >
+	$<$<PLATFORM_ID:Linux>:   src/newt_core/incs/darwin >
 	$<$<PLATFORM_ID:Windows>: src/newt_core/incs/win >
 )
 

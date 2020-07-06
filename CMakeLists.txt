@@ -190,6 +190,7 @@ target_include_directories (newt64 PUBLIC
 target_link_libraries(newt64
 	PUBLIC 
 	libnewt64
+	$<$<PLATFORM_ID:Linux>:dl>
 )
 
 install (TARGETS newt64

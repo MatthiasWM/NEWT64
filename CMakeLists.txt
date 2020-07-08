@@ -14,10 +14,12 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
 	# MacOS
 	set (CMAKE_OSX_ARCHITECTURES=x86_64)
 	set (CMAKE_OSX_DEPLOYMENT_TARGET 10.9)
+	set (NEWT64_INSTALL_PREFIX "")
 
 elseif (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 
 	# Linux
+	set (NEWT64_INSTALL_PREFIX "")
 
 elseif (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
 
@@ -26,6 +28,7 @@ elseif (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
 	set (CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 	set(BISON_ROOT c:/GnuWin32/bin)
 	set(FLEX_ROOT c:/GnuWin32/bin)
+	set (NEWT64_INSTALL_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/ )
 
 else ()
 
@@ -158,11 +161,11 @@ target_compile_definitions(libnewt64 PRIVATE
 )
 
 install (TARGETS libnewt64
-	ARCHIVE DESTINATION lib
+	ARCHIVE DESTINATION ${NEWT64_INSTALL_PREFIX}lib
 )
 
 install (DIRECTORY src/newt_core/incs/
-	DESTINATION include/newt64
+	DESTINATION ${NEWT64_INSTALL_PREFIX}include/newt64
 )
 
 #
@@ -194,6 +197,13 @@ target_link_libraries(newt64
 )
 
 install (TARGETS newt64
-    RUNTIME DESTINATION bin
+    RUNTIME DESTINATION ${NEWT64_INSTALL_PREFIX}bin
 )
 
+if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+	install (FILES Newt64Config.cmake
+		DESTINATION ${NEWT64_INSTALL_PREFIX}lib/cmake/Newt64
+	)
+	set (CMAKE_EXPORT_PACKAGE_REGISTRY 1)
+	export(PACKAGE Newt64)
+endif()

@@ -719,14 +719,29 @@ void NIOPrintObjBinary(newtStream_t * f, newtRefArg r, int32_t depth)
     if (newt_env._printBinaries)
     {
         uint8_t *data = NewtRefToBinary(r);
-        NIOFputs("MakeBinaryFromHex(\"", f);
-        int i; for (i=0; i<len; i++) NIOFprintf(f, "%02X", data[i]);
+        NIOFputs("MakeBinaryFromHex(", f);
+        if (len<=40) {
+            NIOFputs("\"", f);
+            int i; for (i=0; i<len; i++) NIOFprintf(f, "%02X", data[i]);
+            NIOFputs("\", ", f);
+        } else {
+            int j, i;
+            for (j=0; j<len; j+=40) {
+                if (NEWT_INDENT) NIOPrintIndent(f, depth-1);
+                NIOFputs("\"", f);
+                int n = j+40; if (n>len) n = len;
+                for (i=j; i<n; i++) NIOFprintf(f, "%02X", data[i]);
+                NIOFputs("\"", f);
+            }
+            NIOFputs(",", f);
+            if (NEWT_INDENT) NIOPrintIndent(f, depth-1);
+        }
         if (NewtRefIsSymbol(klass))
         {
-            NIOFputs("\", '", f);
+            NIOFputs("'", f);
             NIOPrintObj2(f, klass, 0, true);
         } else {
-            NIOFputs("\", NIL)", f);
+            NIOFputs("NIL)", f);
         }
         NIOFputs(")", f);
     } else {

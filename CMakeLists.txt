@@ -74,6 +74,7 @@ set (sources
 	src/utils/endian_utils.c
 	${CMAKE_CURRENT_BINARY_DIR}/newt.l.c
 	${CMAKE_CURRENT_BINARY_DIR}/y.tab.c
+	src/parser/newt.l
 	src/parser/newt.y
 )
 

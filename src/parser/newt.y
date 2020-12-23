@@ -352,6 +352,8 @@ constructor
 		// 配列の生成
 		: '[' kSYMBOL ':' expr_list ']'		{ $$ = NPSGenNode2(kNPSMakeArray, $2, $4); }
 		// To create a map, we allow the use of an integer as the 'class' argument
+		// This rule generates a shift/reduce conflict, because '[3:b exists]' matches this rule and the exists_expr[4] rule
+		// Default shift rule seems ok?!
 		| '[' kINTEGER ':' expr_list ']'	{ $$ = NPSGenNode2(kNPSMakeArray, $2, $4); }
 		| '[' expr_list ']'					{ $$ = NPSGenNode2(kNPSMakeArray, kNewtRefUnbind, $2); }
 

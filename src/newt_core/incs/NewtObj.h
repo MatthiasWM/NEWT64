@@ -13,6 +13,7 @@
 #ifndef	NEWTOBJ_H
 #define	NEWTOBJ_H
 
+#include <assert.h>
 
 /* ヘッダファイル */
 #include "NewtType.h"
@@ -200,7 +201,7 @@ NewtRefIsPointer(newtRefArg r)      { return ((r & 3) == 1); } ///< ポインタ
 static inline void*
 NewtRefToPointer(newtRefArg r)      { return (void*)(r - 1); } ///< オブジェクト参照をポインタに変換
 static inline newtRef
-NewtMakePointer(void *v)            { return (newtRef)((uintptr_t)v + 1); } ///< ポインタオブジェクトを作成
+NewtMakePointer(void* v)            { return (newtRef)((uintptr_t)v + 1); } ///< ポインタオブジェクトを作成
 
 static inline bool
 NewtRefIsCharacter(newtRefArg r)    { return ((r & 0xF) == 6); } ///< 文字オブジェクトか？

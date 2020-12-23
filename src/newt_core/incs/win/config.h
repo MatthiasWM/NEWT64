@@ -23,6 +23,7 @@
 /* #undef HAVE_ENDIAN_H */
 /* #undef HAVE_MACHINE_ENDIAN_H */
 /* #undef HAVE_TERMIOS_H */
+#define YY_NO_UNISTD_H 1
 
 #define HAVE_DLOPEN 1
 #define HAVE_MMAP 1

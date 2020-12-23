@@ -1167,7 +1167,8 @@ bool NewtRefIsRegex(newtRefArg r)
 void * NewtRefToAddress(newtRefArg r)
 {
     if (NewtRefIsInteger(r))
-        return (void *)((uintptr_t)(r&~2));
+        return (void*)NewtRefToInteger(r);
+        //return (void *)((uintptr_t)(r&~2));
     else
         return NULL;
 }
@@ -1965,7 +1966,9 @@ newtRef NewtSetLength(newtRefArg r, uint32_t n)
 newtRef NewtMakeAddress(void * addr)
 {
     // Create an integer with the upper 62 bits containing the 4 byte aligned address
-    return (newtRef)(((uintptr_t)addr)&~3);
+    //assert((((uintptr_t)addr) & 3) == 0);
+    //return (newtRef)(((uintptr_t)addr)&~3);
+    return NewtMakeInteger((uintptr_t)addr);
 }
 
 
@@ -4450,30 +4453,30 @@ newtRef NewtStrCat(newtRefArg r, char * s)
 newtRef NewtStrCat2(newtRefArg r, char * s, size_t slen)
 {
     newtObjRef	obj;
-    
+
     obj = NewtRefToPointer(r);
-    
+
     if (obj != NULL)
     {
         uint32_t	tgtlen;
         uint32_t	dstlen;
-        
+
         tgtlen = NewtObjStringLength(obj);
         dstlen = (uint32_t)(tgtlen + slen);
-        
+
         if (NewtObjSize(obj) <= dstlen)
             obj = NewtObjStringSetLength(obj, dstlen);
-        
+
         if (obj != NULL)
         {
-            char *	data;
-            
+            char* data;
+
             data = NewtObjToString(obj);
             memcpy(data + tgtlen, s, slen);
             data[dstlen] = '\0';
         }
     }
-    
+
     return r;
 }
 

@@ -157,7 +157,7 @@ target_link_libraries(libnewt64 PUBLIC
 
 target_compile_definitions(libnewt64 PRIVATE
 	$<$<PLATFORM_ID:Darwin>:  TARGET_OS_DARWIN=1 >
-	$<$<PLATFORM_ID:Linux>:   TARGET_OS_LINUX=1 >
+	$<$<PLATFORM_ID:Linux>:   TARGET_OS_LINUX=1 HAVE_ENDIAN_H=1>
 	$<$<PLATFORM_ID:Windows>: TARGET_OS_WINDOWS=1 >
 )
 

@@ -5,6 +5,7 @@ AC_PREREQ(2.57)
 AC_INIT(FULL-PACKAGE-NAME, VERSION, BUG-REPORT-ADDRESS)
 AC_CONFIG_SRCDIR([src/main.c])
 AC_CONFIG_HEADERS([src/config.h])
+AC_CONFIG_HEADERS([src/version.h])
 AC_CONFIG_HEADERS([src/newt_core/incs/NewtConf.h])
 
 # Checks for programs.

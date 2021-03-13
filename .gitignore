@@ -10,6 +10,5 @@ build/
 xcuserdata
 *.xcworkspacedata
 *.xccheckout
-src/version.h
 /CMakeSettings.json
 /.vs

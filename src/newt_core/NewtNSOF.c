@@ -26,10 +26,6 @@
 /* マクロ */
 #define NSOFIsNOS(verno)	((verno == 1) || (verno == 2))	///< Newton OS　互換の NSOF
 
-#if TARGET_OS_WINDOWS || TARGET_OS_LINUX
-#define htonll(x) ((1==htonl(1)) ? (x) : (((uint64_t)htonl((x) & 0xFFFFFFFFUL)) << 32) | htonl((uint32_t)((x) >> 32)))
-#endif
-
 
 /* 型宣言 */
 
@@ -411,7 +407,8 @@ newtErr NSOFWriteBinary(nsof_stream_t * nsof, newtRefArg r, uint16_t objtype)
                     int64_t	n;
                     
                     n = NewtRefToInteger(r);
-                    n = htonll(n);
+                    // step-by-step htonll
+                    n = ((1==htonl(1)) ? (n) : (((uint64_t)htonl((n) & 0xFFFFFFFFUL)) << 32) | htonl((uint32_t)((n) >> 32)));
                     memcpy(data, (uint8_t *)&n, sizeof(n));
                 }
                 break;

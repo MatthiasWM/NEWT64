@@ -533,7 +533,7 @@ newtRef PkgWriteObject(pkg_stream_t *pkg, newtRefArg obj)
  *
  * This function makes heavy use of the "pkg" structure, updating all
  * members to allow writing multiple consecutive parts by repeatedly
- * caling this function. Multiple part packages are untested.
+ * calling this function. Multiple part packages are untested.
  *
  * @param pkg		[inout] the package
  * @param part		[in] object containing part data
@@ -596,7 +596,7 @@ void PkgWritePart(pkg_stream_t *pkg, newtRefArg part)
  * 
  * NewtWritePkg was tested on hierarchies created by NewtReadPackage, reading
  * a random bunch of .pkg files containing Newton Script applications. The 
- * packages created were identiacla to the original packages.
+ * packages created were identical to the original packages.
  *
  * @todo	NewtWritePkg does not support a relocation table yet which may 
  *			be needed to save native function of a higher complexity.
@@ -760,7 +760,7 @@ newtRef PkgReadRef(pkg_stream_t *pkg, uint32_t p_obj)
             result = PkgReadObject(pkg, ref&~3);
             break;
         case 2: // special
-            // special refs are immedites, encoded in the same format in
+            // special refs are immediates, encoded in the same format in
             // memory as in package files (at least for all instances I could find)
             result = ref; 
             break;
@@ -833,7 +833,9 @@ newtRef PkgReadBinaryObject(pkg_stream_t *pkg, uint32_t p_obj)
 #		endif
         result = NewtMakeBinary(klass, pkg->data + p_obj + 12, size-12, true);
     }
-    
+    if (result!= kNewtRefNIL)
+        PkgPartSetInstance(pkg, p_obj, result);
+
     return result;
 }
 
@@ -856,6 +858,9 @@ newtRef PkgReadArrayObject(pkg_stream_t *pkg, uint32_t p_obj)
     array = NewtMakeArray(klass, num_slots);
     
     if (NewtRefIsNotNIL(array)) {
+        // remember that we created this object
+        PkgPartSetInstance(pkg, p_obj, array);
+
         for (i=0; i<num_slots; i++) {
             NewtSetArraySlot(array, i, PkgReadRef(pkg, p_obj+12 + 4*i));
         }
@@ -882,9 +887,11 @@ newtRef PkgReadFrameObject(pkg_stream_t *pkg, uint32_t p_obj)
     map = PkgReadRef(pkg, p_obj+8);
     
     frame = NewtMakeFrame(map, num_slots);
-    
+
     if (NewtRefIsNotNIL(frame)) {
-        
+        // remember that we created this object
+        PkgPartSetInstance(pkg, p_obj, frame);
+
         newtRef *slot = NewtRefToSlots(frame);
         for (i=0; i<num_slots; i++) {
             slot[i] = PkgReadRef(pkg, p_obj+12 + 4*i);

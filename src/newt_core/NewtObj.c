@@ -1262,7 +1262,7 @@ newtRef NewtMakeBinaryFromHex(newtRefArg klass, const char *hex, bool literal)
  *
  * <tt>|xxs0.0000|AAAA.Abbb|BBBB.BBBB|BBBB.BBBB|</tt>
  *
- * x = bits not availabel in NewtonScript integers
+ * x = bits not available in NewtonScript integers
  * s = NewtonScript integer sign bit
  * AAAAA = instruction
  * bbb = parameter, if bbb=111, the bytecode is three bytes long

@@ -453,13 +453,13 @@ int16_t NBCMakeFnArgFrame(newtRefArg argFrame, nps_syntax_node_t * stree, nps_no
                 break;
                 
             case kNPSArg:
-                // type (node->op1) はとりあえず無視
-                NcSetSlot(argFrame, node->op2, kNewtRefUnbind);
+                // type (node->op1) Ignore for the time being
+                NcSetSlot(argFrame, node->op2, kNewtRefNIL /*kNewtRefUnbind*/ );
                 break;
                 
             case kNPSIndefinite:
                 // 不定長
-                NcSetSlot(argFrame, node->op1, kNewtRefUnbind);
+                NcSetSlot(argFrame, node->op1, kNewtRefNIL /*kNewtRefUnbind*/ );
                 *indefiniteP = true;
                 numArgs = 0;
                 break;

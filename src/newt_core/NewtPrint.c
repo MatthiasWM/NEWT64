@@ -228,7 +228,7 @@ bool NewtStrIsPrint(char * str, int len)
         if (str[i] == '"')
             return false;
         
-        if (! isprint(str[i]))
+        if (! isprint((unsigned char)str[i]))
             return false;
     }
     

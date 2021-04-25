@@ -2219,6 +2219,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 ac_config_headers="$ac_config_headers src/config.h"
 
+ac_config_headers="$ac_config_headers src/version.h"
+
 ac_config_headers="$ac_config_headers src/newt_core/incs/NewtConf.h"
 
 
@@ -5473,6 +5475,7 @@ for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
     "src/config.h") CONFIG_HEADERS="$CONFIG_HEADERS src/config.h" ;;
+    "src/version.h") CONFIG_HEADERS="$CONFIG_HEADERS src/version.h" ;;
     "src/newt_core/incs/NewtConf.h") CONFIG_HEADERS="$CONFIG_HEADERS src/newt_core/incs/NewtConf.h" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "ext/protoFILE/Makefile") CONFIG_FILES="$CONFIG_FILES ext/protoFILE/Makefile" ;;

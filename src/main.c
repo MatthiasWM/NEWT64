@@ -440,6 +440,22 @@ newtErr newt_option_with_arg(char c, int argc, const char * argv[], int n)
 
 int main (int argc, const char * argv[])
 {
+#if 0 // use this to debug specific lines of NewtonScript
+    const char* xArgs[] = {
+        "newt.exe",
+//        "-t",
+        "-l",
+        "-s",
+        "-b",
+        "-e",
+        "x := { test: func(a,b) return a/b }; p(x:test(2,1));",
+        "-i", "x:test",
+        0L
+    };
+    argc = sizeof(xArgs)/sizeof(char*)-1;
+    argv = xArgs;
+#endif
+
     const char *	s;
     newtErr	err = kNErrNone;
     int		i;

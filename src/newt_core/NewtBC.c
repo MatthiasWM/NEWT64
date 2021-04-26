@@ -429,7 +429,7 @@ void NBCGenCallFn(newtRefArg fn, int16_t numArgs)
 int16_t NBCMakeFnArgFrame(newtRefArg argFrame, nps_syntax_node_t * stree, nps_node_t r, bool * indefiniteP)
 {
     int16_t	numArgs = 1;
-    
+
     if (r == kNewtRefUnbind)
         return 0;
     
@@ -448,18 +448,19 @@ int16_t NBCMakeFnArgFrame(newtRefArg argFrame, nps_syntax_node_t * stree, nps_no
         switch (node->code)
         {
             case kNPSCommaList:
-                numArgs = NBCMakeFnArgFrame(argFrame, stree, node->op1, indefiniteP)
-                + NBCMakeFnArgFrame(argFrame, stree, node->op2, indefiniteP);
+                // C and C++ do not guarantee an order of evaluation, so don't write 'numArgs = a + b;'
+                numArgs =  NBCMakeFnArgFrame(argFrame, stree, node->op1, indefiniteP);
+                numArgs += NBCMakeFnArgFrame(argFrame, stree, node->op2, indefiniteP);
                 break;
                 
             case kNPSArg:
                 // type (node->op1) Ignore for the time being
-                NcSetSlot(argFrame, node->op2, kNewtRefNIL /*kNewtRefUnbind*/ );
+                NcSetSlot(argFrame, node->op2, kNewtRefNIL /*kNewtRefUnbind*/);
                 break;
                 
             case kNPSIndefinite:
                 // 不定長
-                NcSetSlot(argFrame, node->op1, kNewtRefNIL /*kNewtRefUnbind*/ );
+                NcSetSlot(argFrame, node->op1, kNewtRefNIL /*kNewtRefUnbind*/);
                 *indefiniteP = true;
                 numArgs = 0;
                 break;
@@ -471,7 +472,7 @@ int16_t NBCMakeFnArgFrame(newtRefArg argFrame, nps_syntax_node_t * stree, nps_no
     }
     else
     {
-        NcSetSlot(argFrame, r, kNewtRefUnbind);
+        NcSetSlot(argFrame, r, kNewtRefNIL /*kNewtRefUnbind*/ );
     }
     
     return numArgs;

@@ -45,13 +45,15 @@ About * doxygen
    doxygen doxygen.conf document from the source code can be generated. 
    Doxygen.conf according to the environment and please correct. 
 
-   For example: 
-     # Cd misc 
-     # Doxygen Doxyfile 
-     
-     or
-     
-     # Doxygen Doxyfile.en
+   For example:
+```
+cd misc
+Doxygen Doxyfile
+```     
+or
+```
+Doxygen Doxyfile.en
+```
 
 
 * Other 
@@ -71,15 +73,25 @@ http://www.so-kukan.com/gnue/
 
 * Make CMake
 
+```
+;; Debug version
 mkdir \_Build\_; cd \_Build\_
 mkdir Debug; cd Debug
-cmake --DCMAKE\_BUILD\_TYPE=Debug ../..
-
+cmake -DCMAKE\_BUILD\_TYPE=Debug ../..
+cmake --build .
+sudo cmake --install .
+```
+```
+;; Release version
 mkdir \_Build\_; cd \_Build\_
 mkdir Release; cd Release
-cmake --DCMAKE\_BUILD\_TYPE=Release ../..
-
+cmake -DCMAKE\_BUILD\_TYPE=Release ../..
+cmake --build .
+sudo cmake --install .
+```
+```
+;; Xcode version
 mkdir \_Build\_; cd \_Build\_
 mkdir Release; cd Release
 cmake -P Xcode ../..
-
+```

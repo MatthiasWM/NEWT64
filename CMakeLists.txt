@@ -2,7 +2,7 @@
 # Use a single CMake setup to compile Newt/64 on all supported platforms.
 # 
 
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.13)
 
 project("Newt64" VERSION "2020.4.5")
 

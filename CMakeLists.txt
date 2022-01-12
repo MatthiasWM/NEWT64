@@ -72,11 +72,21 @@ set (sources
 	src/newt_core/NewtVM.c
 	src/parser/lookup_words.c
 	src/utils/endian_utils.c
-	${CMAKE_CURRENT_BINARY_DIR}/newt.l.c
-	${CMAKE_CURRENT_BINARY_DIR}/y.tab.c
-	src/parser/newt.l
-	src/parser/newt.y
 )
+
+if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+	list ( APPEND sources
+		src/parser/newt.l.c
+		src/parser/y.tab.c
+	)
+else ()
+	list ( APPEND sources
+		${CMAKE_CURRENT_BINARY_DIR}/newt.l.c
+		${CMAKE_CURRENT_BINARY_DIR}/y.tab.c
+		src/parser/newt.l
+		src/parser/newt.y
+	)
+endif ()
 
 set (headers
 	src/version.h

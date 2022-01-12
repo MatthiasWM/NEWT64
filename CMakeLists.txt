@@ -124,13 +124,17 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 # ---- lex and yacc -----------------------------------------------------------
 #
 
-find_package(FLEX REQUIRED)
-flex_target(lexer src/parser/newt.l ${CMAKE_CURRENT_BINARY_DIR}/newt.l.c)
+if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+	# avoid Lex and Yacc on Windows as they are a pain to install.
+else ()
+	find_package(FLEX REQUIRED)
+	flex_target(lexer src/parser/newt.l ${CMAKE_CURRENT_BINARY_DIR}/newt.l.c)
 
-find_package(BISON REQUIRED)
-bison_target(parser src/parser/newt.y ${CMAKE_CURRENT_BINARY_DIR}/y.tab.c)
+	find_package(BISON REQUIRED)
+	bison_target(parser src/parser/newt.y ${CMAKE_CURRENT_BINARY_DIR}/y.tab.c)
 
-add_flex_bison_dependency(lexer parser)
+	add_flex_bison_dependency(lexer parser)
+endif ()
 
 #
 # ---- newt64 library ---------------------------------------------------------

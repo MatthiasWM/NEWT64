@@ -93,7 +93,7 @@ REAL					{DIGIT}+"."{DIGIT}*([eE]-?{DIGIT}+)?
 
 NEWLINE					("\r\n"|"\r"|"\n")
 SPACE					[ \t]
-STRING-CHARACTER		[\x20-\x21\x23-\x5b\x5d-\x7f\x80-\xff]
+STRING-CHARACTER		[\t\x20-\x21\x23-\x5b\x5d-\x7f\x80-\xff]
 SYMBOL-CHARACTER        [\x20-\x5b\x5d-\x7b\x7d-\x7f]
 FILENAME-CHARACTER      [\x20-\x21\x23-\x29\x2b-\x2e\x30-\x39\x3b\x3d\x3f-\x5b\x5d-\x7b\7d\x7e\x80-\xff]
 FILEPATH-CHARACTER      ({FILENAME-CHARACTER}|[\x2f\x3a\x5c])

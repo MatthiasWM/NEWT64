@@ -541,7 +541,6 @@ void NIOPrintObjMagicPointer(newtStream_t * f, newtRefArg r)
     NIOFprintf(f, "@%d", index);
 }
 
-
 /*------------------------------------------------------------------------*/
 /** Print bytecode instructions.
  *
@@ -564,6 +563,12 @@ void NIOPrintObjBinaryInstructions(newtStream_t * f, newtRefArg r, newtRefArg co
         NIOFprintf(f, "%s:", NewtSymbolGetName(klass));
 
     newtRef literals = NewtObjGetSlot(NewtRefToPointer(codeBlock), NSSYM0(literals));
+    newtRef argFrame = NewtObjGetSlot(NewtRefToPointer(codeBlock), NSSYM0(argFrame));
+    uint32_t numArgsEnc = NewtRefToInteger(NewtObjGetSlot(NewtRefToPointer(codeBlock), NSSYM0(numArgs)));
+    uint32_t numArgs = numArgsEnc & 0xFFFF;
+    uint32_t numLocals = (numArgsEnc>>16) & 0xFFFF;
+    uint8_t indefinite = NewtRefIsNotNIL(NewtObjGetSlot(NewtRefToPointer(codeBlock), NSSYM0(numArgs)));
+    // docString
 
     // first, mark all the locations that are jump targets and need a label:
     uint8_t *needsLabel = (uint8_t*)calloc(1, len);
@@ -608,6 +613,8 @@ void NIOPrintObjBinaryInstructions(newtStream_t * f, newtRefArg r, newtRefArg co
         }
         int pLit = 0;
         int pImm = 0;
+        int pArg = 0;
+        int pNArgs = 0;
         switch (a) {
             case 0:
                 switch (b) {
@@ -624,24 +631,24 @@ void NIOPrintObjBinaryInstructions(newtStream_t * f, newtRefArg r, newtRefArg co
                 break;
             case 3: NIOFprintf(f, "bc:Push(%d)", b); pLit = 1; break;
             case 4: NIOFprintf(f, "bc:PushConst(%d)", b); pImm = 1; break;
-            case 5: NIOFprintf(f, "bc:CallGlobal(%d)", b); break;
-            case 6: NIOFprintf(f, "bc:Invoke(%d)", b); break;
-            case 7: NIOFprintf(f, "bc:Send(%d)", b); break;
-            case 8: NIOFprintf(f, "bc:SendIfDef(%d)", b); break;
-            case 9: NIOFprintf(f, "bc:Resend(%d)", b); break;
-            case 10: NIOFprintf(f, "bc:ResendIfDef(%d)", b); break;
+            case 5: NIOFprintf(f, "bc:CallGlobal(%d)", b); pNArgs = 1; break;
+            case 6: NIOFprintf(f, "bc:Invoke(%d)", b); pNArgs = 2; break;
+            case 7: NIOFprintf(f, "bc:Send(%d)", b); pNArgs = 3; break;
+            case 8: NIOFprintf(f, "bc:SendIfDef(%d)", b); pNArgs = 3; break;
+            case 9: NIOFprintf(f, "bc:Resend(%d)", b); pNArgs = 4; break;
+            case 10: NIOFprintf(f, "bc:ResendIfDef(%d)", b); pNArgs = 4; break;
             case 11: NIOFprintf(f, "bc:Branch('label_%d)", b); break;
             case 12: NIOFprintf(f, "bc:BranchIfTrue('label_%d)", b); break;
             case 13: NIOFprintf(f, "bc:BranchIfFalse('label_%d)", b); break;
             case 14: NIOFprintf(f, "bc:FindVar(%d)", b); pLit = 1; break;
-            case 15: NIOFprintf(f, "bc:GetVar(%d)", b); break;
-            case 16: NIOFprintf(f, "bc:MakeFrame(%d)", b); break;
-            case 17: NIOFprintf(f, "bc:MakeArray(%d)", b); break;
-            case 18: NIOFprintf(f, "bc:GetPath(%d)", b); break;
-            case 19: NIOFprintf(f, "bc:SetPath(%d)", b); break;
-            case 20: NIOFprintf(f, "bc:SetVar(%d)", b); break;
+            case 15: NIOFprintf(f, "bc:GetVar(%d)", b); pArg = 1; break;
+            case 16: NIOFprintf(f, "bc:MakeFrame(%d)", b); pNArgs = 5; break;
+            case 17: NIOFprintf(f, "bc:MakeArray(%d)", b); pNArgs = 6; break;
+            case 18: NIOFprintf(f, "bc:GetPath(%d)", b); pNArgs = 7; break;
+            case 19: NIOFprintf(f, "bc:SetPath(%d)", b); pNArgs = 8; break;
+            case 20: NIOFprintf(f, "bc:SetVar(%d)", b); pArg = 1; break;
             case 21: NIOFprintf(f, "bc:FindAndSetVar(%d)", b); pLit = 1; break;
-            case 22: NIOFprintf(f, "bc:IncrVar(%d)", b); break;
+            case 22: NIOFprintf(f, "bc:IncrVar(%d)", b); pArg = 1; break;
             case 23: NIOFprintf(f, "bc:BranchIfNotDone('label_%d)", b); break;
             case 24:
                 switch (b) {
@@ -673,7 +680,7 @@ void NIOPrintObjBinaryInstructions(newtStream_t * f, newtRefArg r, newtRefArg co
                     default: NIOFputs("bc:Invalid()", f); break;
                 }
                 break;
-            case 25: NIOFprintf(f, "bc:NewHandlers(%d)", b); break;
+            case 25: NIOFprintf(f, "bc:NewHandlers(%d)", b); pNArgs = 9; break;
             default: NIOFputs("bc:Invalid()", f); break;
         }
         if (pc<len-1) NIOFputs(",", f); else NIOFputs(" ", f);
@@ -686,8 +693,50 @@ void NIOPrintObjBinaryInstructions(newtStream_t * f, newtRefArg r, newtRefArg co
         }
         if (pImm==1) {
             NIOFputs(" // ", f);
-            newtRef imm = (newtRef)((int32_t)((int16_t)(b)));
+            newtRef imm = (newtRef)((int32_t)((int16_t)(b))); // extend the sign bit
             NIOPrintObj2(f, imm, 0, true);
+        }
+        if (pArg==1) {
+            NIOFputs(" // ", f);
+            if (b>=3 && b<3+numArgs) NIOFprintf(f, "arg %d", b-3);
+            else if (b>=3+numArgs) NIOFprintf(f, "local %d", b-numArgs-3);
+            if (NewtRefIsNotNIL(argFrame)) {
+                NIOFputs(": ", f);
+                NIOPrintObj2(f, NewtGetFrameKey(argFrame, b), 0, true);
+            }
+            // if "indefinite" is set, argFrame[numArgs+3] is an array of more arguments.
+        }
+        if (pNArgs==1) {
+            NIOFprintf(f, " // %d args, global func name", b);
+        } else if (pNArgs==2) {
+            NIOFprintf(f, " // %d args, function", b);
+        } else if (pNArgs==3) {
+            NIOFprintf(f, " // %d args, name, receiver", b);
+        } else if (pNArgs==4) {
+            NIOFprintf(f, " // %d args, name", b);
+        } else if (pNArgs==5) {
+            NIOFprintf(f, " // %d values, map", b);
+        } else if (pNArgs==6) {
+            if (b==0xffff)
+                NIOFprintf(f, " // size, class", b);
+            else
+                NIOFprintf(f, " // %d values, class", b);
+        } else if (pNArgs==7) {
+            if (b==0)
+                NIOFprintf(f, " // obj, path, return NIL on err");
+            else if (b==1)
+                NIOFprintf(f, " // obj, path, throws ex on err");
+            else
+                NIOFprintf(f, " // unsupported value in b");
+        } else if (pNArgs==8) {
+            if (b==0)
+                NIOFprintf(f, " // obj, path, value");
+            else if (b==1)
+                NIOFprintf(f, " // obj, path, value, pushed value");
+            else
+                NIOFprintf(f, " // unsupported value in b");
+        } else if (pNArgs==9) {
+            NIOFprintf(f, " // %d handlers: sym1, pc1, sym2, pc2, ...", b);
         }
         pc += n;
     }

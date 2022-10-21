@@ -21,6 +21,11 @@ elseif (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 	# Linux
 	set (NEWT64_INSTALL_PREFIX "")
 
+elseif (${CMAKE_SYSTEM_NAME} STREQUAL "OpenBSD")
+
+	# OpenBSD
+	set (NEWT64_INSTALL_PREFIX "")
+
 elseif (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
 
 	# MSWindows
@@ -115,6 +120,7 @@ set (headers
 	src/newt_core/incs/win/NewtConf.h
 	$<$<PLATFORM_ID:Darwin>:  src/newt_core/incs/darwin/config.h src/newt_core/incs/darwin/NewtConf.h>
 	$<$<PLATFORM_ID:Linux>:   src/newt_core/incs/darwin/config.h src/newt_core/incs/darwin/NewtConf.h>
+	$<$<PLATFORM_ID:OpenBSD>: src/newt_core/incs/darwin/config.h src/newt_core/incs/darwin/NewtConf.h>
 	$<$<PLATFORM_ID:Windows>: src/newt_core/incs/win/config.h src/newt_core/incs/win/NewtConf.h>
 )
 
@@ -160,18 +166,21 @@ target_include_directories (libnewt64 PUBLIC
 	src/
 	$<$<PLATFORM_ID:Darwin>:  src/newt_core/incs/darwin >
 	$<$<PLATFORM_ID:Linux>:   src/newt_core/incs/darwin >
+	$<$<PLATFORM_ID:OpenBSD>:   src/newt_core/incs/darwin >
 	$<$<PLATFORM_ID:Windows>: src/newt_core/incs/win >
 )
 
 target_link_libraries(libnewt64 PUBLIC 
 	$<$<PLATFORM_ID:Darwin>:  >
 	$<$<PLATFORM_ID:Linux>:   >
+	$<$<PLATFORM_ID:OpenBSD>:   >
 	$<$<PLATFORM_ID:Windows>: shlwapi >
 )
 
 target_compile_definitions(libnewt64 PRIVATE
 	$<$<PLATFORM_ID:Darwin>:  TARGET_OS_DARWIN=1 >
 	$<$<PLATFORM_ID:Linux>:   TARGET_OS_LINUX=1 HAVE_ENDIAN_H=1>
+	$<$<PLATFORM_ID:OpenBSD>: TARGET_OS_LINUX=1 HAVE_ENDIAN_H=1>
 	$<$<PLATFORM_ID:Windows>: TARGET_OS_WINDOWS=1 >
 )
 
@@ -202,6 +211,7 @@ target_include_directories (newt64 PUBLIC
 	src/
 	$<$<PLATFORM_ID:Darwin>:  src/newt_core/incs/darwin >
 	$<$<PLATFORM_ID:Linux>:   src/newt_core/incs/darwin >
+	$<$<PLATFORM_ID:OpenBSD>: src/newt_core/incs/darwin >
 	$<$<PLATFORM_ID:Windows>: src/newt_core/incs/win >
 )
 

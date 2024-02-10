@@ -96,7 +96,7 @@ endif ()
 set (headers
 	src/version.h
 	src/newt_core/incs/NewtBC.h
-	src/newt_core/incs/NewtConf.h
+	src/newt_core/incs/NewtConf.h.in
 	src/newt_core/incs/NewtCore.h
 	src/newt_core/incs/NewtEnv.h
 	src/newt_core/incs/NewtErrs.h
@@ -116,8 +116,6 @@ set (headers
 	src/newt_core/incs/NewtType.h
 	src/newt_core/incs/NewtVM.h
 	src/newt_core/incs/platform.h
-	src/newt_core/incs/win/config.h
-	src/newt_core/incs/win/NewtConf.h
 	$<$<PLATFORM_ID:Darwin>:  src/newt_core/incs/darwin/config.h src/newt_core/incs/darwin/NewtConf.h>
 	$<$<PLATFORM_ID:Linux>:   src/newt_core/incs/darwin/config.h src/newt_core/incs/darwin/NewtConf.h>
 	$<$<PLATFORM_ID:OpenBSD>: src/newt_core/incs/darwin/config.h src/newt_core/incs/darwin/NewtConf.h>

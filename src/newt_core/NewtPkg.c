@@ -353,26 +353,38 @@ newtRef PkgWriteFrame(pkg_stream_t *pkg, newtRefArg frame)
     uint32_t dst, size, i, n;
     newtRef map, map_pos;
     newtRef slot, slot_pos;
-    
+
     // calculate the size of this chunk
     dst = PkgAlign(pkg, pkg->size);
     n = NewtFrameLength(frame);
     size = (n+3)*4;
-    
+
     // make room for the entire chunk and write the header
     PkgMakeRoom(pkg, dst, size);
     PkgWriteU32(pkg, dst, (size<<8) | 0x40 | kObjSlotted | kObjFrame);
     PkgWriteU32(pkg, dst+4, 0);
-    
+
     // recursively add all arrays making up the map
     map = NewtFrameMap(frame);
     map_pos = PkgWriteObject(pkg, map);
     PkgWriteU32(pkg, dst+8, (uint32_t)map_pos);
-    
+
     // now add all slots and fill in the rest of our chunk
     for (i=0; i<n; i++) {
+        uint32_t dummy = 0;
+        newtRef sym0 = kNewtRefNIL;
         slot = NewtGetFrameSlot(frame, i);
-        slot_pos = PkgWriteObject(pkg, slot);
+        // This code ensures that we don't write the _nextArgFrame when it
+        // is the local argFrame that called WritePkg.
+        if (i==0) sym0 = NewtGetMapIndex(map, 0, &dummy);
+        if (   (i==0)
+            && NewtSymbolEqual(sym0, NSSYM(_nextArgFrame))
+            && (slot==NewtGetFrameSlot(vm_env.reg.locals, 0)))
+        {
+            slot_pos = kNewtRefNIL;
+        } else {
+            slot_pos = PkgWriteObject(pkg, slot);
+        }
         PkgWriteU32(pkg, dst+12+4*i, (uint32_t)slot_pos);
     }
     

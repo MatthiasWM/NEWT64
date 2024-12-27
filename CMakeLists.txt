@@ -8,12 +8,12 @@ project("Newt64" VERSION "2020.4.5")
 
 set (CMAKE_CXX_STANDARD 14)
 
-# prepare for various platform
+# prepare for various platforms
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
 
 	# MacOS
-	set (CMAKE_OSX_ARCHITECTURES=x86_64)
-	set (CMAKE_OSX_DEPLOYMENT_TARGET 10.9)
+	set (CMAKE_OSX_ARCHITECTURES "arm64;x86_64")
+	set (CMAKE_OSX_DEPLOYMENT_TARGET "10.13")
 	set (NEWT64_INSTALL_PREFIX "")
 
 elseif (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")

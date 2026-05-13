@@ -144,6 +144,16 @@ endif ()
 # ---- newt64 library ---------------------------------------------------------
 #
 
+if(MSVC)
+    set(PLATFORM_CONFIG_DIR src/newt_core/incs/win)
+elseif(MINGW)
+    set(PLATFORM_CONFIG_DIR src/newt_core/incs/mingw)
+elseif(APPLE)
+    set(PLATFORM_CONFIG_DIR src/newt_core/incs/darwin)
+else()
+    set(PLATFORM_CONFIG_DIR src/newt_core/incs/darwin)
+endif()
+
 add_library (libnewt64 STATIC
 	${sources}
 	${headers}
@@ -154,18 +164,17 @@ set_target_properties(libnewt64
 )
 
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
-	target_compile_options(libnewt64 PUBLIC "/bigobj")
+	if (MSVC)
+		target_compile_options(libnewt64 PUBLIC "/bigobj")
+	endif()
 	target_compile_definitions(libnewt64 PRIVATE WIN32_LEAN_AND_MEAN=1 _CRT_SECURE_NO_WARNINGS=1)
 endif ()
 
 target_include_directories (libnewt64 PUBLIC
+	${PLATFORM_CONFIG_DIR}
 	src/newt_core/incs/
 	src/parser/
 	src/
-	$<$<PLATFORM_ID:Darwin>:  src/newt_core/incs/darwin >
-	$<$<PLATFORM_ID:Linux>:   src/newt_core/incs/darwin >
-	$<$<PLATFORM_ID:OpenBSD>:   src/newt_core/incs/darwin >
-	$<$<PLATFORM_ID:Windows>: src/newt_core/incs/win >
 )
 
 target_link_libraries(libnewt64 PUBLIC 
@@ -199,18 +208,17 @@ add_executable(newt64
 )
 
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
-	target_compile_options(newt64 PUBLIC "/bigobj")
+	if (MSVC)
+		target_compile_options(newt64 PUBLIC "/bigobj")
+	endif()
 	target_compile_definitions(newt64 PRIVATE WIN32_LEAN_AND_MEAN=1 _CRT_SECURE_NO_WARNINGS=1)
 endif ()
 
 target_include_directories (newt64 PUBLIC
+	${PLATFORM_CONFIG_DIR}
 	src/newt_core/incs/
 	src/parser/
 	src/
-	$<$<PLATFORM_ID:Darwin>:  src/newt_core/incs/darwin >
-	$<$<PLATFORM_ID:Linux>:   src/newt_core/incs/darwin >
-	$<$<PLATFORM_ID:OpenBSD>: src/newt_core/incs/darwin >
-	$<$<PLATFORM_ID:Windows>: src/newt_core/incs/win >
 )
 
 target_link_libraries(newt64

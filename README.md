@@ -31,13 +31,14 @@ line to read the source code can be executed shortly.
   - Mac OS X 10.2: / Darwin 
   - Linux 
   - BeOS 
-    to make 
+    to make or use CMake (see below)
 
   - FreeBSD 
     GNU make (gmake) to make use 
 
   - Windows 
-    To make on MinGW + MSYS 
+    - MinGW: Use CMake (recommended) or legacy MSYS make
+    - MSVC: Use CMake
 
 
 About * doxygen 
@@ -94,4 +95,11 @@ sudo cmake --install .
 mkdir \_Build\_; cd \_Build\_
 mkdir Release; cd Release
 cmake -P Xcode ../..
+```
+
+### MinGW Cross-compilation (on Linux)
+
+```bash
+cmake -B build -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain-mingw.cmake
+cmake --build build
 ```

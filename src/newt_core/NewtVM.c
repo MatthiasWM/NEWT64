@@ -33,7 +33,11 @@
 /* 型宣言 */
 typedef void(*instruction_t)(int16_t b);			///< 命令セット
 typedef void(*simple_instruction_t)(void);			///< シンプル命令
+#ifdef __MINGW32__
+typedef newtRef(*nvm_func_t)(...);						///< ネイティブ関数
+#else
 typedef newtRef(*nvm_func_t)();						///< ネイティブ関数
+#endif
 
 
 /* グローバル変数 */

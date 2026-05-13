@@ -1,0 +1,56 @@
+name: Build
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: ${{ matrix.os }} (${{ matrix.compiler }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            compiler: gcc
+          - os: ubuntu-latest
+            compiler: mingw
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Dependencies (Linux GCC)
+      if: matrix.compiler == 'gcc'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake flex bison
+
+    - name: Install Dependencies (Linux MinGW)
+      if: matrix.compiler == 'mingw'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake flex bison gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64
+
+    - name: Configure (GCC)
+      if: matrix.compiler == 'gcc'
+      run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+
+    - name: Configure (MinGW)
+      if: matrix.compiler == 'mingw'
+      run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain-mingw.cmake
+
+    - name: Build
+      run: cmake --build build --config Release
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: newt-${{ matrix.compiler }}
+        path: |
+          build/newt64
+          build/newt64.exe
+        if-no-files-found: ignore

@@ -33,7 +33,21 @@
 /* 型宣言 */
 typedef void(*instruction_t)(int16_t b);			///< 命令セット
 typedef void(*simple_instruction_t)(void);			///< シンプル命令
-typedef newtRef(*nvm_func_t)();						///< ネイティブ関数
+
+typedef newtRef (*nvm_fn_0)(void);
+typedef newtRef (*nvm_fn_1)(newtRef);
+typedef newtRef (*nvm_fn_2)(newtRef, newtRef);
+typedef newtRef (*nvm_fn_3)(newtRef, newtRef, newtRef);
+typedef newtRef (*nvm_fn_4)(newtRef, newtRef, newtRef, newtRef);
+typedef newtRef (*nvm_fn_5)(newtRef, newtRef, newtRef, newtRef, newtRef);
+typedef newtRef (*nvm_fn_6)(newtRef, newtRef, newtRef, newtRef, newtRef, newtRef);
+typedef newtRef (*nvm_fn_7)(newtRef, newtRef, newtRef, newtRef, newtRef, newtRef, newtRef);
+typedef newtRef (*nvm_fn_8)(newtRef, newtRef, newtRef, newtRef, newtRef, newtRef, newtRef, newtRef);
+typedef newtRef (*nvm_fn_9)(newtRef, newtRef, newtRef, newtRef, newtRef, newtRef, newtRef, newtRef, newtRef);
+typedef newtRef (*nvm_fn_10)(newtRef, newtRef, newtRef, newtRef, newtRef, newtRef, newtRef, newtRef, newtRef, newtRef);
+typedef newtRef (*nvm_fn_11)(newtRef, newtRef, newtRef, newtRef, newtRef, newtRef, newtRef, newtRef, newtRef, newtRef, newtRef);
+
+typedef void * nvm_func_t;
 
 
 /* グローバル変数 */
@@ -389,7 +403,7 @@ newtRef NVMCurrentFunction(void)
 
 
 /*------------------------------------------------------------------------*/
-/** 現在のインプリメンタを取得する 
+/** 現在のインプリメンタを取得する
  *
  * @return		現在のインプリメンタ
  */
@@ -1287,7 +1301,7 @@ void NVMCallNativeFn(newtRefArg fn, int16_t numArgs)
         switch (minArgs)
         {
             case 0:
-                r = (*funcPtr)();
+                r = ((nvm_fn_0)funcPtr)();
                 break;
 
             case 1:
@@ -1295,7 +1309,7 @@ void NVMCallNativeFn(newtRefArg fn, int16_t numArgs)
                 newtRefVar	a;
 
                 a = stk_pop();
-                r = (*funcPtr)(a);
+                r = ((nvm_fn_1)funcPtr)(a);
             }
                 break;
 
@@ -1304,7 +1318,7 @@ void NVMCallNativeFn(newtRefArg fn, int16_t numArgs)
                 newtRefVar	a[2];
 
                 stk_pop_n(2, a);
-                r = (*funcPtr)(a[0], a[1]);
+                r = ((nvm_fn_2)funcPtr)(a[0], a[1]);
             }
                 break;
 
@@ -1313,7 +1327,7 @@ void NVMCallNativeFn(newtRefArg fn, int16_t numArgs)
                 newtRefVar	a[3];
 
                 stk_pop_n(3, a);
-                r = (*funcPtr)(a[0], a[1], a[2]);
+                r = ((nvm_fn_3)funcPtr)(a[0], a[1], a[2]);
             }
                 break;
 
@@ -1322,7 +1336,7 @@ void NVMCallNativeFn(newtRefArg fn, int16_t numArgs)
                 newtRefVar	a[4];
 
                 stk_pop_n(4, a);
-                r = (*funcPtr)(a[0], a[1], a[2], a[3]);
+                r = ((nvm_fn_4)funcPtr)(a[0], a[1], a[2], a[3]);
             }
                 break;
 
@@ -1331,7 +1345,7 @@ void NVMCallNativeFn(newtRefArg fn, int16_t numArgs)
                 newtRefVar	a[5];
 
                 stk_pop_n(5, a);
-                r = (*funcPtr)(a[0], a[1], a[2], a[3], a[4]);
+                r = ((nvm_fn_5)funcPtr)(a[0], a[1], a[2], a[3], a[4]);
             }
                 break;
 
@@ -1340,7 +1354,7 @@ void NVMCallNativeFn(newtRefArg fn, int16_t numArgs)
                 newtRefVar	a[6];
 
                 stk_pop_n(6, a);
-                r = (*funcPtr)(a[0], a[1], a[2], a[3], a[4], a[5]);
+                r = ((nvm_fn_6)funcPtr)(a[0], a[1], a[2], a[3], a[4], a[5]);
             }
                 break;
 
@@ -1349,7 +1363,7 @@ void NVMCallNativeFn(newtRefArg fn, int16_t numArgs)
                 newtRefVar	a[7];
 
                 stk_pop_n(7, a);
-                r = (*funcPtr)(a[0], a[1], a[2], a[3], a[4], a[5], a[6]);
+                r = ((nvm_fn_7)funcPtr)(a[0], a[1], a[2], a[3], a[4], a[5], a[6]);
             }
                 break;
 
@@ -1359,7 +1373,7 @@ void NVMCallNativeFn(newtRefArg fn, int16_t numArgs)
                 newtRefVar	a[8];
 
                 stk_pop_n(8, a);
-                r = (*funcPtr)(a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7]);
+                r = ((nvm_fn_8)funcPtr)(a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7]);
             }
                 break;
 
@@ -1368,7 +1382,7 @@ void NVMCallNativeFn(newtRefArg fn, int16_t numArgs)
                 newtRefVar	a[9];
 
                 stk_pop_n(9, a);
-                r = (*funcPtr)(a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8]);
+                r = ((nvm_fn_9)funcPtr)(a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8]);
             }
                 break;
 
@@ -1386,7 +1400,7 @@ void NVMCallNativeFn(newtRefArg fn, int16_t numArgs)
         switch (minArgs)
         {
             case 0:
-                r = (*funcPtr)(args);
+                r = ((nvm_fn_1)funcPtr)(args);
                 break;
 
             case 1:
@@ -1394,7 +1408,7 @@ void NVMCallNativeFn(newtRefArg fn, int16_t numArgs)
                 newtRefVar	a;
 
                 a = stk_pop();
-                r = (*funcPtr)(a, args);
+                r = ((nvm_fn_2)funcPtr)(a, args);
             }
                 break;
 
@@ -1403,7 +1417,7 @@ void NVMCallNativeFn(newtRefArg fn, int16_t numArgs)
                 newtRefVar	a[2];
 
                 stk_pop_n(2, a);
-                r = (*funcPtr)(a[0], a[1], args);
+                r = ((nvm_fn_3)funcPtr)(a[0], a[1], args);
             }
                 break;
 
@@ -1412,7 +1426,7 @@ void NVMCallNativeFn(newtRefArg fn, int16_t numArgs)
                 newtRefVar	a[3];
 
                 stk_pop_n(3, a);
-                r = (*funcPtr)(a[0], a[1], a[2], args);
+                r = ((nvm_fn_4)funcPtr)(a[0], a[1], a[2], args);
             }
                 break;
 
@@ -1421,7 +1435,7 @@ void NVMCallNativeFn(newtRefArg fn, int16_t numArgs)
                 newtRefVar	a[4];
 
                 stk_pop_n(4, a);
-                r = (*funcPtr)(a[0], a[1], a[2], a[3], args);
+                r = ((nvm_fn_5)funcPtr)(a[0], a[1], a[2], a[3], args);
             }
                 break;
 
@@ -1430,7 +1444,7 @@ void NVMCallNativeFn(newtRefArg fn, int16_t numArgs)
                 newtRefVar	a[5];
 
                 stk_pop_n(5, a);
-                r = (*funcPtr)(a[0], a[1], a[2], a[3], a[4], args);
+                r = ((nvm_fn_6)funcPtr)(a[0], a[1], a[2], a[3], a[4], args);
             }
                 break;
 
@@ -1439,7 +1453,7 @@ void NVMCallNativeFn(newtRefArg fn, int16_t numArgs)
                 newtRefVar	a[6];
 
                 stk_pop_n(6, a);
-                r = (*funcPtr)(a[0], a[1], a[2], a[3], a[4], a[5], args);
+                r = ((nvm_fn_7)funcPtr)(a[0], a[1], a[2], a[3], a[4], a[5], args);
             }
                 break;
 
@@ -1448,7 +1462,7 @@ void NVMCallNativeFn(newtRefArg fn, int16_t numArgs)
                 newtRefVar	a[7];
 
                 stk_pop_n(7, a);
-                r = (*funcPtr)(a[0], a[1], a[2], a[3], a[4], a[5], a[6], args);
+                r = ((nvm_fn_8)funcPtr)(a[0], a[1], a[2], a[3], a[4], a[5], a[6], args);
             }
                 break;
 
@@ -1458,7 +1472,7 @@ void NVMCallNativeFn(newtRefArg fn, int16_t numArgs)
                 newtRefVar	a[8];
 
                 stk_pop_n(8, a);
-                r = (*funcPtr)(a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], args);
+                r = ((nvm_fn_9)funcPtr)(a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], args);
             }
                 break;
 
@@ -1467,7 +1481,7 @@ void NVMCallNativeFn(newtRefArg fn, int16_t numArgs)
                 newtRefVar	a[9];
 
                 stk_pop_n(9, a);
-                r = (*funcPtr)(a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], args);
+                r = ((nvm_fn_10)funcPtr)(a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], args);
             }
                 break;
 
@@ -1511,7 +1525,7 @@ void NVMCallNativeFunc(newtRefArg fn, newtRefArg rcvr, int16_t numArgs)
         switch (minArgs)
         {
             case 0:
-                r = (*funcPtr)(rcvr);
+                r = ((nvm_fn_1)funcPtr)(rcvr);
                 break;
 
             case 1:
@@ -1519,7 +1533,7 @@ void NVMCallNativeFunc(newtRefArg fn, newtRefArg rcvr, int16_t numArgs)
                 newtRefVar	a;
 
                 a = stk_pop();
-                r = (*funcPtr)(rcvr, a);
+                r = ((nvm_fn_2)funcPtr)(rcvr, a);
             }
                 break;
 
@@ -1528,7 +1542,7 @@ void NVMCallNativeFunc(newtRefArg fn, newtRefArg rcvr, int16_t numArgs)
                 newtRefVar	a[2];
 
                 stk_pop_n(2, a);
-                r = (*funcPtr)(rcvr, a[0], a[1]);
+                r = ((nvm_fn_3)funcPtr)(rcvr, a[0], a[1]);
             }
                 break;
 
@@ -1537,7 +1551,7 @@ void NVMCallNativeFunc(newtRefArg fn, newtRefArg rcvr, int16_t numArgs)
                 newtRefVar	a[3];
 
                 stk_pop_n(3, a);
-                r = (*funcPtr)(rcvr, a[0], a[1], a[2]);
+                r = ((nvm_fn_4)funcPtr)(rcvr, a[0], a[1], a[2]);
             }
                 break;
 
@@ -1546,7 +1560,7 @@ void NVMCallNativeFunc(newtRefArg fn, newtRefArg rcvr, int16_t numArgs)
                 newtRefVar	a[4];
 
                 stk_pop_n(4, a);
-                r = (*funcPtr)(rcvr, a[0], a[1], a[2], a[3]);
+                r = ((nvm_fn_5)funcPtr)(rcvr, a[0], a[1], a[2], a[3]);
             }
                 break;
 
@@ -1555,7 +1569,7 @@ void NVMCallNativeFunc(newtRefArg fn, newtRefArg rcvr, int16_t numArgs)
                 newtRefVar	a[5];
 
                 stk_pop_n(5, a);
-                r = (*funcPtr)(rcvr, a[0], a[1], a[2], a[3], a[4]);
+                r = ((nvm_fn_6)funcPtr)(rcvr, a[0], a[1], a[2], a[3], a[4]);
             }
                 break;
 
@@ -1564,7 +1578,7 @@ void NVMCallNativeFunc(newtRefArg fn, newtRefArg rcvr, int16_t numArgs)
                 newtRefVar	a[6];
 
                 stk_pop_n(6, a);
-                r = (*funcPtr)(rcvr, a[0], a[1], a[2], a[3], a[4], a[5]);
+                r = ((nvm_fn_7)funcPtr)(rcvr, a[0], a[1], a[2], a[3], a[4], a[5]);
             }
                 break;
 
@@ -1573,7 +1587,7 @@ void NVMCallNativeFunc(newtRefArg fn, newtRefArg rcvr, int16_t numArgs)
                 newtRefVar	a[7];
 
                 stk_pop_n(7, a);
-                r = (*funcPtr)(rcvr, a[0], a[1], a[2], a[3], a[4], a[5], a[6]);
+                r = ((nvm_fn_8)funcPtr)(rcvr, a[0], a[1], a[2], a[3], a[4], a[5], a[6]);
             }
                 break;
 
@@ -1583,7 +1597,7 @@ void NVMCallNativeFunc(newtRefArg fn, newtRefArg rcvr, int16_t numArgs)
                 newtRefVar	a[8];
 
                 stk_pop_n(8, a);
-                r = (*funcPtr)(rcvr, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7]);
+                r = ((nvm_fn_9)funcPtr)(rcvr, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7]);
             }
                 break;
 
@@ -1592,7 +1606,7 @@ void NVMCallNativeFunc(newtRefArg fn, newtRefArg rcvr, int16_t numArgs)
                 newtRefVar	a[9];
 
                 stk_pop_n(9, a);
-                r = (*funcPtr)(rcvr, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8]);
+                r = ((nvm_fn_10)funcPtr)(rcvr, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8]);
             }
                 break;
 
@@ -1610,7 +1624,7 @@ void NVMCallNativeFunc(newtRefArg fn, newtRefArg rcvr, int16_t numArgs)
         switch (minArgs)
         {
             case 0:
-                r = (*funcPtr)(rcvr, args);
+                r = ((nvm_fn_2)funcPtr)(rcvr, args);
                 break;
 
             case 1:
@@ -1618,7 +1632,7 @@ void NVMCallNativeFunc(newtRefArg fn, newtRefArg rcvr, int16_t numArgs)
                 newtRefVar	a;
 
                 a = stk_pop();
-                r = (*funcPtr)(rcvr, a, args);
+                r = ((nvm_fn_3)funcPtr)(rcvr, a, args);
             }
                 break;
 
@@ -1627,7 +1641,7 @@ void NVMCallNativeFunc(newtRefArg fn, newtRefArg rcvr, int16_t numArgs)
                 newtRefVar	a[2];
 
                 stk_pop_n(2, a);
-                r = (*funcPtr)(rcvr, a[0], a[1], args);
+                r = ((nvm_fn_4)funcPtr)(rcvr, a[0], a[1], args);
             }
                 break;
 
@@ -1636,7 +1650,7 @@ void NVMCallNativeFunc(newtRefArg fn, newtRefArg rcvr, int16_t numArgs)
                 newtRefVar	a[3];
 
                 stk_pop_n(3, a);
-                r = (*funcPtr)(rcvr, a[0], a[1], a[2], args);
+                r = ((nvm_fn_5)funcPtr)(rcvr, a[0], a[1], a[2], args);
             }
                 break;
 
@@ -1645,7 +1659,7 @@ void NVMCallNativeFunc(newtRefArg fn, newtRefArg rcvr, int16_t numArgs)
                 newtRefVar	a[4];
 
                 stk_pop_n(4, a);
-                r = (*funcPtr)(rcvr, a[0], a[1], a[2], a[3], args);
+                r = ((nvm_fn_6)funcPtr)(rcvr, a[0], a[1], a[2], a[3], args);
             }
                 break;
 
@@ -1654,7 +1668,7 @@ void NVMCallNativeFunc(newtRefArg fn, newtRefArg rcvr, int16_t numArgs)
                 newtRefVar	a[5];
 
                 stk_pop_n(5, a);
-                r = (*funcPtr)(rcvr, a[0], a[1], a[2], a[3], a[4], args);
+                r = ((nvm_fn_7)funcPtr)(rcvr, a[0], a[1], a[2], a[3], a[4], args);
             }
                 break;
 
@@ -1663,7 +1677,7 @@ void NVMCallNativeFunc(newtRefArg fn, newtRefArg rcvr, int16_t numArgs)
                 newtRefVar	a[6];
 
                 stk_pop_n(6, a);
-                r = (*funcPtr)(rcvr, a[0], a[1], a[2], a[3], a[4], a[5], args);
+                r = ((nvm_fn_8)funcPtr)(rcvr, a[0], a[1], a[2], a[3], a[4], a[5], args);
             }
                 break;
 
@@ -1672,7 +1686,7 @@ void NVMCallNativeFunc(newtRefArg fn, newtRefArg rcvr, int16_t numArgs)
                 newtRefVar	a[7];
 
                 stk_pop_n(7, a);
-                r = (*funcPtr)(rcvr, a[0], a[1], a[2], a[3], a[4], a[5], a[6], args);
+                r = ((nvm_fn_9)funcPtr)(rcvr, a[0], a[1], a[2], a[3], a[4], a[5], a[6], args);
             }
                 break;
 
@@ -1682,7 +1696,7 @@ void NVMCallNativeFunc(newtRefArg fn, newtRefArg rcvr, int16_t numArgs)
                 newtRefVar	a[8];
 
                 stk_pop_n(8, a);
-                r = (*funcPtr)(rcvr, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], args);
+                r = ((nvm_fn_10)funcPtr)(rcvr, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], args);
             }
                 break;
 
@@ -1691,7 +1705,7 @@ void NVMCallNativeFunc(newtRefArg fn, newtRefArg rcvr, int16_t numArgs)
                 newtRefVar	a[9];
 
                 stk_pop_n(9, a);
-                r = (*funcPtr)(rcvr, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], args);
+                r = ((nvm_fn_11)funcPtr)(rcvr, a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], args);
             }
                 break;
 
@@ -3460,7 +3474,7 @@ void vm_env_pop(void)
 
 
 /*------------------------------------------------------------------------*/
-/** レジスタの初期化 
+/** レジスタの初期化
  *
  * @return			なし
  */
@@ -3480,7 +3494,7 @@ void NVMInitREG(void)
 
 
 /*------------------------------------------------------------------------*/
-/** スタックの初期化 
+/** スタックの初期化
  *
  * @return			なし
  */
@@ -3496,7 +3510,7 @@ void NVMInitSTACK(void)
 
 
 /*------------------------------------------------------------------------*/
-/** スタックの後始末 
+/** スタックの後始末
  *
  * @return			なし
  */
@@ -3510,7 +3524,7 @@ void NVMCleanSTACK(void)
 
 
 /*------------------------------------------------------------------------*/
-/** 必須グローバル関数の初期化 
+/** 必須グローバル関数の初期化
  *
  * @return			なし
  */

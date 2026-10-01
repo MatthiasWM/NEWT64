@@ -1,0 +1,36 @@
+// #include and #line, including the error cases, which used to exit().
+
+global failures := 0;
+global check(name, ok)
+	if not ok then begin
+		Print("FAIL: " & name & "\n");
+		failures := failures + 1;
+	end;
+
+// Compile(str) runs the same lexer as a file.
+global compiles(src) begin
+	local ok := true;
+	try
+		Compile(src);
+	onexception |evt.ex| do
+		ok := nil;
+	return ok;
+end;
+
+// A file whose first line is an #include.
+check("include on the first line", Load("include/first_line.newt") = 43);
+
+check("include", compiles("#include \"include/value.newt\"\nincludedValue;"));
+check("included code runs", call Compile("#include \"include/value.newt\"\nincludedValue;") with () = 42);
+check("error inside an included file", not compiles("#include \"include/broken.newt\"\n1;"));
+
+check("include without quotes is an error", not compiles("#include include/value.newt\n1;"));
+check("include without a name is an error", not compiles("#include\n1;"));
+check("missing include file is an error", not compiles("#include \"include/no-such-file.newt\"\n1;"));
+check("bad line directive is an error", not compiles("#line abc\n1;"));
+
+// The lexer is back to normal afterwards.
+check("compiles after errors", call Compile("6 * 7") with () = 42);
+check("line directive", compiles("#line 100\n1;"));
+
+if failures = 0 then Print("ALL OK\n");

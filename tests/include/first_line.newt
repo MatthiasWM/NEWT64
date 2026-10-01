@@ -1,0 +1,2 @@
+#include "include/value.newt"
+includedValue + 1;

@@ -60,6 +60,7 @@ static int			lex_makenamedmp(char *s, bool trunc);
 static int          lex_include_file(char *s);
 static void         lex_include_invalid_filename(void);
 static int          lex_include_done(void);
+static void         lex_include_pop(void);
 
 static int          lex_set_line(char *s);
 static void         lex_invalid_line(void);
@@ -68,11 +69,16 @@ static void			lex_debug(int type);
 
 #define MAX_INCLUDE_DEPTH 10
 YY_BUFFER_STATE include_stack[MAX_INCLUDE_DEPTH];
+/* yyin of each including file: NPSParseFile reuses one flex buffer for every
+   file and only replaces yyin, so the buffer's own FILE may be stale. */
+FILE * include_files[MAX_INCLUDE_DEPTH];
 int include_stack_ptr = 0;
 
 /* マクロ */
 #undef YY_INPUT
-#define YY_INPUT(b, r, ms) (r=nps_yyinput(yyin, b, ms))
+/* An included file is read from its own FILE, even while compiling a string. */
+#define YY_INPUT(b, r, ms) (r = (0 < include_stack_ptr) ? \
+    (int)fread(b, 1, ms, yyin) : nps_yyinput(yyin, b, ms))
 
 #define WORN_NOS2(msg)		if (NEWT_MODE_NOS2) NPSErrorStr('W', msg);
 
@@ -85,6 +91,7 @@ int include_stack_ptr = 0;
 %x REGEX
 %x INCL
 %x LINE
+%x SKIPLINE
 
 ALPHA					[A-Za-z]
 DIGIT					[0-9]
@@ -125,8 +132,8 @@ ELSE					[Ee][Ll][Ss][Ee]
 <INCL>[ \t]*                    /* eat the whitespace */
                                 /* read the file name in double quotes */
 <INCL>"\""{FILEPATH-CHARACTER}*"\"" lex_include_file(yytext);
-<INCL>{NEWLINE}                 lex_include_invalid_filename();
-<INCL>.                         lex_include_invalid_filename();
+<INCL>{NEWLINE}                 { lex_include_invalid_filename(); yyless(0); BEGIN INITIAL; }
+<INCL>.                         { lex_include_invalid_filename(); BEGIN SKIPLINE; }
 <<EOF>>                         if (lex_include_done()==0) return 0;
 
                                 /* allow '#line n' to change current line number */
@@ -134,8 +141,12 @@ ELSE					[Ee][Ll][Ss][Ee]
 <LINE>[ \t]*                    /* eat the whitespace */
                                 /* read the line number */
 <LINE>{DIGIT}+                  lex_set_line(yytext);
-<LINE>{NEWLINE}                 lex_invalid_line();
-<LINE>.                         lex_invalid_line();
+<LINE>{NEWLINE}                 { lex_invalid_line(); yyless(0); BEGIN INITIAL; }
+<LINE>.                         { lex_invalid_line(); BEGIN SKIPLINE; }
+
+                                /* skip the rest of a line with a bad directive */
+<SKIPLINE>[^\r\n]+              BEGIN INITIAL;
+<SKIPLINE>{NEWLINE}             { yyless(0); BEGIN INITIAL; }
 
 
 "//".*$
@@ -238,7 +249,7 @@ __LINE__						{ return lex_makeinteger(nps_env.lineno); }
                                 /* if the line is empty, count it and start parsing */
 <SHELL>{NEWLINE}				{ lex_newline(); BEGIN INITIAL; }
                                 /* any other character on the input line will unread it and start parsing */
-<SHELL>.						{ unput(*yytext); BEGIN INITIAL; }
+<SHELL>.						{ unput(*yytext); yy_set_bol(1); BEGIN INITIAL; }
 
 %%
 
@@ -865,43 +876,40 @@ void lex_debug(int type)
  */
 int lex_include_file(char *filename)
 {
+    FILE *	f;
+
+    BEGIN INITIAL;
     filename++; filename[strlen(filename)-1]=0;
     if (include_stack_ptr>=MAX_INCLUDE_DEPTH) {
-        NewtFprintf(stderr, "%s:%d: error: includes nested too deeply.\n",
-            nps_env.fname?nps_env.fname:"-",
-            nps_env.lineno);
-        exit(1);
+        NPSErrorStr('E', "include: nested too deeply");
+        return lex_update_tokenpos(0);
     }
+    f = fopen( filename, "rb" );
+    if (!f) {
+        char msg[256];
+        snprintf(msg, sizeof(msg), "include: %s: %s", filename, strerror(errno));
+        NPSErrorStr('E', msg);
+        return lex_update_tokenpos(0);
+    }
+    include_files[include_stack_ptr] = yyin;
     include_stack[include_stack_ptr++] = YY_CURRENT_BUFFER;
-    yyin = fopen( filename, "rb" );
-    if (!yyin) {
-        NewtFprintf(stderr, "%s:%d: error: %s: %s\n%s\n",
-            nps_env.fname?nps_env.fname:"-",
-            nps_env.lineno,
-            filename,
-            strerror(errno));
-        exit(1);
-    }
+    yyin = f;
 
     yy_switch_to_buffer(
         yy_create_buffer( yyin, YY_BUF_SIZE )
     );
 
-    BEGIN INITIAL;
     return lex_update_tokenpos(0);
 }
 
 /**
- * If we could not read the filename, give an error message and terminate.
- * FIXME: this should unroll the include buffer and return gracefully.
+ * The include has no filename in double quotes. Report a syntax error; the
+ * rule skips the rest of the line, and parsing goes on so that later errors
+ * are reported too. Nothing was pushed on the include stack.
  */
 void lex_include_invalid_filename()
 {
-    NewtFprintf(stderr, "%s:%d: error: include: Invalid filename.\n%s\n",
-        nps_env.fname?nps_env.fname:"-",
-        nps_env.lineno,
-        nps_env.linebuf);
-    exit(1);
+    NPSErrorStr('E', "include: invalid filename");
 }
 
 /**
@@ -912,11 +920,21 @@ void lex_include_invalid_filename()
  */
 int lex_include_done()
 {
-    if ( --include_stack_ptr < 0 )
+    if ( include_stack_ptr == 0 )
         yyterminate(); // this macro returns 0!
-    else
-        yy_switch_to_buffer( include_stack[include_stack_ptr] );
+    lex_include_pop();
     return 1;
+}
+
+/**
+ * Close the current included file and go back to the one that included it.
+ */
+void lex_include_pop(void)
+{
+    fclose(yyin);
+    yy_delete_buffer( YY_CURRENT_BUFFER );
+    yy_switch_to_buffer( include_stack[--include_stack_ptr] );
+    yyin = include_files[include_stack_ptr];
 }
 
 #if 0
@@ -933,11 +951,7 @@ int lex_set_line(char *s)
 
 void lex_invalid_line(void)
 {
-    NewtFprintf(stderr, "%s:%d: error: line: Invalid format.\n%s\n",
-    nps_env.fname?nps_env.fname:"-",
-    nps_env.lineno,
-    nps_env.linebuf);
-    exit(1);
+    NPSErrorStr('E', "line: invalid format");
 }
 
 #if 0
@@ -971,6 +985,9 @@ void nps_yyinit(void)
 
 int nps_yycleanup(void)
 {
+	// A parse can stop inside an included file.
+	while (0 < include_stack_ptr)
+		lex_include_pop();
 	BEGIN INITIAL;
 	YY_FLUSH_BUFFER;
     memset(nps_env.linebuf, '\0', sizeof(nps_env.linebuf));

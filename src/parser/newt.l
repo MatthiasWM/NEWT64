@@ -315,7 +315,7 @@ static keyword_t	operator_words[] = {
 
 int lex_update_tokenpos(int op)
 {
-	strncat(nps_env.linebuf, yytext, sizeof(nps_env.linebuf));
+	strncat(nps_env.linebuf, yytext, sizeof(nps_env.linebuf)-1);
 
 	nps_env.tokenpos += yyleng;
 	nps_env.yyleng = yyleng;

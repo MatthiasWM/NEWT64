@@ -1,0 +1,28 @@
+// push-constant: 16-bit operands, integers sign-extended, other
+// immediates (characters, nil, true) not.
+
+global failures := 0;
+global check(name, ok)
+	if not ok then begin
+		Print("FAIL: " & name & "\n");
+		failures := failures + 1;
+	end;
+
+// The compiler uses push-constant for -8192 to 8191, push beyond.
+check("-8192", -8192 + 8192 = 0);
+check("-8192 < -8191", -8192 < -8191);
+check("-1", -1 * -1 = 1);
+check("0", 0 + 0 = 0);
+check("8191", 8191 - 8191 = 0);
+check("8192", 8192 - 8191 = 1);
+check("-8193", -8193 + 1 = -8192);
+
+// Characters: the operand for $\u0FFF has its sign bit set.
+check("char 0FFF", Ord($\u0FFF) = 4095);
+check("char 00E9", Ord($\u00E9) = 233);
+check("char a", Ord($a) = 97);
+
+check("nil", Length([nil]) = 1 and not nil);
+check("true", true);
+
+if failures = 0 then Print("ALL OK\n");

@@ -148,6 +148,7 @@ newtRef     NVMCurrentException(void);
 void        NVMClearException(void);
 
 bool        NVMFuncCheckNumArgs(newtRefArg fn, int16_t numArgs);
+newtRef     NVMPushConstantRef(int16_t b);
 
 void        NVMDumpInstName(FILE * f, uint8_t a, int16_t b);
 void        NVMDumpCode(FILE * f, uint8_t * bc, uint32_t len);

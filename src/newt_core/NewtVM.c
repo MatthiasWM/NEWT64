@@ -2619,30 +2619,30 @@ void is_push(int16_t b)
 
 void is_push_constant(int16_t b)
 {
-    newtRefVar	r;
+    stk_push(NVMPushConstantRef(b));
+}
 
-    r = (newtRef)b;
 
-    if (NewtRefIsInteger(r))
-    {
-        int64_t	n; // FIXME: n is not ever used
-        // TODO: b is signed, so n needs to be converted using sign extension
-        // TODO: we must verify that this is working as intended
+/*------------------------------------------------------------------------*/
+/** The value that push-constant pushes for its operand
+ *
+ * The operand is a 16-bit ref, read as signed. An integer (-8192 to 8191)
+ * is already correct once sign-extended. Any other immediate (character,
+ * special, magic pointer) is an unsigned 16-bit value.
+ *
+ * @param b		[in] the operand
+ *
+ * @return		the constant
+ */
 
-        n = NewtRefToInteger(r);
+newtRef NVMPushConstantRef(int16_t b)
+{
+    newtRefVar	r = (newtRef)b;
 
-        if (8191 < n)
-        {	// 負の数
-            n |= 0xFFFFC000;
-            r = NewtMakeInt62(r);
-        }
-    }
-    else
-    {
-        r = (r & 0xffff);
-    }
+    if (! NewtRefIsInteger(r))
+        r &= 0xffff;
 
-    stk_push(r);
+    return r;
 }
 
 

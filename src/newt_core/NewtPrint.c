@@ -18,6 +18,7 @@
 #include "NewtObj.h"
 #include "NewtEnv.h"
 #include "NewtIO.h"
+#include "NewtVM.h"
 
 
 /* 関数プロトタイプ */
@@ -693,8 +694,7 @@ void NIOPrintObjBinaryInstructions(newtStream_t * f, newtRefArg r, newtRefArg co
         }
         if (pImm==1) {
             NIOFputs(" // ", f);
-            newtRef imm = (newtRef)((int32_t)((int16_t)(b))); // extend the sign bit
-            NIOPrintObj2(f, imm, 0, true);
+            NIOPrintObj2(f, NVMPushConstantRef((int16_t)b), 0, true);
         }
         if (pArg==1) {
             NIOFputs(" // ", f);

@@ -222,7 +222,9 @@ static inline bool
 NewtRefIsMagicPointer(newtRefArg r)     { return ((r & 3) == 3); } ///< マジックポインタか？（数値および名前付）
 
 #ifdef __NAMED_MAGIC_POINTER__
-// TODO: verify that this is actually working. We seem to be losing the last bit of a symbol pointer here.
+// A symbol ref is its object's address + 1. Objects come from malloc, so the
+// address is a multiple of 8: NewtSymbolToMP drops only the +1 tag bit, and
+// NewtMPToSymbol puts it back. Bit 63 marks the MP as named.
 static inline bool
 NewtRefIsNamedMP(newtRefArg r)      { return ((r & 0x8000000000000003) == 0x8000000000000003); } ///< 名前付マジックポインタか？
 static inline newtRef

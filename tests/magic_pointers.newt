@@ -1,0 +1,36 @@
+// Named and numbered magic pointers, and what packages accept.
+
+global failures := 0;
+global check(name, ok)
+	if not ok then begin
+		Print("FAIL: " & name & "\n");
+		failures := failures + 1;
+	end;
+
+// Named magic pointers map to symbols and back (NewtSymbolToMP and
+// NewtMPToSymbol): define many and read each back.
+// Each name differs, so each symbol is a separate allocation.
+for i := 0 to 199 do
+	call Compile("@mp" & i & "abcdefghij := " & i) with ();
+local ok := true;
+for i := 0 to 199 do
+	if call Compile("@mp" & i & "abcdefghij") with () <> i then ok := nil;
+check("200 named magic pointers", ok);
+
+@aName := {a: 1};
+check("named magic pointer", @aName.a = 1);
+
+// Numbered magic pointers survive a package round trip.
+local pkg := MakePkg({name: "t:SIG", parts: [{data: {b: @12}, type: 'form, flags: 1}]});
+local data := ReadPkg(pkg).parts[0].data;
+check("numbered magic pointer in a package", data.b = @12);
+
+// A package cannot hold a named one: MakePkg throws instead of writing NIL.
+local caught := nil;
+try
+	MakePkg({name: "t:SIG", parts: [{data: {a: @aName}, type: 'form, flags: 1}]});
+onexception |evt.ex| do
+	caught := true;
+check("named magic pointer in a package", caught);
+
+if failures = 0 then Print("ALL OK\n");

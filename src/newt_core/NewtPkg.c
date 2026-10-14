@@ -86,6 +86,7 @@ typedef struct {
     uint8_t		pkg_version;	///< rw corrsponds to the last charof the signature
     uint8_t *	data;			///< rw package data
     uint32_t	size;			///< rw size of package
+    newtRefVar	errValue;		///< w  the object that caused lastErr
     uint32_t	data_size;		///< w  size of data block
     pkg_header_t *header;		///< r  pointer to the package header
     uint32_t	header_size;	///< w  size of header structure w/o var data
@@ -506,7 +507,18 @@ newtRef PkgWriteObject(pkg_stream_t *pkg, newtRefArg obj)
     newtRef dst = pkg->size;
     newtRef prec;
     
-    // FIXME: add handling named magic pointers here
+#ifdef __NAMED_MAGIC_POINTER__
+    if (NewtRefIsNamedMP(obj)) {
+        // A package holds only numbered magic pointers (@12); NewtonOS has
+        // no names for them. Report the first one rather than write NIL.
+        if (pkg->lastErr == kNErrNone) {
+            pkg->lastErr = kNErrBadMagicPointer;
+            pkg->errValue = obj;
+        }
+        return kNewtRefNIL;
+    }
+#endif /* __NAMED_MAGIC_POINTER__ */
+
     if (NewtRefIsImmediate(obj)) {
         // immediates have the same form in memory as in packages
         // immediates include magic pointers
@@ -685,6 +697,12 @@ newtRef NewtWritePkg(newtRefArg package)
         }
     }
     
+    if (pkg.lastErr != kNErrNone) {
+        if (pkg.data)
+            free(pkg.data);
+        return NewtThrow(pkg.lastErr, pkg.errValue);
+    }
+    
     // finish filling in the header
     // size
     PkgWriteU32(&pkg, 28, pkg.size);
@@ -777,8 +795,9 @@ newtRef PkgReadRef(pkg_stream_t *pkg, uint32_t p_obj)
             result = ref; 
             break;
         case 3: // magic pointer
-            // FIXME: we must implement special code for named magic pointers here!
-            result = ref; // already a correct magic pointer
+            // Always numbered: packages cannot hold named magic pointers (see
+            // PkgWriteObject). Zero-extended, this is NEWT's numbered form.
+            result = ref;
             break;
     }
     

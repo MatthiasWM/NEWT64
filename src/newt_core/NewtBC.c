@@ -2158,6 +2158,12 @@ void NBCGenMakeArray(nps_syntax_node_t * stree, nps_node_t klass, nps_node_t r)
     NBCGenBC_op(stree, r);
     n = NBCCountNumArgs(stree, r);
     
+    // An array literal without a class is an 'array, as in NTK. NEWT's own
+    // unbound marker (0xFFF2) is not a NewtonOS value: Newton code that
+    // checks the class (RegTaskTemplate, for one) rejects such arrays.
+    if (NEWT_MODE_NOS2 && klass == kNewtRefUnbind)
+        klass = NSSYM0(array);
+
     NBCGenPUSH(klass);
     NBCGenCode(kNBCMakeArray, n);
 }

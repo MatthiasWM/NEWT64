@@ -222,7 +222,11 @@ void NBCGenCodeEnv(nbc_env_t * env, uint8_t a, int16_t b)
     bc = ENV_BC(env);
     
     if (a == kNBCFieldMask)
-        b = 1;
+    {
+        // NewtonOS encodes pop-handlers as 07 00 07. The original 07 00 01
+        // raises interpreter error -48805 on the device and in ROM 717006.
+        b = kNBCPopHandlers;
+    }
     
     if (a != kNBCFieldMask &&
         ((a & kNBCFieldMask) == a ||

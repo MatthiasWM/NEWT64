@@ -1,0 +1,67 @@
+// MakeNSOF and ReadNSOF round trips.
+
+global failures := 0;
+global check(name, ok)
+	if not ok then begin
+		Print("FAIL: " & name & "\n");
+		failures := failures + 1;
+	end;
+
+global roundTrip(v, ver) ReadNSOF(MakeNSOF(v, ver));
+
+// Strings: reading one used to crash.
+local s := "abc";
+local a := roundTrip([s, s, "déjà vu"], 2);
+check("string", StrEqual(a[0], "abc"));
+check("shared string", a[1] = a[0]);
+check("non-ASCII string", StrEqual(a[2], "déjà vu"));
+
+// A binary object's precedent ID comes before its class's.
+local x := 1.5;
+a := roundTrip([x, x, 'real], 2);
+check("real", a[0] = 1.5);
+check("shared real", a[1] = a[0]);
+check("class symbol after real", a[2] = 'real);
+
+local b := SetClass(Clone("xy"), 'foo);
+a := roundTrip([b, 'foo, b], 2);
+check("classed binary", ClassOf(a[0]) = 'foo);
+check("symbol after classed binary", a[1] = 'foo);
+check("shared classed binary", a[2] = a[0]);
+
+// The same for a classed array.
+local arr := SetClass([1, 2], 'pair);
+a := roundTrip([arr, 'pair, arr], 2);
+check("classed array", ClassOf(a[0]) = 'pair and Length(a[0]) = 2);
+check("symbol after classed array", a[1] = 'pair);
+check("shared classed array", a[2] = a[0]);
+
+// An empty frame takes a precedent ID too.
+local f := {};
+local p := [7];
+a := roundTrip([f, p, p], 2);
+check("empty frame", IsFrame(a[0]));
+check("array after empty frame", IsArray(a[1]) and a[1][0] = 7);
+check("shared array after empty frame", a[2] = a[1]);
+
+// Integers: 30 bits fit an NSOF immediate.
+foreach n in [0, 1, -1, 536870911, -536870912] do
+	check("integer " & n, roundTrip(n, 2) = n);
+
+// Wider integers: NEWT's own NSOF version holds them as 'int64.
+foreach n in [536870912, -536870913, 1000000000, 12884901895, -12884901895] do
+	check("wide integer " & n, roundTrip(n, 3) = n);
+a := roundTrip([1000000000, 1000000000, 'int64, 1.5, 1.5], 3);
+check("wide integers in an array", a[0] = 1000000000 and a[1] = 1000000000);
+check("symbol after wide integers", a[2] = 'int64);
+check("reals after wide integers", a[3] = 1.5 and a[4] = 1.5);
+
+// Newton OS versions cannot hold them: an error, not truncation.
+local caught := nil;
+try
+	MakeNSOF(1000000000, 2);
+onexception |evt.ex| do
+	caught := true;
+check("wide integer in Newton OS NSOF", caught);
+
+if failures = 0 then Print("ALL OK\n");

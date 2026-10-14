@@ -52,6 +52,7 @@ static int32_t		NSOFReadXlong(nsof_stream_t * nsof);
 
 static newtErr		NSOFWritePrecedent(nsof_stream_t * nsof, int32_t pos);
 static newtErr		NSOFWriteImmediate(nsof_stream_t * nsof, newtRefArg r);
+static newtErr		NSOFWriteInteger(nsof_stream_t * nsof, newtRefArg r);
 static newtErr		NSOFWriteCharacter(nsof_stream_t * nsof, newtRefArg r);
 static newtErr		NSOFWriteBinary(nsof_stream_t * nsof, newtRefArg r, uint16_t objtype);
 static newtErr		NSOFWriteSymbol(nsof_stream_t * nsof, newtRefArg r);
@@ -311,6 +312,49 @@ newtErr NSOFWriteImmediate(nsof_stream_t * nsof, newtRefArg r)
 
 
 /*------------------------------------------------------------------------*/
+/** Write an integer that does not fit an NSOF immediate (30 bits)
+ *
+ * NEWT's own NSOF versions hold it as a binary object of class 'int64,
+ * 8 bytes big-endian, which NSOFReadBinary reads back. The Newton OS
+ * versions cannot hold it, and writing it would silently drop the high bits.
+ *
+ * @param nsof		[i/o]NSOFバッファ
+ * @param r			[in] 整数
+ *
+ * @return			エラーコード
+ */
+
+newtErr NSOFWriteInteger(nsof_stream_t * nsof, newtRefArg r)
+{
+    int64_t	n = NewtRefToInteger(r);
+    int32_t	i;
+    
+    if (NSOFIsNOS(nsof->verno))
+    {
+        nsof->lastErr = kNErrNSOFWrite;
+        return nsof->lastErr;
+    }
+    
+    // A binary object takes a precedent ID, though nothing can refer to it.
+    NcAddArraySlot(nsof->precedents, kNewtRefUnbind);
+    
+    NSOFWriteByte(nsof, kNSOFBinaryObject);
+    NSOFWriteXlong(nsof, 8);
+    NewtWriteNSOF(nsof, NSSYM0(int64));
+    
+    if (nsof->data)
+    {
+        for (i = 0; i < 8; i++)
+            nsof->data[nsof->offset + i] = (uint8_t)((uint64_t)n >> (56 - 8 * i));
+    }
+    
+    nsof->offset += 8;
+    
+    return nsof->lastErr;
+}
+
+
+/*------------------------------------------------------------------------*/
 /** 文字データを NSOF でバッファに書込む
  *
  * @param nsof		[i/o]NSOFバッファ
@@ -362,6 +406,13 @@ newtErr NSOFWriteBinary(nsof_stream_t * nsof, newtRefArg r, uint16_t objtype)
     char *		buff = NULL;
     int			type;
     
+    if (objtype == kNewtInt64 && NSOFIsNOS(nsof->verno))
+    {
+        // Set in the sizing pass too, so that NsMakeNSOF sees it.
+        nsof->lastErr = kNErrNSOFWrite;
+        return nsof->lastErr;
+    }
+    
     klass = NcClassOf(r);
     
     if (klass == NSSYM0(string))
@@ -398,11 +449,6 @@ newtErr NSOFWriteBinary(nsof_stream_t * nsof, newtRefArg r, uint16_t objtype)
         switch (objtype)
         {
             case kNewtInt64:
-                if (NSOFIsNOS(nsof->verno))
-                {
-                    nsof->lastErr = kNErrNSOFWrite;
-                }
-                else
                 {
                     int64_t	n;
                     
@@ -648,6 +694,9 @@ newtErr NewtWriteNSOF(nsof_stream_t * nsof, newtRefArg r)
             NSOFWriteByte(nsof, kNSOFNIL);
         else if (NewtRefIsCharacter(r))
             NSOFWriteCharacter(nsof, r);
+        else if (NewtRefIsInteger(r) &&
+                 (NewtRefToInteger(r) < -0x20000000 || 0x1FFFFFFF < NewtRefToInteger(r)))
+            NSOFWriteInteger(nsof, r);
         else
             NSOFWriteImmediate(nsof, r);
     }
@@ -772,8 +821,14 @@ newtRef NSOFReadBinary(nsof_stream_t * nsof, int type)
     newtRefVar	r = kNewtRefUnbind;
     int32_t		xlen;
     uint8_t *	data;
+    uint32_t	precedent;
     
     xlen = NSOFReadXlong(nsof);
+    
+    // The object's precedent ID comes before its class's, as in
+    // NewtWriteNSOF and on the Newton.
+    precedent = NewtArrayLength(nsof->precedents);
+    NcAddArraySlot(nsof->precedents, kNewtRefUnbind);
     
     if (type == kNSOFString)
     {
@@ -787,19 +842,23 @@ newtRef NSOFReadBinary(nsof_stream_t * nsof, int type)
     
     data = nsof->data + nsof->offset;
     
-    if (klass == NSSYM0(int64)) // TODO: check this code for 32/64 bit compatibility
+    if (klass == NSSYM0(int64))
     {
-        if (NSOFIsNOS(nsof->verno))
+        // NEWT's own NSOF versions only: 8 bytes, big-endian, written by
+        // NSOFWriteBinary and NSOFWriteInteger. NEWT/0 wrote 4 bytes.
+        if (NSOFIsNOS(nsof->verno) || (xlen != 8 && xlen != 4))
         {
             nsof->lastErr = kNErrNSOFRead;
         }
         else
         {
-            int32_t	n;
+            int64_t	n = (xlen == 4 && (data[0] & 0x80)) ? -1 : 0;
+            int32_t	i;
             
-            memcpy(&n, data, sizeof(n));
-            n = ntohl(n);
-            r= NewtMakeInteger(n);
+            for (i = 0; i < xlen; i++)
+                n = (int64_t)(((uint64_t)n << 8) | data[i]);
+            
+            r = NewtMakeInteger(n);
         }
     }
     else if (klass == NSSYM0(real))
@@ -832,6 +891,7 @@ newtRef NSOFReadBinary(nsof_stream_t * nsof, int type)
     }
     
     nsof->offset += xlen;
+    NewtSetArraySlot(nsof->precedents, precedent, r);
     
     return r;
 }
@@ -851,8 +911,13 @@ newtRef NSOFReadArray(nsof_stream_t * nsof, int type)
     newtRefVar	klass = kNewtRefUnbind;
     newtRefVar	r;
     int32_t		xlen;
+    uint32_t	precedent;
     
     xlen = NSOFReadXlong(nsof);
+    
+    // The array's precedent ID comes before its class's.
+    precedent = NewtArrayLength(nsof->precedents);
+    NcAddArraySlot(nsof->precedents, kNewtRefUnbind);
     
     if (type == kNSOFArray)
     {
@@ -861,7 +926,7 @@ newtRef NSOFReadArray(nsof_stream_t * nsof, int type)
     }
     
     r = NewtMakeArray(klass, xlen);
-    NcAddArraySlot(nsof->precedents, r);
+    NewtSetArraySlot(nsof->precedents, precedent, r);
     
     if (NewtRefIsNotNIL(r))
     {
@@ -900,7 +965,12 @@ newtRef NSOFReadFrame(nsof_stream_t * nsof)
     xlen = NSOFReadXlong(nsof);
     
     if (xlen == 0)
-        return NcMakeFrame();
+    {
+        // still an object with a precedent ID, as in NewtWriteNSOF
+        r = NcMakeFrame();
+        NcAddArraySlot(nsof->precedents, r);
+        return r;
+    }
     
     map = NewtMakeMap(kNewtRefNIL, xlen, NULL);
     r = NewtMakeFrame(map, xlen);
@@ -1052,7 +1122,6 @@ newtRef NSOFReadNSOF(nsof_stream_t * nsof)
         case kNSOFBinaryObject:
         case kNSOFString:
             r = NSOFReadBinary(nsof, type);
-            NcAddArraySlot(nsof->precedents, r);
             break;
             
         case kNSOFArray:
@@ -1110,7 +1179,7 @@ newtRef NSOFReadNSOF(nsof_stream_t * nsof)
  * @return			オブジェクト
  */
 
-newtRef NewtReadNSOF(uint8_t * data, size_t size)
+static newtRef NSOFReadData(uint8_t * data, size_t size, newtErr * errP)
 {
     nsof_stream_t	nsof;
     newtRefVar		result;
@@ -1123,8 +1192,17 @@ newtRef NewtReadNSOF(uint8_t * data, size_t size)
     nsof.verno = NSOFReadByte(&nsof);
     
     result = NSOFReadNSOF(&nsof);
+    *errP = nsof.lastErr;
     
     return result;
+}
+
+
+newtRef NewtReadNSOF(uint8_t * data, size_t size)
+{
+    newtErr	err;
+    
+    return NSOFReadData(data, size, &err);
 }
 
 
@@ -1139,6 +1217,8 @@ newtRef NewtReadNSOF(uint8_t * data, size_t size)
 
 newtRef NsReadNSOF(newtRefArg rcvr, newtRefArg r)
 {
+    newtRefVar	result;
+    newtErr		err;
     uint32_t	len;
     
     if (! NewtRefIsBinary(r))
@@ -1149,5 +1229,10 @@ newtRef NsReadNSOF(newtRefArg rcvr, newtRefArg r)
     if (len < 2)
         return NewtThrow(kNErrOutOfRange, r);
     
-    return NewtReadNSOF(NewtRefToBinary(r), len);
+    result = NSOFReadData(NewtRefToBinary(r), len, &err);
+    
+    if (err != kNErrNone)
+        return NewtThrow(err, r);
+    
+    return result;
 }

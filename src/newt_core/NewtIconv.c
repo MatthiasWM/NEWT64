@@ -101,7 +101,7 @@ static void putUtf8Char(uint8_t** dp, uint32_t c)
  *
  * @param src[in] utf-8 string to convert
  * @param srclen[in] length of string in bytes to convert
- * @param dstlenp[out] length of utf-16 string in bytes
+ * @param dstlenp[out] length of utf-16 string in bytes, or NULL
  *
  * @return converted string
  *
@@ -109,7 +109,8 @@ static void putUtf8Char(uint8_t** dp, uint32_t c)
  */
 char* NewtUtf8To16(const char* src, size_t srclen, size_t* dstlenp)
 {
-    uint8_t* dBuffer = (uint8_t*)malloc(srclen * 4);
+    // at most 4 bytes per UTF-8 byte, and the 2-byte terminator
+    uint8_t* dBuffer = (uint8_t*)malloc(srclen * 4 + 2);
     uint8_t* d = dBuffer;
     const uint8_t* sBuffer = (uint8_t*)src;
     const uint8_t* s = sBuffer;
@@ -121,7 +122,7 @@ char* NewtUtf8To16(const char* src, size_t srclen, size_t* dstlenp)
     size_t n = d - dBuffer;
     *d++ = 0;
     *d++ = 0;
-    *dstlenp = n;
+    if (dstlenp) *dstlenp = n;
     return realloc(dBuffer, n + 2);
 }
 
@@ -132,7 +133,7 @@ char* NewtUtf8To16(const char* src, size_t srclen, size_t* dstlenp)
  *
  * @param src[in] utf-16 string to convert
  * @param srclen[in] length of string in bytes to convert
- * @param dstlenp[out] length of utf-8 string in bytes
+ * @param dstlenp[out] length of utf-8 string in bytes, or NULL
  *
  * @return converted string
  *
@@ -140,7 +141,8 @@ char* NewtUtf8To16(const char* src, size_t srclen, size_t* dstlenp)
  */
 char* NewtUtf16To8(const char* src, size_t srclen, size_t* dstlenp)
 {
-    uint8_t* dBuffer = (uint8_t*)malloc(srclen * 2);
+    // at most 2 bytes per UTF-16 byte, and the terminator
+    uint8_t* dBuffer = (uint8_t*)malloc(srclen * 2 + 1);
     uint8_t* d = dBuffer;
     const uint8_t* sBuffer = (uint8_t*)src;
     const uint8_t* s = sBuffer;
@@ -151,7 +153,7 @@ char* NewtUtf16To8(const char* src, size_t srclen, size_t* dstlenp)
     }
     size_t n = d - dBuffer;
     *d++ = 0;
-    *dstlenp = n;
+    if (dstlenp) *dstlenp = n;
     return realloc(dBuffer, n + 1);
 }
 

@@ -1,0 +1,31 @@
+// Basic language checks, and the fib sample.
+
+global failures := 0;
+global check(name, ok)
+	if not ok then begin
+		Print("FAIL: " & name & "\n");
+		failures := failures + 1;
+	end;
+
+check("integer arithmetic", 6 * 7 = 42);
+check("negative integers", -3 - 5 = -8);
+check("real arithmetic", 1.5 + 2.25 = 3.75);
+check("string concatenation", StrEqual("ab" & "cd", "abcd"));
+
+local f := {a: 1, b: {c: 2}};
+check("frame path", f.b.c = 2);
+
+local a := [1, 2, 3];
+AddArraySlot(a, 4);
+check("array length", Length(a) = 4);
+
+local caught := nil;
+try
+	Throw('|evt.ex.msg|, "boom");
+onexception |evt.ex.msg| do
+	caught := true;
+check("exception caught", caught);
+
+check("fib sample", Load("../sample/fib.newt") = 17711);
+
+if failures = 0 then Print("ALL OK\n");

@@ -1,0 +1,28 @@
+// protoFILE: write a file, read it back line by line.
+
+global failures := 0;
+global check(name, ok)
+	if not ok then begin
+		Print("FAIL: " & name & "\n");
+		failures := failures + 1;
+	end;
+
+Require("protoFILE");
+
+local dir := GetEnv("NEWT64_TEST_TMP");
+if not dir then dir := ".";
+local path := dir & "/protoFILE-test.txt";
+local f := {_proto: @protoFILE};
+f:Open(path, "w");
+f:Print("first\n");
+f:Print("second\n");
+f:Close();
+
+f := {_proto: @protoFILE};
+f:Open(path, "r");
+check("first line", StrEqual(f:Gets(), "first\n"));
+check("second line", StrEqual(f:Gets(), "second\n"));
+check("line count", f._lineno = 2);
+f:Close();
+
+if failures = 0 then Print("ALL OK\n");

@@ -1,0 +1,26 @@
+// protoREGEX, directly and through regex literals.
+
+global failures := 0;
+global check(name, ok)
+	if not ok then begin
+		Print("FAIL: " & name & "\n");
+		failures := failures + 1;
+	end;
+
+Require("protoREGEX");
+
+local re := {_proto: @protoREGEX, pattern: "([a-zA-Z]+)([0-9]*)", option: ""};
+local m := re:Match("foo123");
+check("match", m <> nil);
+if m then begin
+	check("group 1", StrEqual(m[1], "foo"));
+	check("group 2", StrEqual(m[2], "123"));
+end;
+check("no match", re:Match("!!!") = nil);
+
+// A literal /.../ calls MakeRegex, which builds on @protoREGEX.
+local lit := /([a-z]+)([0-9]*)/;
+m := lit:Match("bar42");
+check("literal match", m <> nil and StrEqual(m[1], "bar") and StrEqual(m[2], "42"));
+
+if failures = 0 then Print("ALL OK\n");

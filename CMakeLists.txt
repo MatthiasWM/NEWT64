@@ -12,8 +12,13 @@ set (CMAKE_CXX_STANDARD 14)
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
 
 	# MacOS
-	set (CMAKE_OSX_ARCHITECTURES "arm64;x86_64")
-	set (CMAKE_OSX_DEPLOYMENT_TARGET "10.13")
+	# Defaults; override them with -D. Xcode 27 needs a target of 12.0 or later.
+	if (NOT CMAKE_OSX_ARCHITECTURES)
+		set (CMAKE_OSX_ARCHITECTURES "arm64;x86_64")
+	endif ()
+	if (NOT CMAKE_OSX_DEPLOYMENT_TARGET)
+		set (CMAKE_OSX_DEPLOYMENT_TARGET "10.13")
+	endif ()
 	set (NEWT64_INSTALL_PREFIX "")
 
 elseif (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
@@ -46,13 +51,14 @@ endif ()
 # ---- Timestamp --------------------------------------------------------------
 #
 
-set_source_files_properties (${CMAKE_CURRENT_SOURCE_DIR}/src/version.h PROPERTIES GENERATED TRUE)
+# version.h is generated into the build tree, so the sources stay untouched
+# and several build directories can share one checkout.
 string (TIMESTAMP COMPILE_TIME_YYYY "%Y")
 string (TIMESTAMP COMPILE_TIME_MM "%m")
 string (TIMESTAMP COMPILE_TIME_DD "%d")
 configure_file(
 	${CMAKE_CURRENT_SOURCE_DIR}/src/version.h.in
-	${CMAKE_CURRENT_SOURCE_DIR}/src/version.h
+	${CMAKE_CURRENT_BINARY_DIR}/version.h
 )
 
 #
@@ -94,7 +100,7 @@ else ()
 endif ()
 
 set (headers
-	src/version.h
+	${CMAKE_CURRENT_BINARY_DIR}/version.h
 	src/newt_core/incs/NewtBC.h
 	src/newt_core/incs/NewtConf.h.in
 	src/newt_core/incs/NewtCore.h
@@ -152,6 +158,9 @@ add_library (libnewt64 STATIC
 set_target_properties(libnewt64
 	PROPERTIES OUTPUT_NAME newt64
 )
+
+# for the generated version.h
+target_include_directories (libnewt64 PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
 	target_compile_options(libnewt64 PUBLIC "/bigobj")
@@ -230,3 +239,78 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
 	set (CMAKE_EXPORT_PACKAGE_REGISTRY 1)
 	export(PACKAGE Newt64)
 endif()
+
+#
+# ---- extensions -------------------------------------------------------------
+#
+
+# Require("protoFILE") loads protoFILE<DYLIBSUFFIX> from the NEWTLIB path with
+# dlopen(). The extensions call back into newt64, which exports its symbols
+# (ENABLE_EXPORTS: -rdynamic on Linux).
+
+if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+	set (NEWT64_BUILD_EXTENSIONS_DEFAULT OFF)
+else ()
+	set (NEWT64_BUILD_EXTENSIONS_DEFAULT ON)
+endif ()
+option (NEWT64_BUILD_EXTENSIONS "Build the loadable extensions in ext/" ${NEWT64_BUILD_EXTENSIONS_DEFAULT})
+
+if (NEWT64_BUILD_EXTENSIONS)
+
+	set_target_properties (newt64 PROPERTIES ENABLE_EXPORTS ON)
+
+	foreach (ext protoFILE protoREGEX)
+		add_library (${ext} MODULE ext/${ext}/${ext}.c)
+		# Must match __DYLIBSUFFIX__ in the platform config.h, which is
+		# ".dylib" for every platform that uses incs/darwin.
+		set_target_properties (${ext} PROPERTIES PREFIX "" SUFFIX ".dylib")
+		# Only the headers: linking libnewt64 in would give each extension
+		# its own copy of the interpreter (and fails where it is not PIC).
+		target_include_directories (${ext} PRIVATE
+			$<TARGET_PROPERTY:libnewt64,INTERFACE_INCLUDE_DIRECTORIES>
+		)
+		if (APPLE)
+			# check the NEWT functions against newt64 at link time
+			target_link_options (${ext} PRIVATE "LINKER:-bundle_loader,$<TARGET_FILE:newt64>")
+			add_dependencies (${ext} newt64)
+		endif ()
+	endforeach ()
+
+	# __LIBDIR__ in config.h: /usr/local/lib/newt64
+	install (TARGETS protoFILE protoREGEX
+		LIBRARY DESTINATION ${NEWT64_INSTALL_PREFIX}lib/newt64
+	)
+
+endif ()
+
+#
+# ---- tests ------------------------------------------------------------------
+#
+
+# Each tests/*.newt script prints "FAIL" for a failed check and "ALL OK" when
+# it reaches its end. newt64 exits with 0 even after an uncaught exception, so
+# a test passes only when "ALL OK" appears. Scripts that write files put them
+# in NEWT64_TEST_TMP, the build directory. Run the tests with ctest.
+
+enable_testing ()
+
+file (GLOB NEWT64_TESTS CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.newt)
+if (NEWT64_BUILD_EXTENSIONS)
+	file (GLOB NEWT64_EXT_TESTS CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tests/ext/*.newt)
+	list (APPEND NEWT64_TESTS ${NEWT64_EXT_TESTS})
+endif ()
+
+foreach (test ${NEWT64_TESTS})
+	get_filename_component (test_name ${test} NAME_WE)
+	get_filename_component (test_dir ${test} DIRECTORY)
+	add_test (NAME ${test_name}
+		COMMAND ${CMAKE_COMMAND} -E env NEWTLIB=$<TARGET_FILE_DIR:newt64>
+			NEWT64_TEST_TMP=${CMAKE_CURRENT_BINARY_DIR}
+			$<TARGET_FILE:newt64> ${test}
+		WORKING_DIRECTORY ${test_dir}
+	)
+	set_tests_properties (${test_name} PROPERTIES
+		PASS_REGULAR_EXPRESSION "ALL OK"
+		FAIL_REGULAR_EXPRESSION "FAIL"
+	)
+endforeach ()

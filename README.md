@@ -2,7 +2,7 @@
 **This code is in the progress of being rewritten for 64bit**
 
 * done: convert all Xcode projects to 64bit
-* TODO: move build environment ot cmake
+* done: move build environment to cmake (see "Make CMake" below)
 * TODO: 
 
 
@@ -73,25 +73,34 @@ http://www.so-kukan.com/gnue/
 
 * Make CMake
 
-```
-;; Debug version
-mkdir \_Build\_; cd \_Build\_
-mkdir Debug; cd Debug
-cmake -DCMAKE\_BUILD\_TYPE=Debug ../..
-cmake --build .
-sudo cmake --install .
-```
+CMake builds the library, the `newt64` command, and the extensions in `ext/`
+(not on Windows). It needs flex and bison, except on Windows. Generated files,
+including `version.h`, go into the build directory.
+
 ```
 ;; Release version
-mkdir \_Build\_; cd \_Build\_
-mkdir Release; cd Release
-cmake -DCMAKE\_BUILD\_TYPE=Release ../..
-cmake --build .
-sudo cmake --install .
+cmake -S . -B _Build_/Release -DCMAKE_BUILD_TYPE=Release
+cmake --build _Build_/Release
+sudo cmake --install _Build_/Release
 ```
 ```
-;; Xcode version
-mkdir \_Build\_; cd \_Build\_
-mkdir Release; cd Release
-cmake -P Xcode ../..
+;; Debug version
+cmake -S . -B _Build_/Debug -DCMAKE_BUILD_TYPE=Debug
+cmake --build _Build_/Debug
 ```
+```
+;; Xcode version (Xcode 27 needs a deployment target of 12.0 or later)
+cmake -S . -B _Build_/Xcode -G Xcode -DCMAKE_OSX_DEPLOYMENT_TARGET=12.0
+```
+
+Options:
+
+  - `-DNEWT64_BUILD_EXTENSIONS=OFF` skips `ext/`.
+  - `-DCMAKE_OSX_DEPLOYMENT_TARGET=...` and `-DCMAKE_OSX_ARCHITECTURES=...`
+    replace the macOS defaults, 10.13 and `arm64;x86_64`.
+
+Extensions install into `lib/newt64`, where `Require()` finds them. Set
+`NEWTLIB` to a `:`-separated list of directories to look elsewhere.
+
+Tests: run `ctest` in the build directory (`ctest -C Release` for Xcode).
+The scripts are in `tests/`; see `tests/README.md`.

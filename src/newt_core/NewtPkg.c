@@ -101,6 +101,10 @@ typedef struct {
     uint32_t    part_align;     ///< align objects inside current part to 4 or 8 bytes
     newtRefVar	instances;		///< rw array holding the previously generated instance of any ref per part
     newtRefVar	precedents;		///< w  array referencing the instances array
+    newtRef *	precedent_keys;		///< w  hash index of precedents (kNewtRefUnbind: empty)
+    int32_t *	precedent_slots;	///< w  position of each key in precedents
+    uint32_t	precedent_capacity;	///< w  index size, a power of two
+    uint32_t	precedent_count;	///< w  keys in the index
     newtErr		lastErr;		///< r  a way to return error from deep below
     pkg_relocation_t relocations;
 } pkg_stream_t;
@@ -114,6 +118,7 @@ static uint32_t	PkgGetSlotInt(newtRefArg frame, newtRefArg name, uint32_t def);
 
 static newtRef	PkgPartGetPrecedent(pkg_stream_t *pkg, newtRefArg ref);
 static void		PkgPartSetPrecedent(pkg_stream_t *pkg, newtRefArg ref, newtRefArg val);
+static void		PkgPrecedentReset(pkg_stream_t *pkg);
 
 static void		PkgMakeRoom(pkg_stream_t *pkg, uint32_t offset, uint32_t size);
 static void		PkgWriteData(pkg_stream_t *pkg, uint32_t offset, void *data, uint32_t size);
@@ -174,9 +179,60 @@ int32_t PkgArraySearch(newtRefArg array, newtRefArg r)
  * @retval	ref to the previously written object
  * @retval	or kNewtRefUnbind if the object still needs to be written
  */
+static uint32_t PkgPrecedentHash(newtRef ref, uint32_t mask)
+{
+    uint64_t x = (uint64_t)ref;
+    x ^= x >> 33; x *= 0xff51afd7ed558ccdULL; x ^= x >> 33;
+    return (uint32_t)x & mask;
+}
+
+/** Position of ref in pkg->precedents, or -1. Objects do not move (the GC
+ * only marks and sweeps), so references are stable keys. This replaces a
+ * linear search that made large parts quadratic to write. */
+static int32_t PkgPrecedentFind(pkg_stream_t *pkg, newtRefArg ref)
+{
+    uint32_t mask, i;
+    if (!pkg->precedent_capacity) return -1;
+    mask = pkg->precedent_capacity - 1;
+    for (i = PkgPrecedentHash(ref, mask); pkg->precedent_keys[i] != kNewtRefUnbind; i = (i + 1) & mask)
+        if (pkg->precedent_keys[i] == ref) return pkg->precedent_slots[i];
+    return -1;
+}
+
+static void PkgPrecedentInsert(pkg_stream_t *pkg, newtRefArg ref, int32_t ix)
+{
+    uint32_t mask, i;
+    if ((pkg->precedent_count + 1) * 2 > pkg->precedent_capacity) {
+        uint32_t old_capacity = pkg->precedent_capacity, j;
+        newtRef *old_keys = pkg->precedent_keys;
+        int32_t *old_slots = pkg->precedent_slots;
+        pkg->precedent_capacity = old_capacity ? old_capacity * 2 : 1024;
+        pkg->precedent_keys = (newtRef*)malloc(pkg->precedent_capacity * sizeof(newtRef));
+        pkg->precedent_slots = (int32_t*)malloc(pkg->precedent_capacity * sizeof(int32_t));
+        for (j = 0; j < pkg->precedent_capacity; j++) pkg->precedent_keys[j] = kNewtRefUnbind;
+        pkg->precedent_count = 0;
+        for (j = 0; j < old_capacity; j++)
+            if (old_keys[j] != kNewtRefUnbind) PkgPrecedentInsert(pkg, old_keys[j], old_slots[j]);
+        free(old_keys); free(old_slots);
+    }
+    mask = pkg->precedent_capacity - 1;
+    for (i = PkgPrecedentHash(ref, mask); pkg->precedent_keys[i] != kNewtRefUnbind; i = (i + 1) & mask)
+        if (pkg->precedent_keys[i] == ref) return; // the first position wins, as with the search
+    pkg->precedent_keys[i] = ref;
+    pkg->precedent_slots[i] = ix;
+    pkg->precedent_count++;
+}
+
+static void PkgPrecedentReset(pkg_stream_t *pkg)
+{
+    free(pkg->precedent_keys); free(pkg->precedent_slots);
+    pkg->precedent_keys = NULL; pkg->precedent_slots = NULL;
+    pkg->precedent_capacity = pkg->precedent_count = 0;
+}
+
 newtRef PkgPartGetPrecedent(pkg_stream_t *pkg, newtRefArg ref)
 {
-    int32_t ix = PkgArraySearch(pkg->precedents, ref);
+    int32_t ix = PkgPrecedentFind(pkg, ref);
     if (ix>=0) {
         return NewtGetArraySlot(pkg->instances, ix);
     } else {
@@ -198,6 +254,7 @@ void PkgPartSetPrecedent(pkg_stream_t *pkg, newtRefArg ref, newtRefArg val)
     // we should consider implementing a binary search tree at some point
     NewtInsertArraySlot(pkg->instances, n, val);
     NewtInsertArraySlot(pkg->precedents, n, ref);
+    PkgPrecedentInsert(pkg, ref, (int32_t)n);
 }
 
 /*------------------------------------------------------------------------*/
@@ -567,6 +624,7 @@ void PkgWritePart(pkg_stream_t *pkg, newtRefArg part)
     
     pkg->instances = NewtMakeArray(kNewtRefUnbind, 0);
     pkg->precedents = NewtMakeArray(kNewtRefUnbind, 0);
+    PkgPrecedentReset(pkg);
 
     pkg->part_align = PkgGetSlotInt(part, NSSYM(align), 0);
     if (pkg->part_align!=4 && pkg->part_align!=8) pkg->part_align = 8;
@@ -578,6 +636,7 @@ void PkgWritePart(pkg_stream_t *pkg, newtRefArg part)
     
     NewtSetLength(pkg->precedents, 0);
     NewtSetLength(pkg->instances, 0);
+    PkgPrecedentReset(pkg);
     
     PkgMakeRoom(pkg, PkgAlign(pkg, pkg->size), 0);
     part_size = pkg->size - pkg->part_offset;
